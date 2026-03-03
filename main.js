@@ -669,21 +669,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (expPreview && window.innerWidth > 768) {
-        // Resume blocks — support both data-images (legacy) and data-media (with video)
-        document.querySelectorAll('.resume-block[data-images], .resume-block[data-media]').forEach(block => {
-            const srcs = JSON.parse(block.dataset.media || block.dataset.images || '[]');
-            srcs.forEach(src => {
-                if (!src.startsWith('video:')) { const img = new Image(); img.src = src; }
+        // Preload cache — track which source arrays have been preloaded
+        const preloadedSets = new WeakSet();
+        const loadedImages = new Map(); // src → Image (fully loaded)
+
+        function staggeredPreload(srcs) {
+            srcs.forEach((src, i) => {
+                if (src.startsWith('video:') || loadedImages.has(src)) return;
+                setTimeout(() => {
+                    const img = new Image();
+                    img.onload = () => loadedImages.set(src, img);
+                    img.src = src;
+                }, i * 150);
             });
-            block.addEventListener('mouseenter', (e) => startSlideshow(srcs, e));
+        }
+
+        // Lazy preload: start loading when element is near viewport
+        const preloadObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const srcs = JSON.parse(el.dataset.media || el.dataset.images || '[]');
+                    staggeredPreload(srcs);
+                    preloadObserver.unobserve(el);
+                }
+            });
+        }, { rootMargin: '300px 0px' }); // start preloading 300px before visible
+
+        // Setup for resume blocks
+        document.querySelectorAll('.resume-block[data-images], .resume-block[data-media]').forEach(block => {
+            preloadObserver.observe(block);
+            block.addEventListener('mouseenter', (e) => {
+                const srcs = JSON.parse(block.dataset.media || block.dataset.images || '[]');
+                staggeredPreload(srcs); // ensure preloading starts on hover too
+                startSlideshow(srcs, e);
+            });
             block.addEventListener('mouseleave', hidePreview);
             block.addEventListener('mousemove', positionPreview);
         });
-        // Project lines
+
+        // Setup for project lines
         document.querySelectorAll('.project-line[data-media]').forEach(line => {
-            const srcs = JSON.parse(line.dataset.media || '[]');
-            srcs.forEach(src => { if (!src.startsWith('video:')) { const img = new Image(); img.src = src; } });
-            line.addEventListener('mouseenter', (e) => startSlideshow(srcs, e));
+            preloadObserver.observe(line);
+            line.addEventListener('mouseenter', (e) => {
+                const srcs = JSON.parse(line.dataset.media || '[]');
+                staggeredPreload(srcs);
+                startSlideshow(srcs, e);
+            });
             line.addEventListener('mouseleave', hidePreview);
             line.addEventListener('mousemove', positionPreview);
         });
