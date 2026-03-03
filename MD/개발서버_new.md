@@ -24,13 +24,15 @@ description: 개발서버 자동 시작 (범용 템플릿)
 ## 실행 순서
 
 ### 1단계: 기존 서버 종료
-```bash
-lsof -ti:9000 | xargs kill -9 2>/dev/null; sleep 1
+```powershell
+$conn = Get-NetTCPConnection -LocalPort 9000 -ErrorAction SilentlyContinue
+if ($conn) { Stop-Process -Id $conn.OwningProcess -Force -ErrorAction SilentlyContinue }
+Start-Sleep -Seconds 1
 ```
 
 ### 2단계: 새 서버 시작
-```bash
-python3 -m http.server 9000
+```powershell
+python -m http.server 9000
 ```
 
 서버 URL: http://localhost:9000
@@ -38,10 +40,10 @@ python3 -m http.server 9000
 ---
 
 ## 수동 실행 (터미널에서 직접)
-```bash
+```powershell
 # 프로젝트 루트 폴더로 이동 후
-cd /your/project/root
-python3 -m http.server 8000
+cd C:\Users\soxmf\Downloads\jinprofile
+python -m http.server 8000
 ```
 서버 URL: http://localhost:8000
 
@@ -53,12 +55,12 @@ python3 -m http.server 8000
 위 명령어에서 `9000` 또는 `8000`을 원하는 포트 번호로 변경하세요.
 
 ### Node.js 서버 사용 시
-```bash
+```powershell
 npx -y live-server --port=9000 --no-browser
 ```
 장점: 파일 변경 시 자동 새로고침(Live Reload) 지원
 
 ### 특정 디렉토리만 서빙
-```bash
-python3 -m http.server 9000 --directory ./dist
+```powershell
+python -m http.server 9000 --directory ./dist
 ```
