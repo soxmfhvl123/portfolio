@@ -957,7 +957,6 @@ button {
     letter-spacing: -0.02em;
     margin-bottom: 48px;
     color: var(--text-primary);
-    white-space: nowrap;
 }
 
 .futureofgd-body p {
@@ -1188,6 +1187,23 @@ button {
 
     .nav-status {
         display: none;
+    }
+
+    .futureofgd-title {
+        font-size: clamp(36px, 12vw, 80px);
+    }
+
+    .futureofgd-text {
+        padding: 60px 24px 0;
+    }
+
+    .futureofgd-subtitle {
+        font-size: clamp(16px, 4.5vw, 22px);
+    }
+
+    .clock-face-big {
+        width: clamp(280px, 70vw, 400px);
+        height: clamp(280px, 70vw, 400px);
     }
 }
 
