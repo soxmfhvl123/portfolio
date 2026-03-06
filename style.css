@@ -1001,6 +1001,15 @@ button {
     transform: translateY(0);
 }
 
+/* Vibe Coding Single Grid Override */
+.vibe-coding-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    position: relative;
+    cursor: pointer;
+}
+
 /* ===== FUTURE OF GRAPHIC DESIGNER ===== */
 .futureofgd {
     background: var(--bg);
