@@ -136,14 +136,14 @@ class MonoOrchestra {
                     float nx = snoise(noisePos + vec3(flow, 0.0, 0.0));
                     float ny = snoise(noisePos + vec3(0.0, flow, 0.0));
                     float nz = snoise(noisePos + vec3(0.0, 0.0, flow));
-                    // SUBTLE REACTIVITY: 30% of extreme version
-                    vec3 fluidOffset = vec3(nx, ny, nz) * (1.5 + uTreble * 7.5 + uBass * 4.5);
+                    // CALM AMBIENT REACTIVITY: Drastically reduced values (approx 10-15% of extreme)
+                    vec3 fluidOffset = vec3(nx, ny, nz) * (1.5 + uTreble * 1.5 + uBass * 1.0);
                     vec3 finalPos = iPos + fluidOffset;
                     
                     vAlpha = 1.0 - (abs(finalPos.z) / 40.0);
 
-                    // Dynamic Pumping: Reduced scale hit to 30%
-                    float dynamicScale = aScale * (1.0 + uBass * 2.4 + uTreble * 0.6);
+                    // Dynamic Pumping: Barely noticeable, gentle pulse instead of massive explosion
+                    float dynamicScale = aScale * (1.0 + uBass * 0.4 + uTreble * 0.1);
 
                     vec4 mvPosition = viewMatrix * vec4(finalPos, 1.0);
                     mvPosition.xyz += position * dynamicScale; 
@@ -236,8 +236,8 @@ class MonoOrchestra {
         requestAnimationFrame(this.animate);
         const deltaTime = this.clock.getDelta();
         
-        // SUBTLE REACTIVITY: 30% warp speed
-        this.flowTime += deltaTime * (0.1 + this.audioData.bass * 0.75);
+        // CALM AMBIENT REACTIVITY: Gentle speed up on bass
+        this.flowTime += deltaTime * (0.1 + this.audioData.bass * 0.4);
 
         this.currentMouse3D.lerp(this.targetMouse3D, 0.1);
 
