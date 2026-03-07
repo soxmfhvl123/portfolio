@@ -119,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let imgObj = new Image();
     let animationId;
     let mousePos = { x: 0.5, y: 0.5 }; // Initialize to center to prevent top-left jumping
+    let currentMode = 0; // Distinct animation profile per track
 
     window.addEventListener('mousemove', (e) => {
         const rect = canvas.getBoundingClientRect();
@@ -218,32 +219,56 @@ document.addEventListener('DOMContentLoaded', () => {
             let rot = 0;
 
             // DIVERSE MOTION PROFILES:
-            if (i < 2) {
-                // Dark Layers (Shadows/Background): Visually appealing "Sway & Pump"
-                // Independent X/Y waving based on time and audio energy
-                moveX += Math.cos(time * (1.5 + i)) * (energy * 25);
-                moveY += Math.sin(time * (1.2 - i)) * (energy * 30);
-                
-                // Aggressive, opposing scale bumps on heavy bass
-                if (energy > 0.4) {
-                    scale += (energy - 0.4) * 0.2 * rotDir; // One expands, one retracts
+            if (currentMode === 0) {
+                // PROFILE 0: "The Sway" (Original Deep Refinement)
+                if (i < 2) {
+                    moveX += Math.cos(time * (1.5 + i)) * (energy * 25);
+                    moveY += Math.sin(time * (1.2 - i)) * (energy * 30);
+                    if (energy > 0.4) scale += (energy - 0.4) * 0.2 * rotDir;
+                    rot = Math.sin(time * 0.8 + i) * rotDir * (energy * 0.1);
+                } else {
+                    moveY -= (energy * depth * 35); 
+                    rot = Math.sin(time * (2.0 + i*0.5) + i) * rotDir * (energy * 0.06);
                 }
-                
-                // Slower, wider rotation for dark elements
-                rot = Math.sin(time * 0.8 + i) * rotDir * (energy * 0.1);
-
+            } else if (currentMode === 1) {
+                // PROFILE 1: "The Pulse & Tremor" (Aggressive scale, shaking)
+                scale = 1.0 + (energy * 0.15) + (depth * 0.05 * energy); // Heavier scale
+                if (i < 2) {
+                    moveY += (energy * 20); // Heavy drop down
+                    rot = 0; // Stiff
+                } else {
+                    // Tremor on high energy
+                    if (energy > 0.3) {
+                        moveX += (Math.random() - 0.5) * energy * 40;
+                        moveY += (Math.random() - 0.5) * energy * 40;
+                    }
+                    rot = (Math.random() - 0.5) * energy * 0.1;
+                }
+            } else if (currentMode === 2) {
+                // PROFILE 2: "The Vortex" (Heavy continuous rotation)
+                if (i < 2) {
+                    rot = (time * 0.5) * rotDir + (energy * 0.3 * rotDir);
+                    scale = 1.0 + (energy * 0.1);
+                } else {
+                    rot = -(time * 0.8) * rotDir - (energy * 0.5 * rotDir);
+                    moveX += Math.cos(time * 2 + i) * (energy * 40);
+                    moveY += Math.sin(time * 2 + i) * (energy * 40);
+                }
             } else {
-                // Light Layers (Highlights/Text): Sharp "Flutter & Rise"
-                moveY -= (energy * depth * 35); // Shoot upwards
-                
-                // Faster, tighter rotation for bright elements
-                let rotSpeed = 2.0 + (i * 0.5);
-                rot = Math.sin(time * rotSpeed + i) * rotDir * (energy * 0.06);
+                // PROFILE 3: "The Shear Slide" (Horizontal/Vertical aggressive sliding)
+                rot = 0; // No rotation, pure sliding
+                if (i % 2 === 0) {
+                    moveX += (energy * depth * 80) * rotDir; // Aggressive X
+                } else {
+                    moveY += (energy * depth * 80) * rotDir; // Aggressive Y
+                }
+                scale = 1.0 + (energy * 0.05);
             }
             
             ctx.translate(cx + moveX, cy + moveY);
             ctx.scale(scale, scale);
             ctx.rotate(rot);
+
             
             // Glow effect for highlights on peaks
             if (i >= NUM_LAYERS - 2 && energy > 0.4) {
@@ -290,10 +315,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function openModal(track) {
+        currentMode = track.id % 4; // Assign 1 of 4 distinct profiles
+
         mRank.textContent = `#${String(track.id).padStart(2, '0')}`;
         mTitle.textContent = track.title;
         mArtist.textContent = track.artist;
         mLyrics.textContent = track.lyrics;
+
 
         imgObj.onload = () => {
             console.log("Image Loaded: " + track.image);
