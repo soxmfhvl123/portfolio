@@ -113,7 +113,12 @@ document.addEventListener('DOMContentLoaded', () => {
     analyser.smoothingTimeConstant = 0.5; // Faster reaction
     const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-    let segments = [];
+    let layerDarkCanvas = document.createElement('canvas');
+    let layerLightCanvas = document.createElement('canvas');
+    let layerDarkCtx = layerDarkCanvas.getContext('2d');
+    let layerLightCtx = layerLightCanvas.getContext('2d');
+    let smoothBass = 0;
+    let smoothTreble = 0;
     let imgObj = new Image();
     let animationId;
     let mousePos = { x: -1, y: -1 };
@@ -129,40 +134,43 @@ document.addEventListener('DOMContentLoaded', () => {
         if (audioCtx.state === 'suspended') audioCtx.resume();
     }, { once: true });
 
-    // Analyze image brightness to create segments (Shadows vs Highlights)
-    function initLumaSegments() {
+    // Analyze image brightness and split into exact black & white structural layers
+    function initLumaLayers() {
+        const w = imgObj.width;
+        const h = imgObj.height;
+        
+        layerDarkCanvas.width = w;
+        layerDarkCanvas.height = h;
+        layerLightCanvas.width = w;
+        layerLightCanvas.height = h;
+        
         const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = w;
+        tempCanvas.height = h;
         const tctx = tempCanvas.getContext('2d');
-        tempCanvas.width = 100; // Low res scan
-        tempCanvas.height = 100;
-        tctx.drawImage(imgObj, 0, 0, 100, 100);
-        const data = tctx.getImageData(0, 0, 100, 100).data;
-
-        segments = [];
-        const step = 4; // Sample every 4 pixels for performance
-        const scaleX = canvas.width / 100;
-        const scaleY = canvas.height / 100;
-
-        for (let y = 0; y < 100; y += step) {
-            for (let x = 0; x < 100; x += step) {
-                const i = (y * 100 + x) * 4;
-                const r = data[i], g = data[i+1], b = data[i+2];
-                const luma = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-                segments.push({
-                    x: x * scaleX,
-                    y: y * scaleY,
-                    originX: x * scaleX,
-                    originY: y * scaleY,
-                    w: step * scaleX,
-                    h: step * scaleY,
-                    luma: luma, // 0 = dark, 1 = light
-                    vx: 0,
-                    vy: 0,
-                    phase: Math.random() * Math.PI * 2
-                });
+        tctx.drawImage(imgObj, 0, 0);
+        
+        const imgData = tctx.getImageData(0, 0, w, h);
+        const data = imgData.data;
+        
+        const darkData = layerDarkCtx.createImageData(w, h);
+        const lightData = layerLightCtx.createImageData(w, h);
+        
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
+            const luma = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            
+            if (luma < 0.5) {
+                // Dark pixel (Shadows, background)
+                darkData.data[i] = r; darkData.data[i+1] = g; darkData.data[i+2] = b; darkData.data[i+3] = a;
+            } else {
+                // Light pixel (Text, highlights)
+                lightData.data[i] = r; lightData.data[i+1] = g; lightData.data[i+2] = b; lightData.data[i+3] = a;
             }
         }
+        
+        layerDarkCtx.putImageData(darkData, 0, 0);
+        layerLightCtx.putImageData(lightData, 0, 0);
     }
 
     function animate() {
@@ -176,40 +184,59 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 20; i < 60; i++) high += dataArray[i];
         high /= 40;
 
-        // DEBUG LOG: Let's see if we get actual data
-        if (Date.now() % 1000 < 20) {
-            console.log(`Audio Analysis - Bass: ${low.toFixed(2)}, Treble: ${high.toFixed(2)}`);
-        }
+        // Smooth Interpolation for "Visually Appealing" non-chaotic movement
+        const targetBass = low / 255;
+        const targetTreble = high / 255;
+        smoothBass += (targetBass - smoothBass) * 0.15;
+        smoothTreble += (targetTreble - smoothTreble) * 0.2;
 
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // EXTRA BOOST for visibility
-        const bassFactor = (low / 255) * 1.5;
-        const trebleFactor = (high / 255) * 1.5;
+        const w = canvas.width;
+        const h = canvas.height;
+        const cx = w / 2;
+        const cy = h / 2;
 
-        segments.forEach(s => {
-            s.vx += (s.originX - s.x) * 0.1;
-            s.vy += (s.originY - s.y) * 0.1;
+        // Dark Layer (Bass driven) - Slow, heavy heartbeat expansion
+        const darkScale = 1 + (smoothBass * 0.04);
+        const darkY = smoothBass * 10;
+        
+        ctx.save();
+        ctx.translate(cx, cy + darkY);
+        ctx.scale(darkScale, darkScale);
+        ctx.drawImage(layerDarkCanvas, -cx, -cy, w, h);
+        ctx.restore();
 
-            const reaction = s.luma > 0.5 ? trebleFactor * 60 : bassFactor * 100;
-            const wave = Math.sin(Date.now() * 0.003 + s.phase) * (bassFactor * 20);
-            
-            s.vx += (Math.random() - 0.5) * reaction;
-            s.vy += (Math.random() - 0.5) * reaction + wave;
+        // Light Layer (Treble driven) - Quick, sharp float/flutter upwards
+        const lightScale = 1 + (smoothTreble * 0.05);
+        const lightY = -smoothTreble * 15;
+        
+        ctx.save();
+        // Add subtle mouse parallax for depth
+        let parallaxX = 0, parallaxY = 0;
+        if (mousePos.x !== -1) {
+            parallaxX = (mousePos.x - 0.5) * 15;
+            parallaxY = (mousePos.y - 0.5) * 15;
+        }
+        
+        ctx.translate(cx + parallaxX, cy + lightY + parallaxY);
+        ctx.scale(lightScale, lightScale);
+        
+        // Dynamic glow on high energy
+        if (smoothTreble > 0.3) {
+            ctx.shadowColor = 'rgba(255,255,255,0.4)';
+            ctx.shadowBlur = smoothTreble * 20;
+        }
+        
+        ctx.drawImage(layerLightCanvas, -cx, -cy, w, h);
+        ctx.restore();
 
-            s.vx *= 0.8;
-            s.vy *= 0.8;
-            s.x += s.vx;
-            s.y += s.vy;
-
-            ctx.drawImage(imgObj, s.originX, s.originY, s.w, s.h, s.x, s.y, s.w, s.h);
-        });
-
-        if (bassFactor > 0.3) {
-            ctx.globalAlpha = 0.3;
+        // Global composite flash for heavy drops
+        if (smoothBass > 0.6) {
+            ctx.globalAlpha = (smoothBass - 0.6) * 0.6;
             ctx.globalCompositeOperation = 'lighter';
-            ctx.drawImage(canvas, -4, -4, canvas.width+8, canvas.height+8);
+            ctx.drawImage(canvas, -2, -2, w+4, h+4);
             ctx.globalCompositeOperation = 'source-over';
             ctx.globalAlpha = 1.0;
         }
@@ -249,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Image Loaded: " + track.image);
             canvas.width = imgObj.width;
             canvas.height = imgObj.height;
-            initLumaSegments();
+            initLumaLayers();
             
             if (track.audio) {
                 console.log("Playing local audio for analysis: " + track.audio);
