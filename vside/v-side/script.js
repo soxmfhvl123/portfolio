@@ -209,19 +209,39 @@ document.addEventListener('DOMContentLoaded', () => {
             const depth = i / (NUM_LAYERS - 1); // 0.0 to 1.0 (Dark to Light)
             const energy = smoothBands[i];
             
-            // Parallax shift based on depth
-            const shiftX = px * (0.2 + depth * 0.8);
-            const shiftY = py * (0.2 + depth * 0.8);
+            // Base Parallax shift
+            let moveX = px * (0.2 + depth * 0.8);
+            let moveY = py * (0.2 + depth * 0.8);
             
-            // Scaling and Y movement based on energy
             let scale = 1.0 + (energy * 0.08) + (depth * 0.02 * energy);
-            let moveY = shiftY - (energy * depth * 25); 
-            
-            // Subtle rotation alternating per layer
             let rotDir = i % 2 === 0 ? 1 : -1;
-            let rot = Math.sin(time + i) * rotDir * (energy * 0.04);
+            let rot = 0;
+
+            // DIVERSE MOTION PROFILES:
+            if (i < 2) {
+                // Dark Layers (Shadows/Background): Visually appealing "Sway & Pump"
+                // Independent X/Y waving based on time and audio energy
+                moveX += Math.cos(time * (1.5 + i)) * (energy * 25);
+                moveY += Math.sin(time * (1.2 - i)) * (energy * 30);
+                
+                // Aggressive, opposing scale bumps on heavy bass
+                if (energy > 0.4) {
+                    scale += (energy - 0.4) * 0.2 * rotDir; // One expands, one retracts
+                }
+                
+                // Slower, wider rotation for dark elements
+                rot = Math.sin(time * 0.8 + i) * rotDir * (energy * 0.1);
+
+            } else {
+                // Light Layers (Highlights/Text): Sharp "Flutter & Rise"
+                moveY -= (energy * depth * 35); // Shoot upwards
+                
+                // Faster, tighter rotation for bright elements
+                let rotSpeed = 2.0 + (i * 0.5);
+                rot = Math.sin(time * rotSpeed + i) * rotDir * (energy * 0.06);
+            }
             
-            ctx.translate(cx + shiftX, cy + moveY);
+            ctx.translate(cx + moveX, cy + moveY);
             ctx.scale(scale, scale);
             ctx.rotate(rot);
             
