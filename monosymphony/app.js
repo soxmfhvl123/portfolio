@@ -136,14 +136,14 @@ class MonoOrchestra {
                     float nx = snoise(noisePos + vec3(flow, 0.0, 0.0));
                     float ny = snoise(noisePos + vec3(0.0, flow, 0.0));
                     float nz = snoise(noisePos + vec3(0.0, 0.0, flow));
-                    // BALANCED REACTIVITY: Reduced multipliers by half from the extreme version
-                    vec3 fluidOffset = vec3(nx, ny, nz) * (1.5 + uTreble * 12.5 + uBass * 7.5);
+                    // SUBTLE REACTIVITY: 30% of extreme version
+                    vec3 fluidOffset = vec3(nx, ny, nz) * (1.5 + uTreble * 7.5 + uBass * 4.5);
                     vec3 finalPos = iPos + fluidOffset;
                     
                     vAlpha = 1.0 - (abs(finalPos.z) / 40.0);
 
-                    // Dynamic Pumping: Reduced scale hit by half
-                    float dynamicScale = aScale * (1.0 + uBass * 4.0 + uTreble * 1.0);
+                    // Dynamic Pumping: Reduced scale hit to 30%
+                    float dynamicScale = aScale * (1.0 + uBass * 2.4 + uTreble * 0.6);
 
                     vec4 mvPosition = viewMatrix * vec4(finalPos, 1.0);
                     mvPosition.xyz += position * dynamicScale; 
@@ -159,7 +159,8 @@ class MonoOrchestra {
                     if (distance > 1.0) discard;
                     
                     float intensity = exp(-distance * 3.0); 
-                    float alpha = intensity * vAlpha;
+                    // Tamed Bloom: Reduced final alpha by 50% to prevent blow-out from additive blending
+                    float alpha = intensity * vAlpha * 0.5;
                     
                     gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
                 }
@@ -235,8 +236,8 @@ class MonoOrchestra {
         requestAnimationFrame(this.animate);
         const deltaTime = this.clock.getDelta();
         
-        // BALANCED REACTIVITY: Halved warp speed
-        this.flowTime += deltaTime * (0.1 + this.audioData.bass * 1.25);
+        // SUBTLE REACTIVITY: 30% warp speed
+        this.flowTime += deltaTime * (0.1 + this.audioData.bass * 0.75);
 
         this.currentMouse3D.lerp(this.targetMouse3D, 0.1);
 
