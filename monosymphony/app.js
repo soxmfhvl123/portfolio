@@ -136,16 +136,14 @@ class MonoOrchestra {
                     float nx = snoise(noisePos + vec3(flow, 0.0, 0.0));
                     float ny = snoise(noisePos + vec3(0.0, flow, 0.0));
                     float nz = snoise(noisePos + vec3(0.0, 0.0, flow));
-                    
-                    // INCREASED REACTIVITY: multiplied uTreble effect
-                    // EXTREME REACTIVITY: 25x multiplier for treble, 15x for bass in scatter range
-                    vec3 fluidOffset = vec3(nx, ny, nz) * (2.0 + uTreble * 25.0 + uBass * 15.0);
+                    // BALANCED REACTIVITY: Reduced multipliers by half from the extreme version
+                    vec3 fluidOffset = vec3(nx, ny, nz) * (1.5 + uTreble * 12.5 + uBass * 7.5);
                     vec3 finalPos = iPos + fluidOffset;
                     
                     vAlpha = 1.0 - (abs(finalPos.z) / 40.0);
 
-                    // Dynamic Pumping: Increase individual star footprint size heavily on bass
-                    float dynamicScale = aScale * (1.0 + uBass * 8.0 + uTreble * 2.0);
+                    // Dynamic Pumping: Reduced scale hit by half
+                    float dynamicScale = aScale * (1.0 + uBass * 4.0 + uTreble * 1.0);
 
                     vec4 mvPosition = viewMatrix * vec4(finalPos, 1.0);
                     mvPosition.xyz += position * dynamicScale; 
@@ -237,9 +235,8 @@ class MonoOrchestra {
         requestAnimationFrame(this.animate);
         const deltaTime = this.clock.getDelta();
         
-        // INCREASED REACTIVITY: higher base speed and stronger bass reaction
-        // EXTREME REACTIVITY: Warp speed on bass hits
-        this.flowTime += deltaTime * (0.1 + this.audioData.bass * 2.5);
+        // BALANCED REACTIVITY: Halved warp speed
+        this.flowTime += deltaTime * (0.1 + this.audioData.bass * 1.25);
 
         this.currentMouse3D.lerp(this.targetMouse3D, 0.1);
 
