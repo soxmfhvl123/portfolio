@@ -1,0 +1,269 @@
+:root {
+    --bg-base: #1a1a1a;
+    --ui-bg: rgba(26, 26, 26, 0.6);
+    --ui-border: rgba(255, 255, 255, 0.1);
+    --text-primary: #ffffff;
+    --text-secondary: #888888;
+    --accent: #0077ff;
+    /* Blue from the grid */
+
+    --font-ui: 'Inter', sans-serif;
+    --font-ascii: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* --- Canvas Background --- */
+.bg-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* --- UI Layer --- */
+.ui-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+    /* Let clicks pass down except specific elements */
+}
+
+.app-header,
+.left-panel,
+.action-bar {
+    pointer-events: auto;
+}
+
+/* Header */
+.app-header {
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--ui-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--ui-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.app-header h1 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.slider {
+    accent-color: var(--accent);
+    cursor: pointer;
+    width: 150px;
+}
+
+#resValue {
+    width: 30px;
+    text-align: right;
+    font-family: var(--font-ascii);
+    color: var(--text-primary);
+}
+
+/* Main Layout */
+.app-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: transparent;
+}
+
+.left-panel {
+    padding: 40px;
+    border-right: 1px solid var(--ui-border);
+    background-color: var(--ui-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    max-width: 400px;
+}
+
+.right-panel {
+    padding: 0;
+}
+
+/* Dropzone */
+.dropzone {
+    flex: 1;
+    border: 1px dashed var(--text-secondary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.dropzone:hover,
+.dropzone.dragover {
+    border-color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.drop-content {
+    text-align: center;
+    color: var(--text-secondary);
+    transition: opacity 0.3s;
+}
+
+.dropzone.has-image .drop-content {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.upload-icon {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 24px;
+    color: var(--text-secondary);
+}
+
+.drop-content h2 {
+    color: var(--text-primary);
+    font-weight: 400;
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+#fileInput {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+#imagePreview {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+    z-index: 1;
+    opacity: 0.5;
+    mix-blend-mode: luminosity;
+    /* Monotone preview */
+}
+
+/* ASCII Output */
+.output-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    padding: 40px;
+}
+
+.ascii-art {
+    font-family: var(--font-ascii);
+    /* Magic numbers to fix monospace character distortion */
+    line-height: 0.6em;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    white-space: pre;
+    text-align: center;
+    /* Removed flex to allow text to shrink properly */
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    transition: font-size 0.1s;
+    /* Optional: Subtle drop shadow makes it pop */
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+/* Buttons */
+.action-bar {
+    padding: 20px 40px;
+    border-top: 1px solid var(--ui-border);
+    display: flex;
+    justify-content: flex-end;
+    background-color: var(--ui-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.btn {
+    padding: 12px 24px;
+    background-color: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--text-primary);
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    background-color: var(--text-primary);
+    color: var(--bg-base);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .app-main {
+        flex-direction: column;
+    }
+
+    .left-panel {
+        max-width: 100%;
+        max-height: 300px;
+        border-right: none;
+        border-bottom: 1px solid var(--ui-border);
+    }
+}
