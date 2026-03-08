@@ -268,3 +268,52 @@ html {
     color: rgba(255, 255, 255, 0.3);
     letter-spacing: 0.05em;
 }
+
+/* Tablet / iPad Portrait Optimization */
+@media screen and (max-width: 1024px) {
+    .ui-layer {
+        padding: 2rem;
+    }
+    .title {
+        font-size: 2rem;
+    }
+    .subtitle {
+        font-size: 0.7rem;
+    }
+    .lang-toggle {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.8rem;
+    }
+    .playlist-panel {
+        width: 320px;
+        right: 2rem;
+    }
+}
+
+/* Mobile Optimization */
+@media screen and (max-width: 768px) {
+    .ui-layer {
+        padding: 1.5rem;
+    }
+    .header-top {
+        align-items: center; /* Keep toggle on same line */
+    }
+    .title {
+        font-size: 1.5rem;
+    }
+    .subtitle {
+        font-size: 0.6rem;
+    }
+    .playlist-panel {
+        width: calc(100% - 3rem);
+        right: 1.5rem;
+        height: 50vh;
+        top: 55%;
+    }
+    .track-item {
+        font-size: 0.9rem;
+    }
+    .now-playing {
+        font-size: 1rem;
+    }
+}

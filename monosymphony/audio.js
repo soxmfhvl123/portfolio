@@ -73,7 +73,10 @@ class AudioVisualizer {
 
     initAudioContext() {
         if (!this.audioContext) {
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            // Safari prefix required for older iOS
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.audioContext = new AudioContext();
+            
             this.analyser = this.audioContext.createAnalyser();
             this.analyser.fftSize = 2048; // High resolution
             this.analyser.smoothingTimeConstant = 0.8;
@@ -88,55 +91,86 @@ class AudioVisualizer {
     }
 
     initEvents() {
+        // iOS Safari Audio Unlock Helper
+        const unlockAudio = () => {
+            if (this.audioContext && this.audioContext.state === 'suspended') {
+                this.audioContext.resume();
+            }
+            // Remove listener once unlocked
+            document.removeEventListener('touchstart', unlockAudio);
+            document.removeEventListener('click', unlockAudio);
+        };
+        document.addEventListener('touchstart', unlockAudio, { once: true });
+        document.addEventListener('click', unlockAudio, { once: true });
+
         // Track Selection
         this.trackItems.forEach(item => {
             item.addEventListener('click', (e) => {
-                // Initialize audio context on first user interaction
+                // Initialize audio context synchronously on strict iOS Safari
                 this.initAudioContext();
                 if (this.audioContext.state === 'suspended') {
                     this.audioContext.resume();
                 }
 
-                // Remove active class from all
                 this.trackItems.forEach(i => i.classList.remove('active'));
-
-                // Set new track
-                e.target.classList.add('active');
-                const src = e.target.getAttribute('data-src');
                 
-                // Fetch the track name depending on active language
-                this.currentTrackName.textContent = e.target.getAttribute(`data-title-${this.currentLang}`);
+                // We must use currentTarget to ensure we get the LI, not a span inside it
+                const targetNode = e.currentTarget;
+                targetNode.classList.add('active');
+                
+                const src = targetNode.getAttribute('data-src');
+                this.currentTrackName.textContent = targetNode.getAttribute(`data-title-${this.currentLang}`);
 
+                // Direct synchronous assignment and play to satisfy iOS Safari
                 this.audio.src = src;
-                this.audio.play().then(() => {
+                this.audio.load();
+                
+                const playPromise = this.audio.play();
+
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        this.isPlaying = true;
+                        this.playPauseBtn.disabled = false;
+                        this.playPauseBtn.innerText = "PAUSE";
+                        this.playingIndicator.classList.add('active');
+                    }).catch(error => {
+                        console.log("iOS Autoplay prevented or file missing:", error);
+                        // Fallback UI if Safari still blocks
+                        this.isPlaying = false;
+                        this.playPauseBtn.disabled = false;
+                        this.playPauseBtn.innerText = "PLAY";
+                        this.playingIndicator.classList.remove('active');
+                    });
+                } else {
+                    // Older browsers
                     this.isPlaying = true;
-                    this.playPauseBtn.disabled = false;
                     this.playPauseBtn.innerText = "PAUSE";
                     this.playingIndicator.classList.add('active');
-
-                    // Animation now stays continuous as requested
-                }).catch(err => {
-                    console.log("Audio play error (usually means missing mp3 file):", err);
-                    this.currentTrackName.innerText = "[FILE NOT FOUND] Place MP3 in /audio/";
-                    this.isPlaying = false;
-                    this.playingIndicator.classList.remove('active');
-                    this.playPauseBtn.innerText = "PLAY";
-                });
+                }
             });
         });
 
         // Play/Pause Button
         this.playPauseBtn.addEventListener('click', () => {
+            this.initAudioContext(); // Ensure context exists on fallback path
+            
             if (this.isPlaying) {
                 this.audio.pause();
                 this.isPlaying = false;
                 this.playPauseBtn.innerText = "PLAY";
                 this.playingIndicator.classList.remove('active');
             } else {
-                this.audio.play();
-                this.isPlaying = true;
-                this.playPauseBtn.innerText = "PAUSE";
-                this.playingIndicator.classList.add('active');
+                if (this.audioContext.state === 'suspended') {
+                    this.audioContext.resume();
+                }
+                const playPromise = this.audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        this.isPlaying = true;
+                        this.playPauseBtn.innerText = "PAUSE";
+                        this.playingIndicator.classList.add('active');
+                    }).catch(e => console.error("Play prevented", e));
+                }
             }
         });
 
