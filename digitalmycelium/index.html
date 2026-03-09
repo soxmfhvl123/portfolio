@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Digital Mycelium</title>
+    <!-- Premium Swiss-inspired sans-serif typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    
+    <div id="custom-cursor"></div>
+    <!-- 0. Intro Overlay: The Seed -->
+    <!-- 0. Intro Overlay: The Seed -->
+    <div id="intro-overlay" class="intro-overlay active">
+        <div class="intro-content">
+            <h1>The Digital Mycelium</h1>
+            <p class="subtitle">A Living Architecture</p>
+            <p class="prompt">Would you like to connect your intelligence to the ecosystem?</p>
+            <button id="btn-enter" class="btn-primary">Connect & Enter</button>
+            <p class="micro-text">Microphone access requested for Audio-Reactive Symbiosis.</p>
+        </div>
+    </div>
+
+    <!-- 1. Z-Index Layer 0: The WebGL Canvas -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- 2. Main HUD Interface -->
+    <main id="hud" class="hud hidden">
+        
+        <!-- Topbar with Hamburger (Cleaned) -->
+        <header class="topbar">
+            <button id="btn-menu" class="btn-hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </header>
+
+        <!-- Side Drawer (Hidden by default) -->
+        <aside id="menu-drawer" class="menu-drawer">
+            <button id="btn-close-menu" class="btn-close">&times;</button>
+            
+            <div class="drawer-content">
+                <section class="project-info">
+                    <h3>The Digital Mycelium</h3>
+                    <p class="kr-desc">
+                        본 프로젝트는 자연의 <strong>균사체(Mycelium)</strong>와 <strong>AI 데이터</strong>의 유기적 연결을 시각화한 생성 예술입니다. 
+                        당신의 목소리와 움직임이 이 디지털 숲의 에너지가 되어 실시간으로 형태를 변화시킵니다.
+                    </p>
+                </section>
+
+                <hr class="divider">
+
+                <!-- Intelligence Bars (Relocated from Topbar) -->
+                <section class="intelligence-panel">
+                    <div class="intelligence-status drawer-bars">
+                        <div class="intel-item">
+                            <span class="label">AI</span>
+                            <div class="bar-bg"><div id="ai-bar" class="bar-fill ai-bar"></div></div>
+                        </div>
+                        <div class="intel-item">
+                            <span class="label">NATURE</span>
+                            <div class="bar-bg"><div id="nature-bar" class="bar-fill nature-bar"></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="controls-panel">
+                    <h3>Mycelium Sandbox</h3>
+                    
+                    <div class="control-group">
+                        <label>Ecosystem Mutation</label>
+                        <div class="mode-toggles">
+                            <button class="btn-mode active" data-mode="flora">Flora</button>
+                            <button class="btn-mode" data-mode="fauna">Fauna</button>
+                            <button class="btn-mode" data-mode="fungi">Fungi</button>
+                        </div>
+                        <p id="mode-description" class="mode-description">
+                            부드럽고 가벼운 입자들이 공중에 떠다니는 씨앗처럼 부유합니다.
+                        </p>
+                    </div>
+                </section>
+
+                <div class="audio-wave-monitor">
+                    <canvas id="audio-canvas" width="250" height="40"></canvas>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Footer (Cleaned Up) -->
+        <footer class="footer">
+            <!-- Footer controls/nav removed by user request -->
+        </footer>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/Shaders.js"></script>
+    <script src="js/AudioReactive.js"></script>
+    <script src="js/MyceliumEngine.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
