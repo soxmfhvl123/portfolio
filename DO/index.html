@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko" class="lang-kr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DO to Refine — My Intelligence, My Design, and I</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- SVG gooey filter (hidden, referenced by CSS) -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
+      <defs>
+        <filter id="gooey" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+          <feColorMatrix in="blur" mode="matrix"
+            values="1 0 0 0 0
+                    0 1 0 0 0
+                    0 0 1 0 0
+                    0 0 0 28 -10"
+            result="gooey" />
+          <feComposite in="SourceGraphic" in2="gooey" operator="atop" />
+        </filter>
+      </defs>
+    </svg>
+
+    <!-- ========== LANG TOGGLE ========== -->
+    <div class="lang-toggle-wrap">
+        <button class="lang-btn active" id="btn-kr" onclick="setLang('kr')">KR</button>
+        <span class="lang-divider">/</span>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+
+    <!-- ========== SLIDE 1: HERO ========== -->
+    <section class="slide slide-hero" id="slide-1">
+        <div class="slide-inner">
+            <div class="corner-label top-left">My Intelligence, my design and I</div>
+            <div class="corner-label top-right"><span class="slide-num">01</span> — <span class="t" data-kr="Title" data-en="Title">Title</span></div>
+
+            <div class="hero-content">
+                <div class="hero-text-wrap">
+                    <div class="hero-word" id="heroWord">
+                        <span class="hero-state hero-do">DO</span>
+                        <span class="hero-state hero-refine">REFINE</span>
+                    </div>
+                    <div class="hero-subtitle">
+                        <span class="subtitle-line t" data-kr="실천의 디자인 방법론" data-en="A Design Methodology of Practice"></span>
+                        <span class="subtitle-tag t" data-kr="Zero Latency Strategy — 정제함에 도달하기 위한" data-en="Zero Latency Strategy — Toward Refinement"></span>
+                    </div>
+                </div>
+
+                <div class="hero-body-text reveal-item">
+                    <p class="t" style="white-space:nowrap;"
+                       data-kr="저에게 &lt;strong&gt;'DO'&lt;/strong&gt;는 복잡한 문제를 가시적 결과물로 변환하여 본질만 남기기 위한 연습이자 비효율의 시간입니다."
+                       data-en="For me, &lt;strong&gt;'DO'&lt;/strong&gt; is the practice and the time of inefficiency spent transforming complex problems into tangible results, leaving only the essence."></p>
+                </div>
+            </div>
+
+            <div class="scroll-indicator">
+                <span class="scroll-text">Scroll</span>
+                <div class="scroll-line"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SLIDE 2: GENESIS OF DO ========== -->
+    <section class="slide slide-standard" id="slide-3">
+        <div class="slide-video-bg">
+            <video id="slide3video" src="visual/Flower_blooming_process_delpmaspu_.mp4"
+                   muted playsinline loop preload="auto"></video>
+        </div>
+        <div class="slide-inner">
+            <div class="corner-label top-left">My Intelligence, my design and I</div>
+            <div class="corner-label top-right"><span class="slide-num">02</span> — <span class="t" data-kr="Genesis" data-en="Genesis">Genesis</span></div>
+
+            <div class="glass-card">
+                <div class="standard-header" style="margin-top:0;">
+                    <p class="standard-overline t" data-kr="손끝에서 시작된 논리의 진화" data-en="The evolution of logic born from fingertips"></p>
+                    <h2 class="standard-title">Genesis of <em>'DO'</em></h2>
+                </div>
+
+                <div class="pillars-grid">
+                    <div class="pillar-item reveal-item">
+                        <div class="pillar-num">01</div>
+                        <h3 class="pillar-name t" data-kr="감각의 내재화" data-en="Internalization of Sense"></h3>
+                        <p class="pillar-desc t" data-kr="텍스트를 넘어 감각으로 소통하는 비언어적 시각 언어 체득" data-en="Mastering the non-verbal visual language that communicates beyond text"></p>
+                    </div>
+                    <div class="pillar-item reveal-item">
+                        <div class="pillar-num">02</div>
+                        <h3 class="pillar-name t" data-kr="디자인 툴 부딪히기" data-en="Confronting Design Tools"></h3>
+                        <p class="pillar-desc t" data-kr="미지의 툴에 대한 두려움을&lt;br&gt;반복적 실행을 통해 학습하는 메커니즘" data-en="A learning mechanism that overcomes fear&lt;br&gt;of unknown tools through repeated execution"></p>
+                    </div>
+                    <div class="pillar-item reveal-item">
+                        <div class="pillar-num">03</div>
+                        <h3 class="pillar-name t" data-kr="실천적 돌파" data-en="Practical Breakthrough"></h3>
+                        <p class="pillar-desc t" data-kr="이론의 병목 현상을 즉각적인 실천으로 돌파하는 결과 중심 사고" data-en="Result-oriented thinking that breaks through theoretical bottlenecks through immediate action"></p>
+                    </div>
+                    <div class="pillar-item reveal-item">
+                        <div class="pillar-num">04</div>
+                        <h3 class="pillar-name t" data-kr="선순환 구조" data-en="Virtuous Cycle"></h3>
+                        <p class="pillar-desc t" data-kr="행동이 결과를 만들고, 그 결과가 다시 전략으로 진화하는 과정" data-en="The process where action creates results, and those results evolve back into strategy"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SLIDE 3: 3 PILLARS ========== -->
+    <section class="slide slide-standard" id="slide-4">
+        <div class="slide-video-bg">
+            <video id="slide4video" src="visual/ComfyUI_00046_.mp4"
+                   muted playsinline loop preload="auto"></video>
+        </div>
+        <div class="slide-inner">
+            <div class="corner-label top-left">My Intelligence, my design and I</div>
+            <div class="corner-label top-right"><span class="slide-num">03</span> — <span class="t" data-kr="Strategy" data-en="Strategy">Strategy</span></div>
+
+            <div class="glass-card">
+                <div class="standard-header" style="margin-top:0;">
+                    <p class="standard-overline t" data-kr="정제함에 도달하는 세 가지 기둥" data-en="Three pillars reaching refinement"></p>
+                    <h2 class="standard-title">The 3 Pillars of<br><em>Strategic DO</em></h2>
+                </div>
+
+                <div class="three-pillars">
+                    <div class="tpillar reveal-item">
+                        <div class="tpillar-bracket">[</div>
+                        <div class="tpillar-body">
+                            <h3 class="tpillar-title t" data-kr="패턴 인식" data-en="Pattern Recognition"></h3>
+                            <p class="tpillar-desc t" data-kr="수만 번의 실행을 통해 축적하고 습득한 최적의 UI/UX 데이터셋" data-en="The optimal UI/UX dataset accumulated through tens of thousands of executions"></p>
+                        </div>
+                    </div>
+                    <div class="tpillar reveal-item">
+                        <div class="tpillar-bracket">[</div>
+                        <div class="tpillar-body">
+                            <h3 class="tpillar-title t" data-kr="시각적 수사학" data-en="Visual Rhetoric"></h3>
+                            <p class="tpillar-desc t" data-kr="브랜드의 미션을 시각 언어로 치환하는 구현 역량" data-en="The implementation capability to translate a brand's mission into visual language"></p>
+                        </div>
+                    </div>
+                    <div class="tpillar reveal-item">
+                        <div class="tpillar-bracket">[</div>
+                        <div class="tpillar-body">
+                            <h3 class="tpillar-title t" data-kr="가설 기반 반복" data-en="Hypothesis-Based Iteration"></h3>
+                            <p class="tpillar-desc t" data-kr="결과물을 먼저 도출한 뒤, &lt;strong&gt;'정제함'&lt;/strong&gt;의 기준에 맞춰 불필요한 노이즈를 깎아내는 역방향 설계" data-en="Deriving outputs first, then carving away unnecessary noise to meet the standard of &lt;strong&gt;'Refinement'&lt;/strong&gt;"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SLIDE 4: ZERO LATENCY ========== -->
+    <section class="slide slide-standard" id="slide-5">
+        <div class="slide-video-bg">
+            <video id="slide5video" src="visual/ComfyUI_00050_.mp4"
+                   muted playsinline preload="auto"></video>
+        </div>
+        <div class="slide-inner">
+            <div class="corner-label top-left">My Intelligence, my design and I</div>
+            <div class="corner-label top-right"><span class="slide-num">04</span> — <span class="t" data-kr="Core Strength" data-en="Core Strength">Core Strength</span></div>
+
+            <div class="zerolat-layout" style="position:relative;z-index:2;">
+                <div class="zerolat-left">
+                    <p class="standard-overline t" data-kr="가설의 즉각적 실체화" data-en="Immediate materialization of hypotheses"></p>
+                    <h2 class="zerolat-title">Zero<br>Latency</h2>
+                    <p class="zerolat-tagline t" data-kr="아이디어와 결과물 사이의 시차를 없앤다" data-en="Eliminating the time lag between ideas and output"></p>
+                </div>
+                <div class="zerolat-right glass-card" style="margin-top:0;">
+                    <div class="zlat-item reveal-item">
+                        <span class="zlat-arrow">→</span>
+                        <div>
+                            <h4 class="zlat-name t" data-kr="시차의 혁신적 단축" data-en="Revolutionary Reduction of Latency"></h4>
+                            <p class="zlat-desc t" data-kr="아이디어와 결과물 사이의 시차(Latency)를 없앰" data-en="Eliminating the gap (Latency) between idea and output"></p>
+                        </div>
+                    </div>
+                    <div class="zlat-item reveal-item">
+                        <span class="zlat-arrow">→</span>
+                        <div>
+                            <h4 class="zlat-name t" data-kr="즉각적 투입" data-en="Immediate Deployment"></h4>
+                            <p class="zlat-desc t" data-kr="가설 단계에서 AI 툴을 즉시 투입하여 실체를 눈으로 확인" data-en="Deploying AI tools immediately at the hypothesis stage to visualize reality"></p>
+                        </div>
+                    </div>
+                    <div class="zlat-item reveal-item">
+                        <span class="zlat-arrow">→</span>
+                        <div>
+                            <h4 class="zlat-name t" data-kr="수정의 극대화" data-en="Maximizing Iteration"></h4>
+                            <p class="zlat-desc t" data-kr="빠른 시각화는 곧 '더 많은 수정과 정제의 기회'를 의미" data-en="Rapid visualization means more opportunities for refinement"></p>
+                        </div>
+                    </div>
+                    <div class="zlat-item reveal-item">
+                        <span class="zlat-arrow">→</span>
+                        <div>
+                            <h4 class="zlat-name t" data-kr="밀도의 결정" data-en="Density of Decision"></h4>
+                            <p class="zlat-desc t" data-kr="실행 속도가 최종 디자인의 밀도와 &lt;strong&gt;'정제함'&lt;/strong&gt;을 결정함" data-en="Execution speed determines the density and &lt;strong&gt;'refinement'&lt;/strong&gt; of the final design"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SLIDE 5: TOOL AS A CRAFTSMANSHIP ========== -->
+    <section class="slide slide-narrative" id="slide-6">
+        <div class="slide-video-bg">
+            <video id="slide6video" src="visual/ComfyUI_00044_.mp4"
+                   muted playsinline loop preload="auto"></video>
+        </div>
+        <div class="slide-inner">
+            <div class="corner-label top-left">My Intelligence, my design and I</div>
+            <div class="corner-label top-right"><span class="slide-num">05</span> — Craftsmanship</div>
+
+            <div class="narrative-layout" style="margin-top:100px;">
+                <div class="narrative-label-col">
+                    <p class="narrative-overline t" data-kr="도구는 사고의 확장" data-en="Tools as extensions of thought"></p>
+                    <h2 class="narrative-title">Tool as a<br>Craftsmanship</h2>
+                </div>
+                <div class="narrative-body-col glass-card" style="margin-top:0;">
+                    <div class="narrative-quote-line"></div>
+                    <p class="narrative-body t"
+                       data-kr="AI를 통해 수백 가지의 시각적 가설을 순식간에 검토하며 최적의 톤앤매너를 분석하고, 마치 도자기의 큰 틀을 잡은 뒤 섬세하게 디테일을 빚어나가듯 저는 &lt;strong&gt;'만드는 과정'&lt;/strong&gt; 그 자체에서 전략의 정답을 도출하고자 합니다."
+                       data-en="Through AI, I review hundreds of visual hypotheses in an instant to find the optimal tone and manner. Just as a potter shapes the large form before crafting the fine details, I seek to draw out the strategic answer from the &lt;strong&gt;'process of making'&lt;/strong&gt; itself."></p>
+                    <div class="tool-tags">
+                        <span class="tool-tag">AI</span>
+                        <span class="tool-tag">Craftsmanship</span>
+                        <span class="tool-tag">Refinement</span>
+                        <span class="tool-tag">Process</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CONCLUSION ========== -->
+    <section class="slide slide-conclusion" id="slide-8">
+        <div class="slide-video-bg">
+            <video id="slide8video" src="visual/ComfyUI_00054_.mp4"
+                   muted playsinline loop preload="auto"></video>
+        </div>
+        <div class="slide-inner">
+            <div class="corner-label top-left">My Intelligence, my design and I</div>
+            <div class="corner-label top-right"><span class="slide-num">06</span> — Conclusion</div>
+
+            <div class="conclusion-content">
+                <p class="conclusion-overline t" data-kr="Directed DO: 정제함을 향한 실행" data-en="Directed DO: Execution toward Refinement"></p>
+                <p class="conclusion-body t"
+                   data-kr="현 시대의 저의 디자인에 대한 정의는 생성을 넘어, &lt;strong&gt;'무엇을 남길 것인가'&lt;/strong&gt;를 결정하는 통찰력이고, 비효율의 시간을 견디면서, 멈추지 않는 실행이 가장 정제된 결과물을 만든다고 생각합니다."
+                   data-en="My definition of design in this era goes beyond generation — it is the insight to decide &lt;strong&gt;'what to keep'&lt;/strong&gt;, and I believe that enduring the time of inefficiency while never stopping execution creates the most refined results."></p>
+                <div class="conclusion-divider"></div>
+                <blockquote class="conclusion-quote">
+                    "My Intelligence is not just Action,<br>but Refinement through Execution."
+                </blockquote>
+            </div>
+
+            <div class="conclusion-morph-word" id="conclusionMorph">
+                <span class="hero-state hero-do" style="font-size:clamp(60px,10vw,140px);">DO</span>
+                <span class="hero-state hero-refine" style="font-size:clamp(60px,10vw,140px);">REFINE</span>
+            </div>
+        </div>
+    </section>
+
+    <script src="main.js"></script>
+</body>
+</html>

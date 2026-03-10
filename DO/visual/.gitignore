@@ -1,0 +1,5 @@
+# Exclude large video files from git (use external hosting or LFS instead)
+*.mp4
+*.mov
+*.avi
+*.webm
