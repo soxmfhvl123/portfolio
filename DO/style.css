@@ -53,8 +53,8 @@
      --white: #ffffff;
      --gray-100: #f5f5f5;
      --gray-300: #d4d4d4;
-     --gray-500: #8a8a8a;
-     --gray-700: #404040;
+     --gray-500: #0a0a0a;
+     --gray-700: #0a0a0a;
      --accent: #0a0a0a;
      /* Helvetica Now Display — commercial font, falls back to system Helvetica */
      --serif: 'Helvetica Now Display', 'HelveticaNeue-CondensedBlack', 'Helvetica Neue', Helvetica, Arial, sans-serif;
