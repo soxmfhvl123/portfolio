@@ -29,18 +29,29 @@ const params = {
     gridSize: 10
 };
 
+let pane;
+
 function setup() {
     canvas = createCanvas(windowWidth - 340, windowHeight - 60);
     canvas.parent('p5-canvas');
     
-    // Load font using opentype.js
-    // Using a reliable Google Font TTF URL
-    const fontUrl = 'https://fonts.gstatic.com/s/spacegrotesk/v15/V8mDoQDj3hyHErbVEWBT8KeubPNoL2uX.ttf';
+    // Load font using opentype.js - Using a more stable CDN link
+    const fontUrl = 'https://cdn.jsdelivr.net/gh/google/fonts/ofl/spacegrotesk/SpaceGrotesk%5Bwght%5D.ttf';
     
     opentype.load(fontUrl, (err, f) => {
         if (err) {
             console.error('Font load error:', err);
-            document.getElementById('status-val').innerText = 'ERROR';
+            // Fallback to a secondary stable font if first one fails
+            opentype.load('https://cdn.jsdelivr.net/gh/google/fonts/ofl/inter/Inter-Medium.ttf', (e, fallbackFont) => {
+               if (e) {
+                   document.getElementById('status-val').innerText = 'ERROR';
+               } else {
+                   font = fallbackFont;
+                   fontLoaded = true;
+                   generatePoints();
+                   document.getElementById('status-val').innerText = 'READY';
+               }
+            });
         } else {
             font = f;
             fontLoaded = true;
@@ -53,18 +64,12 @@ function setup() {
     document.getElementById('res-val').innerText = `${width}x${height}`;
 }
 
+// ... generatePoints, draw, etc stay same ...
 function generatePoints() {
     if (!fontLoaded) return;
-    
-    // Get path from font
     const path = font.getPath(params.text, 0, 0, params.fontSize);
-    
-    // Convert path to points
-    // This is a simplified approach, real implementation would sample the path
     points = [];
     const fontPoints = path.toPoints(params.pointDensity);
-    
-    // Center the points
     const bbox = path.getBoundingBox();
     const offsetX = (bbox.x1 + bbox.x2) / 2;
     const offsetY = (bbox.y1 + bbox.y2) / 2;
@@ -82,46 +87,35 @@ function generatePoints() {
 function draw() {
     background(params.bg);
     if (!fontLoaded) return;
-
     document.getElementById('fps-val').innerText = floor(frameRate());
-    
     translate(width/2, height/2);
     rotate(params.autoRotate * frameCount * 0.01);
-    
     stroke(params.color);
     strokeWeight(params.strokeWeight);
     noFill();
 
-    // Update point positions with noise
     points.forEach(p => {
         const n = noise(
             p.origX * params.noiseScale, 
             p.origY * params.noiseScale, 
             frameCount * params.noiseSpeed
         );
-        
         const angle = n * TWO_PI * 2;
         p.x = p.origX + cos(angle) * params.noiseStrength;
         p.y = p.origY + sin(angle) * params.noiseStrength;
-        
         if (params.snapToGrid) {
             p.x = round(p.x / params.gridSize) * params.gridSize;
             p.y = round(p.y / params.gridSize) * params.gridSize;
         }
     });
 
-    // Draw lines between nearby points for that "Kinetic" feel
     if (params.showLines) {
         beginShape(POINTS);
-        points.forEach(p => {
-            vertex(p.x, p.y);
-        });
+        points.forEach(p => vertex(p.x, p.y));
         endShape();
-
-        // Connect points logic (intensive, but looks great)
         if (params.connectDistance > 0) {
-            stroke(params.color + '44'); // Add transparency (hex + 44)
-            for (let i = 0; i < points.length; i += 5) { // Optimization: skip some points
+            stroke(params.color + '44');
+            for (let i = 0; i < points.length; i += 5) {
                 for (let j = i + 1; j < points.length; j += 15) {
                     const d = dist(points[i].x, points[i].y, points[j].x, points[j].y);
                     if (d < params.connectDistance) {
@@ -131,7 +125,6 @@ function draw() {
             }
         }
     }
-
     if (params.showPoints) {
         strokeWeight(params.strokeWeight * 3);
         points.forEach(p => point(p.x, p.y));
@@ -144,7 +137,7 @@ function windowResized() {
 }
 
 function initTweakpane() {
-    const pane = new Tweakpane.Pane({
+    pane = new Tweakpane.Pane({
         container: document.getElementById('tweakpane-container')
     });
 
@@ -178,5 +171,8 @@ document.getElementById('fluxus-btn').addEventListener('click', () => {
     params.noiseScale = random(0.002, 0.02);
     params.noiseSpeed = random(0.005, 0.03);
     params.connectDistance = random(10, 60);
-    // Refresh Pane (Advanced: iterate through pane components if needed)
+    params.fontSize = random(100, 400);
+    
+    generatePoints();
+    if (pane) pane.refresh();
 });
