@@ -18,6 +18,12 @@
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=tweak">
+    <script>
+        // Redirect imageview repo root to portfolio
+        if (window.location.hostname.includes('github.io') && (window.location.pathname === '/imageview/' || window.location.pathname === '/imageview')) {
+            window.location.href = '/imageview/portfolio/';
+        }
+    </script>
 </head>
 
 <body data-scroll>
@@ -43,6 +49,7 @@
             <span class="nav-status" id="navStatus">PORTFOLIO 2026</span>
         </div>
         <div class="nav-right">
+            <a href="portfolio/" class="portfolio-direct-link reveal-text" data-magnetic>VIEW IMAGE ONLY PORTFOLIO</a>
             <button class="lang-toggle" id="langToggle" data-magnetic aria-label="EN/KR toggle">
                 <span class="lang-label lang-active">KR</span>
                 <span class="lang-divider">/</span>
