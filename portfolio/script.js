@@ -1,55 +1,65 @@
-class TextScramble {
-  constructor(el) {
-    this.el = el;
-    this.chars = '!<>-_\\/[]{}—=+*^?#________';
-    this.update = this.update.bind(this);
-  }
-  setText(newText) {
-    const oldText = this.el.innerText;
-    const length = Math.max(oldText.length, newText.length);
-    const promise = new Promise((resolve) => (this.resolve = resolve));
-    this.queue = [];
-    for (let i = 0; i < length; i++) {
-      const from = oldText[i] || '';
-      const to = newText[i] || '';
-      const start = Math.floor(Math.random() * 40);
-      const end = start + Math.floor(Math.random() * 40);
-      this.queue.push({ from, to, start, end });
+class Marquee {
+    constructor(el, speed = 1) {
+        this.el = el;
+        this.speed = speed;
+        this.x = 0;
+        this.isDragging = false;
+        this.startX = 0;
+        this.scrollLeft = 0;
+        this.lastTime = 0;
+
+        this.init();
     }
-    cancelAnimationFrame(this.frameRequest);
-    this.frame = 0;
-    this.update();
-    return promise;
-  }
-  update() {
-    let output = '';
-    let complete = 0;
-    for (let i = 0, n = this.queue.length; i < n; i++) {
-      let { from, to, start, end, char } = this.queue[i];
-      if (this.frame >= end) {
-        complete++;
-        output += to;
-      } else if (this.frame >= start) {
-        if (!char || Math.random() < 0.28) {
-          char = this.randomChar();
-          this.queue[i].char = char;
+
+    init() {
+        this.el.addEventListener('mousedown', (e) => this.dragStart(e));
+        window.addEventListener('mousemove', (e) => this.dragMove(e));
+        window.addEventListener('mouseup', () => this.dragEnd());
+        
+        this.el.addEventListener('touchstart', (e) => this.dragStart(e.touches[0]));
+        window.addEventListener('touchmove', (e) => this.dragMove(e.touches[0]));
+        window.addEventListener('touchend', () => this.dragEnd());
+
+        requestAnimationFrame((t) => this.animate(t));
+    }
+
+    dragStart(e) {
+        this.isDragging = true;
+        this.startX = e.pageX;
+        this.scrollLeft = this.x;
+    }
+
+    dragMove(e) {
+        if (!this.isDragging) return;
+        const walk = (e.pageX - this.startX) * 1.5;
+        this.x = this.scrollLeft + walk;
+    }
+
+    dragEnd() {
+        this.isDragging = false;
+    }
+
+    animate(time) {
+        const delta = time - this.lastTime;
+        this.lastTime = time;
+
+        if (!this.isDragging) {
+            this.x -= this.speed * (delta / 16);
         }
-        output += `<span class="dud">${char}</span>`;
-      } else {
-        output += from;
-      }
+
+        // Loop logic: track is duplicated, so width/2 is the loop point
+        const trackWidth = this.el.offsetWidth / 2;
+        if (this.x <= -trackWidth) {
+            this.x += trackWidth;
+            if (this.isDragging) this.startX += trackWidth; // Adjust startX to prevent jumping while dragging
+        } else if (this.x > 0) {
+            this.x -= trackWidth;
+            if (this.isDragging) this.startX -= trackWidth;
+        }
+
+        this.el.style.transform = `translateX(${this.x}px)`;
+        requestAnimationFrame((t) => this.animate(t));
     }
-    this.el.innerHTML = output;
-    if (complete === this.queue.length) {
-      this.resolve();
-    } else {
-      this.frameRequest = requestAnimationFrame(this.update);
-      this.frame++;
-    }
-  }
-  randomChar() {
-    return this.chars[Math.floor(Math.random() * this.chars.length)];
-  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -65,12 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Text Scramble Logic
     const scrambleElements = document.querySelectorAll('.scramble-text');
-    const observers = [];
-
     scrambleElements.forEach(el => {
         const fx = new TextScramble(el);
         const originalText = el.getAttribute('data-text');
-        el.innerText = ''; // Start empty
+        el.innerText = '';
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -83,19 +91,26 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(el);
     });
 
-    // 3. Link Hover
-    document.querySelectorAll('a').forEach(link => {
-        link.addEventListener('mouseenter', () => {
+    // 3. Marquee Initialization
+    const tracks = document.querySelectorAll('.marquee-track');
+    tracks.forEach(track => {
+        const speed = track.classList.contains('marquee-cuz') ? 0.8 : 1.2;
+        new Marquee(track, speed);
+    });
+
+    // 4. Link Hover
+    document.querySelectorAll('a, button').forEach(el => {
+        el.addEventListener('mouseenter', () => {
             ring.style.transform += ' scale(2.5)';
             ring.style.opacity = '1';
         });
-        link.addEventListener('mouseleave', () => {
+        el.addEventListener('mouseleave', () => {
             ring.style.transform = ring.style.transform.replace(' scale(2.5)', '');
             ring.style.opacity = '0.3';
         });
     });
 
-    // 4. Back To Top
+    // 5. Back To Top
     const backToTopBtn = document.getElementById('backToTop');
     if (backToTopBtn) {
         backToTopBtn.addEventListener('click', (e) => {
@@ -107,15 +122,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. Theme Toggle
+    // 6. Theme Toggle
     const themeToggle = document.getElementById('themeToggle');
-
     const updateCursorColor = (isDark) => {
         if (dot) dot.style.background = isDark ? '#FFF' : '#000';
         if (ring) ring.style.borderColor = isDark ? '#FFF' : '#000';
     };
 
-    // Load saved theme
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
         if (themeToggle) {
@@ -129,14 +142,10 @@ document.addEventListener('DOMContentLoaded', () => {
         themeToggle.addEventListener('click', () => {
             const isDark = document.body.classList.toggle('dark-mode');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            
             const newText = isDark ? 'VIEW IN LIGHT' : 'VIEW IN DARK';
             themeToggle.setAttribute('data-text', newText);
-            
-            // Trigger scramble on toggle
             const fx = new TextScramble(themeToggle);
             fx.setText(newText);
-            
             updateCursorColor(isDark);
         });
     }
