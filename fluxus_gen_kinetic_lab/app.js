@@ -35,8 +35,8 @@ function setup() {
     canvas = createCanvas(windowWidth - 340, windowHeight - 60);
     canvas.parent('p5-canvas');
     
-    // Load font using opentype.js - Using a more stable CDN link
-    const fontUrl = 'https://cdn.jsdelivr.net/gh/google/fonts/ofl/spacegrotesk/SpaceGrotesk%5Bwght%5D.ttf';
+    // Load font using opentype.js - Using local font for maximum reliability
+    const fontUrl = 'font.ttf';
     
     opentype.load(fontUrl, (err, f) => {
         if (err) {
