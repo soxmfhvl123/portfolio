@@ -50,8 +50,9 @@ let mainFolder, exportFolder, optionsFolder;
 
 function setup() {
     updateCanvasSize();
-    canvas = createCanvas(windowWidth - 340, windowHeight - 60);
+    canvas = createCanvas(width, height); // Initial size from updateCanvasSize
     canvas.parent('p5-canvas');
+    resizeCanvasToRatio();
     
     const fontUrl = 'font.ttf';
     opentype.load(fontUrl, (err, f) => {
@@ -69,11 +70,28 @@ function setup() {
     initTweakpane();
 }
 
-function updateCanvasSize() {
+/**
+ * Resizes the p5 canvas to fit the container while maintaining aspect ratio
+ */
+function resizeCanvasToRatio() {
     const container = document.getElementById('canvas-container');
-    const w = container.offsetWidth;
-    const h = container.offsetHeight;
-    document.getElementById('res-val').innerText = `${w}x${h}`;
+    const containerW = container.offsetWidth - 40; // margin
+    const containerH = container.offsetHeight - 40;
+    
+    let targetW, targetH;
+    const [rw, rh] = params.ratio.split(':').map(Number);
+    const targetRatio = rw / rh;
+    
+    if (containerW / containerH > targetRatio) {
+        targetH = containerH;
+        targetW = containerH * targetRatio;
+    } else {
+        targetW = containerW;
+        targetH = containerW / targetRatio;
+    }
+    
+    resizeCanvas(targetW, targetH);
+    updateCanvasSize();
 }
 
 function generatePoints() {
@@ -211,7 +229,7 @@ function initTweakpane() {
 
     // OPTIONS PAGE
     const opt = tabs.pages[2];
-    opt.addInput(params, 'ratio', { options: { '16:9': '16:9', '4:5': '4:5', '1:1': '1:1' } });
+    opt.addInput(params, 'ratio', { options: { '16:9': '16:9', '4:5': '4:5', '1:1': '1:1' } }).on('change', () => resizeCanvasToRatio());
     opt.addInput(params, 'margins', { min: 0, max: 1 });
     opt.addButton({ title: 'FULLSCREEN MODE' });
 }
@@ -253,6 +271,5 @@ document.getElementById('fluxus-btn').addEventListener('click', () => {
 });
 
 function windowResized() {
-    resizeCanvas(windowWidth - 340, windowHeight - 60);
-    updateCanvasSize();
+    resizeCanvasToRatio();
 }
