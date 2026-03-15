@@ -49,8 +49,10 @@ let pane;
 let mainFolder, exportFolder, optionsFolder;
 
 function setup() {
-    updateCanvasSize();
-    canvas = createCanvas(width, height); // Initial size from updateCanvasSize
+    const container = document.getElementById('canvas-container');
+    const w = container.offsetWidth;
+    const h = container.offsetHeight;
+    canvas = createCanvas(w, h);
     canvas.parent('p5-canvas');
     resizeCanvasToRatio();
     
