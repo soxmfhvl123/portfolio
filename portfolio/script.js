@@ -24,6 +24,9 @@ class Marquee {
     }
 
     dragStart(e) {
+        if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') {
+            e.preventDefault();
+        }
         this.isDragging = true;
         this.startX = e.pageX;
         this.scrollLeft = this.x;
@@ -94,6 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Marquee Initialization
     const tracks = document.querySelectorAll('.marquee-track');
     tracks.forEach(track => {
+        // Disable native drag on images/videos
+        track.querySelectorAll('img, video').forEach(el => {
+            el.setAttribute('draggable', false);
+        });
         const speed = track.classList.contains('marquee-cuz') ? 0.8 : 1.2;
         new Marquee(track, speed);
     });
