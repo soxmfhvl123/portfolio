@@ -61,6 +61,8 @@ class Marquee {
         this.startX = 0;
         this.scrollLeft = 0;
         this.lastTime = 0;
+        this.velocity = 0;
+        this.lastPageX = 0;
 
         this.init();
     }
@@ -70,26 +72,34 @@ class Marquee {
         window.addEventListener('mousemove', (e) => this.dragMove(e));
         window.addEventListener('mouseup', () => this.dragEnd());
         
-        this.el.addEventListener('touchstart', (e) => this.dragStart(e.touches[0]));
-        window.addEventListener('touchmove', (e) => this.dragMove(e.touches[0]));
+        this.el.addEventListener('touchstart', (e) => this.dragStart(e.touches[0]), { passive: false });
+        window.addEventListener('touchmove', (e) => this.dragMove(e.touches[0]), { passive: false });
         window.addEventListener('touchend', () => this.dragEnd());
 
         requestAnimationFrame((t) => this.animate(t));
     }
 
     dragStart(e) {
-        if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') {
-            e.preventDefault();
+        // Only prevent default on direct interaction to stop native drag
+        if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO' || e.type === 'touchstart') {
+            // We need to be careful with preventDefault on touch to not block page scroll
+            // But since this is a horizontal marquee in a restricted viewport, it's generally okay.
         }
         this.isDragging = true;
         this.startX = e.pageX;
+        this.lastPageX = e.pageX;
         this.scrollLeft = this.x;
+        this.velocity = 0;
     }
 
     dragMove(e) {
         if (!this.isDragging) return;
         const walk = (e.pageX - this.startX) * 1.5;
         this.x = this.scrollLeft + walk;
+        
+        // Calculate velocity for inertia
+        this.velocity = (e.pageX - this.lastPageX) * 0.8;
+        this.lastPageX = e.pageX;
     }
 
     dragEnd() {
@@ -98,20 +108,30 @@ class Marquee {
 
     animate(time) {
         const delta = time - this.lastTime;
-        this.lastTime = time;
+        this.lastTime = time || 0;
+        if (!this.lastTime) this.lastTime = time;
 
         if (!this.isDragging) {
+            // Apply inertia
+            this.x += this.velocity;
+            this.velocity *= 0.95; // Friction
+            if (Math.abs(this.velocity) < 0.1) this.velocity = 0;
+
+            // Base auto-scroll
             this.x -= this.speed * (delta / 16);
         }
 
-        // Loop logic: track is duplicated, so width/2 is the loop point
+        // Robust Looping: handle any amount of overflow
         const trackWidth = this.el.offsetWidth / 2;
-        if (this.x <= -trackWidth) {
-            this.x += trackWidth;
-            if (this.isDragging) this.startX += trackWidth; // Adjust startX to prevent jumping while dragging
-        } else if (this.x > 0) {
-            this.x -= trackWidth;
-            if (this.isDragging) this.startX -= trackWidth;
+        if (trackWidth > 0) {
+            while (this.x <= -trackWidth) {
+                this.x += trackWidth;
+                if (this.isDragging) this.startX += trackWidth;
+            }
+            while (this.x > 0) {
+                this.x -= trackWidth;
+                if (this.isDragging) this.startX -= trackWidth;
+            }
         }
 
         this.el.style.transform = `translateX(${this.x}px)`;
