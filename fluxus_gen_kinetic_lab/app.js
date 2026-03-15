@@ -59,9 +59,13 @@ function setup() {
 // ... generatePoints, draw, etc stay same ...
 function generatePoints() {
     if (!fontLoaded) return;
+    
     const path = font.getPath(params.text, 0, 0, params.fontSize);
     points = [];
-    const fontPoints = path.toPoints(params.pointDensity);
+    
+    // Custom sampling logic for opentype.js path
+    const fontPoints = getPointsFromPath(path, params.pointDensity);
+    
     const bbox = path.getBoundingBox();
     const offsetX = (bbox.x1 + bbox.x2) / 2;
     const offsetY = (bbox.y1 + bbox.y2) / 2;
@@ -74,6 +78,44 @@ function generatePoints() {
             y: p.y - offsetY
         });
     });
+}
+
+/**
+ * Samples an opentype.js path to get points at a certain density
+ */
+function getPointsFromPath(path, density) {
+    const pts = [];
+    const commands = path.commands;
+    let curX = 0;
+    let curY = 0;
+    
+    for (let i = 0; i < commands.length; i++) {
+        const cmd = commands[i];
+        if (cmd.type === 'M' || cmd.type === 'L') {
+            pts.push({ x: cmd.x, y: cmd.y });
+            curX = cmd.x;
+            curY = cmd.y;
+        } else if (cmd.type === 'Q') {
+            // Sample quadratic curve
+            for (let t = 0.1; t <= 1; t += 1 / (density * 100)) {
+                const x = (1 - t) * (1 - t) * curX + 2 * (1 - t) * t * cmd.x1 + t * t * cmd.x;
+                const y = (1 - t) * (1 - t) * curY + 2 * (1 - t) * t * cmd.y1 + t * t * cmd.y;
+                pts.push({ x, y });
+            }
+            curX = cmd.x;
+            curY = cmd.y;
+        } else if (cmd.type === 'C') {
+            // Sample cubic curve
+            for (let t = 0.1; t <= 1; t += 1 / (density * 100)) {
+                const x = Math.pow(1 - t, 3) * curX + 3 * Math.pow(1 - t, 2) * t * cmd.x1 + 3 * (1 - t) * Math.pow(t, 2) * cmd.x2 + Math.pow(t, 3) * cmd.x;
+                const y = Math.pow(1 - t, 3) * curY + 3 * Math.pow(1 - t, 2) * t * cmd.y1 + 3 * (1 - t) * Math.pow(t, 2) * cmd.y2 + Math.pow(t, 3) * cmd.y;
+                pts.push({ x, y });
+            }
+            curX = cmd.x;
+            curY = cmd.y;
+        }
+    }
+    return pts;
 }
 
 function draw() {
