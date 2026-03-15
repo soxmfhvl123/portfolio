@@ -41,17 +41,9 @@ function setup() {
     opentype.load(fontUrl, (err, f) => {
         if (err) {
             console.error('Font load error:', err);
-            // Fallback to a secondary stable font if first one fails
-            opentype.load('https://cdn.jsdelivr.net/gh/google/fonts/ofl/inter/Inter-Medium.ttf', (e, fallbackFont) => {
-               if (e) {
-                   document.getElementById('status-val').innerText = 'ERROR';
-               } else {
-                   font = fallbackFont;
-                   fontLoaded = true;
-                   generatePoints();
-                   document.getElementById('status-val').innerText = 'READY';
-               }
-            });
+            document.getElementById('status-val').innerText = 'PARSE ERROR';
+            // Final fallback to a very simple system text if opentype fails
+            // (p5 text will handle this in draw if fontLoaded is false but we can set a flag)
         } else {
             font = f;
             fontLoaded = true;
