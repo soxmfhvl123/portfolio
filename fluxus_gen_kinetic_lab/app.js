@@ -11,39 +11,53 @@ let canvas;
 
 // Parameters
 const params = {
-    text: 'FLUX',
-    fontSize: 280,
+    // MAIN TAB
+    text: 'NOISE',
+    fontSize: 80,
+    pointDensity: 0.1,
+    
+    // GRID SETTINGS
+    gridRows: 8,
+    gridCols: 10,
+    gridSpacingX: 120,
+    gridSpacingY: 60,
+    stagger: true,
+    
+    // NOISE FIELD
+    noiseStrength: 20,
     noiseScale: 0.005,
     noiseSpeed: 0.01,
-    noiseStrength: 80,
-    pointDensity: 0.15,
-    strokeWeight: 1.5,
-    color: '#ffffff',
-    bg: '#0a0a0a',
-    showPoints: false,
+    
+    // VISUALS
     showLines: true,
-    connectDistance: 30,
-    autoRotate: 0,
-    noiseMode: 'perlin',
-    snapToGrid: false,
-    gridSize: 10
+    connectDistance: 45,
+    strokeWeight: 1.0,
+    color: '#FF6600',
+    bg: '#0a0a0a',
+    transparent: false,
+    
+    // VIEWPORT
+    ratio: '16:9',
+    margins: 0.39,
+    
+    // EXPORT (Placeholder logic)
+    exportSize: 4.0,
+    exportLength: 15,
 };
 
 let pane;
+let mainFolder, exportFolder, optionsFolder;
 
 function setup() {
+    updateCanvasSize();
     canvas = createCanvas(windowWidth - 340, windowHeight - 60);
     canvas.parent('p5-canvas');
     
-    // Load font using opentype.js - Using local font for maximum reliability
     const fontUrl = 'font.ttf';
-    
     opentype.load(fontUrl, (err, f) => {
         if (err) {
             console.error('Font load error:', err);
             document.getElementById('status-val').innerText = 'PARSE ERROR';
-            // Final fallback to a very simple system text if opentype fails
-            // (p5 text will handle this in draw if fontLoaded is false but we can set a flag)
         } else {
             font = f;
             fontLoaded = true;
@@ -53,160 +67,192 @@ function setup() {
     });
 
     initTweakpane();
-    document.getElementById('res-val').innerText = `${width}x${height}`;
 }
 
-// ... generatePoints, draw, etc stay same ...
+function updateCanvasSize() {
+    const container = document.getElementById('canvas-container');
+    const w = container.offsetWidth;
+    const h = container.offsetHeight;
+    document.getElementById('res-val').innerText = `${w}x${h}`;
+}
+
 function generatePoints() {
     if (!fontLoaded) return;
-    
     const path = font.getPath(params.text, 0, 0, params.fontSize);
-    points = [];
-    
-    // Custom sampling logic for opentype.js path
-    const fontPoints = getPointsFromPath(path, params.pointDensity);
+    points = getPointsFromPath(path, params.pointDensity);
     
     const bbox = path.getBoundingBox();
     const offsetX = (bbox.x1 + bbox.x2) / 2;
     const offsetY = (bbox.y1 + bbox.y2) / 2;
     
-    fontPoints.forEach(p => {
-        points.push({
-            origX: p.x - offsetX,
-            origY: p.y - offsetY,
-            x: p.x - offsetX,
-            y: p.y - offsetY
-        });
+    // Center points relative to origin
+    points.forEach(p => {
+        p.origX = p.x - offsetX;
+        p.origY = p.y - offsetY;
     });
 }
 
-/**
- * Samples an opentype.js path to get points at a certain density
- */
+function draw() {
+    if (params.transparent) clear();
+    else background(params.bg);
+    
+    if (!fontLoaded) return;
+    document.getElementById('fps-val').innerText = floor(frameRate());
+    
+    translate(width/2, height/2);
+    
+    // Grid Rendering (Step & Repeat)
+    for (let r = 0; r < params.gridRows; r++) {
+        for (let c = 0; c < params.gridCols; c++) {
+            push();
+            let x = (c - (params.gridCols - 1) / 2) * params.gridSpacingX;
+            let y = (r - (params.gridRows - 1) / 2) * params.gridSpacingY;
+            
+            if (params.stagger && r % 2 === 1) x += params.gridSpacingX / 2;
+            
+            translate(x, y);
+            drawKineticText(r, c);
+            pop();
+        }
+    }
+}
+
+function drawKineticText(row, col) {
+    stroke(params.color);
+    strokeWeight(params.strokeWeight);
+    noFill();
+
+    // Secondary noise for individual text instances
+    const instanceNoise = noise(row * 0.1, col * 0.1, frameCount * 0.005);
+    
+    // Calculate displaced positions for this instance
+    const displacedPoints = points.map(p => {
+        const n = noise(
+            (p.origX + row * 100) * params.noiseScale, 
+            (p.origY + col * 100) * params.noiseScale, 
+            frameCount * params.noiseSpeed
+        );
+        const angle = n * TWO_PI * 2;
+        return {
+            x: p.origX + cos(angle) * params.noiseStrength * instanceNoise,
+            y: p.origY + sin(angle) * params.noiseStrength * instanceNoise
+        };
+    });
+
+    if (params.showLines) {
+        if (params.connectDistance > 1) {
+            // Optimization: Only connect a subset of points if density is high
+            const step = points.length > 500 ? 5 : 2;
+            for (let i = 0; i < displacedPoints.length; i += step) {
+                const p1 = displacedPoints[i];
+                for (let j = i + 1; j < displacedPoints.length; j += step * 3) {
+                    const p2 = displacedPoints[j];
+                    const d = dist(p1.x, p1.y, p2.x, p2.y);
+                    if (d < params.connectDistance) {
+                        line(p1.x, p1.y, p2.x, p2.y);
+                    }
+                }
+            }
+        } else {
+            beginShape(POINTS);
+            displacedPoints.forEach(p => vertex(p.x, p.y));
+            endShape();
+        }
+    }
+}
+
+function initTweakpane() {
+    pane = new Tweakpane.Pane({
+        container: document.getElementById('tweakpane-container'),
+        title: 'TEXTR ENGINE'
+    });
+
+    const tabs = pane.addTab({
+        pages: [
+            {title: 'MAIN'},
+            {title: 'EXPORT'},
+            {title: 'OPTIONS'},
+        ],
+    });
+
+    // MAIN PAGE
+    const main = tabs.pages[0];
+    main.addInput(params, 'text').on('change', () => generatePoints());
+    main.addInput(params, 'fontSize', { min: 10, max: 200 }).on('change', () => generatePoints());
+    
+    const fGrid = main.addFolder({ title: 'STEP & REPEAT' });
+    fGrid.addInput(params, 'gridRows', { min: 1, max: 30, step: 1 });
+    fGrid.addInput(params, 'gridCols', { min: 1, max: 30, step: 1 });
+    fGrid.addInput(params, 'gridSpacingX', { min: 10, max: 400 });
+    fGrid.addInput(params, 'gridSpacingY', { min: 10, max: 400 });
+    fGrid.addInput(params, 'stagger');
+
+    const fMotion = main.addFolder({ title: 'MOTION / NOISE' });
+    fMotion.addInput(params, 'noiseStrength', { min: 0, max: 200 });
+    fMotion.addInput(params, 'noiseScale', { min: 0.0001, max: 0.02 });
+    fMotion.addInput(params, 'noiseSpeed', { min: 0, max: 0.1 });
+
+    const fVisual = main.addFolder({ title: 'VISUALS' });
+    fVisual.addInput(params, 'connectDistance', { min: 0, max: 100 });
+    fVisual.addInput(params, 'strokeWeight', { min: 0.1, max: 4 });
+    fVisual.addInput(params, 'color');
+    fVisual.addInput(params, 'bg');
+    fVisual.addInput(params, 'transparent').on('change', (v) => {
+        const canvasEl = document.getElementById('p5-canvas');
+        if (v.value) canvasEl.classList.add('canvas-grid-bg');
+        else canvasEl.classList.remove('canvas-grid-bg');
+    });
+
+    // EXPORT PAGE
+    const exp = tabs.pages[1];
+    exp.addInput(params, 'exportSize', { min: 1, max: 8 });
+    exp.addInput(params, 'exportLength', { min: 1, max: 60 });
+    exp.addButton({ title: 'EXPORT GRAPHICS' });
+
+    // OPTIONS PAGE
+    const opt = tabs.pages[2];
+    opt.addInput(params, 'ratio', { options: { '16:9': '16:9', '4:5': '4:5', '1:1': '1:1' } });
+    opt.addInput(params, 'margins', { min: 0, max: 1 });
+    opt.addButton({ title: 'FULLSCREEN MODE' });
+}
+
 function getPointsFromPath(path, density) {
     const pts = [];
     const commands = path.commands;
-    let curX = 0;
-    let curY = 0;
-    
+    let curX = 0, curY = 0;
     for (let i = 0; i < commands.length; i++) {
         const cmd = commands[i];
         if (cmd.type === 'M' || cmd.type === 'L') {
             pts.push({ x: cmd.x, y: cmd.y });
-            curX = cmd.x;
-            curY = cmd.y;
+            curX = cmd.x; curY = cmd.y;
         } else if (cmd.type === 'Q') {
-            // Sample quadratic curve
-            for (let t = 0.1; t <= 1; t += 1 / (density * 100)) {
-                const x = (1 - t) * (1 - t) * curX + 2 * (1 - t) * t * cmd.x1 + t * t * cmd.x;
-                const y = (1 - t) * (1 - t) * curY + 2 * (1 - t) * t * cmd.y1 + t * t * cmd.y;
+            for (let t = 0.1; t <= 1; t += 1 / (density * 50)) {
+                const x = (1-t)**2 * curX + 2*(1-t)*t * cmd.x1 + t**2 * cmd.x;
+                const y = (1-t)**2 * curY + 2*(1-t)*t * cmd.y1 + t**2 * cmd.y;
                 pts.push({ x, y });
             }
-            curX = cmd.x;
-            curY = cmd.y;
+            curX = cmd.x; curY = cmd.y;
         } else if (cmd.type === 'C') {
-            // Sample cubic curve
-            for (let t = 0.1; t <= 1; t += 1 / (density * 100)) {
-                const x = Math.pow(1 - t, 3) * curX + 3 * Math.pow(1 - t, 2) * t * cmd.x1 + 3 * (1 - t) * Math.pow(t, 2) * cmd.x2 + Math.pow(t, 3) * cmd.x;
-                const y = Math.pow(1 - t, 3) * curY + 3 * Math.pow(1 - t, 2) * t * cmd.y1 + 3 * (1 - t) * Math.pow(t, 2) * cmd.y2 + Math.pow(t, 3) * cmd.y;
+            for (let t = 0.1; t <= 1; t += 1 / (density * 50)) {
+                const x = (1-t)**3 * curX + 3*(1-t)**2*t * cmd.x1 + 3*(1-t)*t**2 * cmd.x2 + t**3 * cmd.x;
+                const y = (1-t)**3 * curY + 3*(1-t)**2*t * cmd.y1 + 3*(1-t)*t**2 * cmd.y2 + t**3 * cmd.y;
                 pts.push({ x, y });
             }
-            curX = cmd.x;
-            curY = cmd.y;
+            curX = cmd.x; curY = cmd.y;
         }
     }
     return pts;
 }
 
-function draw() {
-    background(params.bg);
-    if (!fontLoaded) return;
-    document.getElementById('fps-val').innerText = floor(frameRate());
-    translate(width/2, height/2);
-    rotate(params.autoRotate * frameCount * 0.01);
-    stroke(params.color);
-    strokeWeight(params.strokeWeight);
-    noFill();
-
-    points.forEach(p => {
-        const n = noise(
-            p.origX * params.noiseScale, 
-            p.origY * params.noiseScale, 
-            frameCount * params.noiseSpeed
-        );
-        const angle = n * TWO_PI * 2;
-        p.x = p.origX + cos(angle) * params.noiseStrength;
-        p.y = p.origY + sin(angle) * params.noiseStrength;
-        if (params.snapToGrid) {
-            p.x = round(p.x / params.gridSize) * params.gridSize;
-            p.y = round(p.y / params.gridSize) * params.gridSize;
-        }
-    });
-
-    if (params.showLines) {
-        beginShape(POINTS);
-        points.forEach(p => vertex(p.x, p.y));
-        endShape();
-        if (params.connectDistance > 0) {
-            stroke(params.color + '44');
-            for (let i = 0; i < points.length; i += 5) {
-                for (let j = i + 1; j < points.length; j += 15) {
-                    const d = dist(points[i].x, points[i].y, points[j].x, points[j].y);
-                    if (d < params.connectDistance) {
-                        line(points[i].x, points[i].y, points[j].x, points[j].y);
-                    }
-                }
-            }
-        }
-    }
-    if (params.showPoints) {
-        strokeWeight(params.strokeWeight * 3);
-        points.forEach(p => point(p.x, p.y));
-    }
-}
+document.getElementById('fluxus-btn').addEventListener('click', () => {
+    params.noiseStrength = random(5, 60);
+    params.noiseScale = random(0.001, 0.015);
+    params.gridRows = floor(random(3, 15));
+    params.gridCols = floor(random(3, 15));
+    if (pane) pane.refresh();
+});
 
 function windowResized() {
     resizeCanvas(windowWidth - 340, windowHeight - 60);
-    document.getElementById('res-val').innerText = `${width}x${height}`;
+    updateCanvasSize();
 }
-
-function initTweakpane() {
-    pane = new Tweakpane.Pane({
-        container: document.getElementById('tweakpane-container')
-    });
-
-    const f1 = pane.addFolder({ title: 'TYPE SETTINGS' });
-    f1.addInput(params, 'text').on('change', () => generatePoints());
-    f1.addInput(params, 'fontSize', { min: 50, max: 600 }).on('change', () => generatePoints());
-    f1.addInput(params, 'pointDensity', { min: 0.05, max: 0.5 }).on('change', () => generatePoints());
-    
-    const f2 = pane.addFolder({ title: 'NOISE FIELD' });
-    f2.addInput(params, 'noiseStrength', { min: 0, max: 300 });
-    f2.addInput(params, 'noiseScale', { min: 0.001, max: 0.05 });
-    f2.addInput(params, 'noiseSpeed', { min: 0, max: 0.05 });
-    
-    const f3 = pane.addFolder({ title: 'VISUALS' });
-    f3.addInput(params, 'showLines');
-    f3.addInput(params, 'connectDistance', { min: 0, max: 100 });
-    f3.addInput(params, 'showPoints');
-    f3.addInput(params, 'strokeWeight', { min: 0.5, max: 5 });
-    f3.addInput(params, 'snapToGrid');
-    f3.addInput(params, 'gridSize', { min: 2, max: 50, step: 1 });
-    f3.addInput(params, 'autoRotate', { min: -1, max: 1 });
-
-    const f4 = pane.addFolder({ title: 'COLORS' });
-    f4.addInput(params, 'color');
-    f4.addInput(params, 'bg');
-}
-
-// Randomizer
-document.getElementById('fluxus-btn').addEventListener('click', () => {
-    params.noiseStrength = random(20, 200);
-    params.noiseScale = random(0.002, 0.02);
-    params.noiseSpeed = random(0.005, 0.03);
-    params.connectDistance = random(10, 60);
-    params.fontSize = random(100, 400);
-    
-    generatePoints();
-    if (pane) pane.refresh();
-});
