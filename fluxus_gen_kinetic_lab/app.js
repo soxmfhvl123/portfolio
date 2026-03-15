@@ -94,6 +94,13 @@ function resizeCanvasToRatio() {
     updateCanvasSize();
 }
 
+function updateCanvasSize() {
+    const container = document.getElementById('canvas-container');
+    const w = container.offsetWidth;
+    const h = container.offsetHeight;
+    document.getElementById('res-val').innerText = `${w}x${h}`;
+}
+
 function generatePoints() {
     if (!fontLoaded) return;
     const path = font.getPath(params.text, 0, 0, params.fontSize);
