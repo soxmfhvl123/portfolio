@@ -17,14 +17,16 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=tweak">
+    <link rel="stylesheet" href="style.css?v=20260316v2">
     <script>
-        // Only redirect ONLY when visiting the imageview repo root on GitHub Pages
-        if (window.location.hostname.includes('github.io') && window.location.pathname.endsWith('/imageview/')) {
-            window.location.href = window.location.origin + window.location.pathname + 'portfolio/';
-        } else if (window.location.hostname.includes('github.io') && window.location.pathname.endsWith('/imageview')) {
-            window.location.href = window.location.origin + window.location.pathname + '/portfolio/';
-        }
+        (function() {
+            var h = window.location.hostname;
+            var p = window.location.pathname;
+            // Force redirect on imageview repo only
+            if (h.indexOf('soxmfhvl123.github.io') !== -1 && p.indexOf('/imageview') === 0 && p.indexOf('/portfolio') === -1) {
+                window.location.href = window.location.origin + '/imageview/portfolio/';
+            }
+        })();
     </script>
 </head>
 
