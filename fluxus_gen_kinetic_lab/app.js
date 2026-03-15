@@ -1,83 +1,318 @@
 /**
- * FLUX-GEN: Kinetic Type Lab
- * Core Engine v1.0.0
- * p5.js + Tweakpane + opentype.js
+ * FLUX-GEN: Kinetic Type Lab 2.0
+ * Professional Kinetic Typography Engine
+ * Based on TEXTR Benchmarking
  */
 
 let font;
-let points = [];
 let fontLoaded = false;
 let canvas;
+let capturer;
+let isRecording = false;
+let recordFrames = 0;
+let currentFrame = 0;
 
-// Parameters
+// Parameters & State
 const params = {
-    // MAIN TAB
-    text: 'NOISE',
-    fontSize: 80,
-    pointDensity: 0.1,
+    // MAIN / CONTENT
+    text: 'KINETIC',
+    fontSize: 120,
+    lineHeight: 1.2,
     
-    // GRID SETTINGS
-    gridRows: 8,
-    gridCols: 10,
-    gridSpacingX: 120,
-    gridSpacingY: 60,
-    stagger: true,
-    
-    // NOISE FIELD
-    noiseStrength: 20,
-    noiseScale: 0.005,
-    noiseSpeed: 0.01,
-    
+    // GRID / LAYOUT
+    rows: 12,
+    cols: 1,
+    spacingY: 100,
+    spacingX: 0,
+    stagger: 0,
+    align: 'center',
+
+    // MOTION - POSITION
+    posMode: 'Double Sinusoid',
+    posFreq: 2.0,
+    posAmp: 50,
+    posPhase: 0,
+    posSpeed: 0.02,
+
+    // MOTION - SCALE
+    scaleMode: 'Noise',
+    scaleStart: 1.0,
+    scaleEnd: 0.5,
+    scaleFreq: 0.5,
+    scaleSpeed: 0.01,
+
     // VISUALS
-    showLines: true,
-    connectDistance: 45,
-    strokeWeight: 1.0,
     color: '#FF6600',
     bg: '#0a0a0a',
-    transparent: false,
+    strokeOnly: false,
+    strokeWeight: 1,
+    opacity: 100,
     
-    // VIEWPORT
+    // EXPORT
+    format: 'webm',
+    exportSize: 1, // multiplier
+    exportDuration: 5, // seconds
+    fps: 30,
+    
+    // OPTIONS
     ratio: '16:9',
-    margins: 0.39,
-    
-    // EXPORT (Placeholder logic)
-    exportSize: 4.0,
-    exportLength: 15,
+    margins: 0,
+    showGrid: false
 };
 
+const motionModes = ['None', 'Sinusoid', 'Double Sinusoid', 'Noise', 'Bounce'];
+const exportFormats = ['webm', 'png', 'gif'];
+
 let pane;
-let mainFolder, exportFolder, optionsFolder;
 
 function setup() {
-    const container = document.getElementById('canvas-container');
-    const w = container.offsetWidth;
-    const h = container.offsetHeight;
-    canvas = createCanvas(w, h);
+    initLayout();
+    canvas = createCanvas(width, height);
     canvas.parent('p5-canvas');
-    resizeCanvasToRatio();
     
-    const fontUrl = 'font.ttf';
-    opentype.load(fontUrl, (err, f) => {
+    // Initial Font Load
+    loadFont('font.ttf');
+    
+    initTweakpane();
+    windowResized();
+}
+
+function initLayout() {
+    const container = document.getElementById('canvas-container');
+    resizeCanvasToRatio();
+}
+
+function loadFont(url) {
+    document.getElementById('status-val').innerText = 'LOADING...';
+    opentype.load(url, (err, f) => {
         if (err) {
             console.error('Font load error:', err);
-            document.getElementById('status-val').innerText = 'PARSE ERROR';
+            document.getElementById('status-val').innerText = 'FONT ERROR';
         } else {
             font = f;
             fontLoaded = true;
-            generatePoints();
             document.getElementById('status-val').innerText = 'READY';
         }
     });
-
-    initTweakpane();
 }
 
-/**
- * Resizes the p5 canvas to fit the container while maintaining aspect ratio
- */
+function draw() {
+    background(params.bg);
+    if (!fontLoaded) return;
+    
+    document.getElementById('fps-val').innerText = floor(frameRate());
+    
+    if (params.showGrid) drawGuideGrid();
+    
+    push();
+    translate(width/2, height/2);
+    
+    const time = isRecording ? (currentFrame / params.fps) : (frameCount * 0.01);
+    
+    for (let r = 0; r < params.rows; r++) {
+        for (let c = 0; c < params.cols; c++) {
+            push();
+            
+            // Base Position
+            let bx = (c - (params.cols - 1) / 2) * params.spacingX;
+            let by = (r - (params.rows - 1) / 2) * params.spacingY;
+            
+            if (r % 2 === 1) bx += params.stagger;
+            
+            // Motion Calculations
+            const offset = (r * 0.2 + c * 0.1);
+            const posM = calculateMotion(params.posMode, time * params.posSpeed * 100, offset, params.posFreq);
+            const scaleM = calculateMotion(params.scaleMode, time * params.scaleSpeed * 100, offset, params.scaleFreq);
+            
+            translate(bx + posM * params.posAmp, by);
+            
+            const s = lerp(params.scaleStart, params.scaleEnd, scaleM);
+            scale(s);
+            
+            renderText();
+            pop();
+        }
+    }
+    pop();
+
+    handleExport();
+}
+
+function calculateMotion(mode, time, offset, freq) {
+    const t = time * 0.1 + offset * freq;
+    switch(mode) {
+        case 'Sinusoid': return sin(t);
+        case 'Double Sinusoid': return sin(t) * cos(t * 0.5);
+        case 'Noise': return noise(t) * 2 - 1;
+        case 'Bounce': return abs(sin(t));
+        default: return 0;
+    }
+}
+
+function renderText() {
+    const p5Color = color(params.color);
+    p5Color.setAlpha(map(params.opacity, 0, 100, 0, 255));
+    
+    if (params.strokeOnly) {
+        noFill();
+        stroke(p5Color);
+        strokeWeight(params.strokeWeight);
+    } else {
+        fill(p5Color);
+        noStroke();
+    }
+    
+    // Draw using standard p5 text or opentype path for precision
+    // Switching to standard p5 text for "Solid" feel and better performance in grid
+    textAlign(CENTER, CENTER);
+    textFont('Arial'); // Fallback
+    textSize(params.fontSize);
+    
+    // If opentype font is used, we can draw the path directly for better quality
+    const path = font.getPath(params.text, 0, 0, params.fontSize);
+    const bbox = path.getBoundingBox();
+    const tw = bbox.x2 - bbox.x1;
+    const th = bbox.y2 - bbox.y1;
+    
+    // Drawing at origin (centered)
+    const ctx = canvas.drawingContext;
+    ctx.save();
+    ctx.translate(-tw/2, th/2); // Adjustment for opentype baseline
+    path.draw(ctx);
+    ctx.restore();
+}
+
+function drawGuideGrid() {
+    stroke(40);
+    strokeWeight(1);
+    for (let x = 0; x <= width; x += 50) line(x, 0, x, height);
+    for (let y = 0; y <= height; y += 50) line(0, y, width, y);
+}
+
+function initTweakpane() {
+    pane = new Tweakpane.Pane({
+        container: document.getElementById('tweakpane-container'),
+        title: 'TEXTR ENGINE 2.0'
+    });
+
+    const tabs = pane.addTab({
+        pages: [
+            {title: 'MAIN'},
+            {title: 'MOTION'},
+            {title: 'EXPORT'},
+            {title: 'OPTIONS'},
+        ],
+    });
+
+    // --- MAIN TAB ---
+    const main = tabs.pages[0];
+    main.addInput(params, 'text');
+    main.addInput(params, 'fontSize', { min: 10, max: 300 });
+
+    const fGrid = main.addFolder({ title: 'GRID / LAYOUT' });
+    fGrid.addInput(params, 'rows', { min: 1, max: 50, step: 1 });
+    fGrid.addInput(params, 'cols', { min: 1, max: 50, step: 1 });
+    fGrid.addInput(params, 'spacingY', { min: 0, max: 500 });
+    fGrid.addInput(params, 'spacingX', { min: 0, max: 500 });
+    fGrid.addInput(params, 'stagger', { min: 0, max: 200 });
+
+    const fVisuals = main.addFolder({ title: 'VISUALS' });
+    fVisuals.addInput(params, 'color');
+    fVisuals.addInput(params, 'bg');
+    fVisuals.addInput(params, 'opacity', { min: 0, max: 100 });
+    fVisuals.addInput(params, 'strokeOnly');
+    fVisuals.addInput(params, 'strokeWeight', { min: 0.1, max: 10 });
+
+    // --- MOTION TAB ---
+    const motion = tabs.pages[1];
+    const fPos = motion.addFolder({ title: 'POSITION' });
+    fPos.addInput(params, 'posMode', { options: motionModes.reduce((a,v) => ({...a, [v]:v}), {}) });
+    fPos.addInput(params, 'posFreq', { min: 0, max: 10 });
+    fPos.addInput(params, 'posAmp', { min: 0, max: 500 });
+    fPos.addInput(params, 'posSpeed', { min: 0, max: 0.2 });
+
+    const fScale = motion.addFolder({ title: 'SCALE' });
+    fScale.addInput(params, 'scaleMode', { options: motionModes.reduce((a,v) => ({...a, [v]:v}), {}) });
+    fScale.addInput(params, 'scaleStart', { min: 0, max: 3 });
+    fScale.addInput(params, 'scaleEnd', { min: 0, max: 3 });
+    fScale.addInput(params, 'scaleFreq', { min: 0, max: 10 });
+    fScale.addInput(params, 'scaleSpeed', { min: 0, max: 0.2 });
+
+    // --- EXPORT TAB ---
+    const exp = tabs.pages[2];
+    exp.addInput(params, 'format', { options: { 'WebM': 'webm', 'PNG Sequence': 'png', 'GIF': 'gif' } });
+    exp.addInput(params, 'exportDuration', { min: 1, max: 60, title: 'Length (sec)' });
+    exp.addInput(params, 'fps', { min: 1, max: 60, step: 1 });
+    
+    exp.addButton({ title: 'LOAD CUSTOM FONT' }).on('click', () => {
+        document.getElementById('font-input').click();
+    });
+
+    // --- OPTIONS TAB ---
+    const opt = tabs.pages[3];
+    opt.addInput(params, 'ratio', { options: { '16:9': '16:9', '4:5': '4:5', '1:1': '1:1', '9:16': '9:16' } }).on('change', () => resizeCanvasToRatio());
+    opt.addInput(params, 'showGrid');
+    opt.addButton({ title: 'ENTER FULLSCREEN' }).on('click', () => toggleFullScreen());
+}
+
+// --- FONT LOADING ---
+document.getElementById('font-input').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const fontData = event.target.result;
+            font = opentype.parse(fontData);
+            fontLoaded = true;
+            document.getElementById('status-val').innerText = 'CUSTOM FONT';
+        };
+        reader.readAsArrayBuffer(file);
+    }
+});
+
+// --- EXPORT LOGIC ---
+document.getElementById('generate-output-btn').addEventListener('click', () => {
+    startExport();
+});
+
+function startExport() {
+    isRecording = true;
+    currentFrame = 0;
+    recordFrames = params.exportDuration * params.fps;
+    
+    capturer = new CCapture({
+        format: params.format,
+        framerate: params.fps,
+        verbose: true,
+        display: true
+    });
+    
+    document.getElementById('export-progress-container').style.display = 'block';
+    capturer.start();
+}
+
+function handleExport() {
+    if (!isRecording) return;
+    
+    capturer.capture(canvas.elt);
+    currentFrame++;
+    
+    const percent = floor((currentFrame / recordFrames) * 100);
+    document.getElementById('export-percent').innerText = percent;
+    document.getElementById('progress-fill').style.width = `${percent}%`;
+    
+    if (currentFrame >= recordFrames) {
+        isRecording = false;
+        capturer.stop();
+        capturer.save();
+        document.getElementById('export-progress-container').style.display = 'none';
+    }
+}
+
+// --- UTILS ---
 function resizeCanvasToRatio() {
     const container = document.getElementById('canvas-container');
-    const containerW = container.offsetWidth - 40; // margin
+    const containerW = container.offsetWidth - 40;
     const containerH = container.offsetHeight - 40;
     
     let targetW, targetH;
@@ -93,192 +328,28 @@ function resizeCanvasToRatio() {
     }
     
     resizeCanvas(targetW, targetH);
-    updateCanvasSize();
+    document.getElementById('res-val').innerText = `${floor(targetW)}x${floor(targetH)}`;
 }
-
-function updateCanvasSize() {
-    const container = document.getElementById('canvas-container');
-    const w = container.offsetWidth;
-    const h = container.offsetHeight;
-    document.getElementById('res-val').innerText = `${w}x${h}`;
-}
-
-function generatePoints() {
-    if (!fontLoaded) return;
-    const path = font.getPath(params.text, 0, 0, params.fontSize);
-    points = getPointsFromPath(path, params.pointDensity);
-    
-    const bbox = path.getBoundingBox();
-    const offsetX = (bbox.x1 + bbox.x2) / 2;
-    const offsetY = (bbox.y1 + bbox.y2) / 2;
-    
-    // Center points relative to origin
-    points.forEach(p => {
-        p.origX = p.x - offsetX;
-        p.origY = p.y - offsetY;
-    });
-}
-
-function draw() {
-    if (params.transparent) clear();
-    else background(params.bg);
-    
-    if (!fontLoaded) return;
-    document.getElementById('fps-val').innerText = floor(frameRate());
-    
-    translate(width/2, height/2);
-    
-    // Grid Rendering (Step & Repeat)
-    for (let r = 0; r < params.gridRows; r++) {
-        for (let c = 0; c < params.gridCols; c++) {
-            push();
-            let x = (c - (params.gridCols - 1) / 2) * params.gridSpacingX;
-            let y = (r - (params.gridRows - 1) / 2) * params.gridSpacingY;
-            
-            if (params.stagger && r % 2 === 1) x += params.gridSpacingX / 2;
-            
-            translate(x, y);
-            drawKineticText(r, c);
-            pop();
-        }
-    }
-}
-
-function drawKineticText(row, col) {
-    stroke(params.color);
-    strokeWeight(params.strokeWeight);
-    noFill();
-
-    // Secondary noise for individual text instances
-    const instanceNoise = noise(row * 0.1, col * 0.1, frameCount * 0.005);
-    
-    // Calculate displaced positions for this instance
-    const displacedPoints = points.map(p => {
-        const n = noise(
-            (p.origX + row * 100) * params.noiseScale, 
-            (p.origY + col * 100) * params.noiseScale, 
-            frameCount * params.noiseSpeed
-        );
-        const angle = n * TWO_PI * 2;
-        return {
-            x: p.origX + cos(angle) * params.noiseStrength * instanceNoise,
-            y: p.origY + sin(angle) * params.noiseStrength * instanceNoise
-        };
-    });
-
-    if (params.showLines) {
-        if (params.connectDistance > 1) {
-            // Optimization: Only connect a subset of points if density is high
-            const step = points.length > 500 ? 5 : 2;
-            for (let i = 0; i < displacedPoints.length; i += step) {
-                const p1 = displacedPoints[i];
-                for (let j = i + 1; j < displacedPoints.length; j += step * 3) {
-                    const p2 = displacedPoints[j];
-                    const d = dist(p1.x, p1.y, p2.x, p2.y);
-                    if (d < params.connectDistance) {
-                        line(p1.x, p1.y, p2.x, p2.y);
-                    }
-                }
-            }
-        } else {
-            beginShape(POINTS);
-            displacedPoints.forEach(p => vertex(p.x, p.y));
-            endShape();
-        }
-    }
-}
-
-function initTweakpane() {
-    pane = new Tweakpane.Pane({
-        container: document.getElementById('tweakpane-container'),
-        title: 'TEXTR ENGINE'
-    });
-
-    const tabs = pane.addTab({
-        pages: [
-            {title: 'MAIN'},
-            {title: 'EXPORT'},
-            {title: 'OPTIONS'},
-        ],
-    });
-
-    // MAIN PAGE
-    const main = tabs.pages[0];
-    main.addInput(params, 'text').on('change', () => generatePoints());
-    main.addInput(params, 'fontSize', { min: 10, max: 200 }).on('change', () => generatePoints());
-    
-    const fGrid = main.addFolder({ title: 'STEP & REPEAT' });
-    fGrid.addInput(params, 'gridRows', { min: 1, max: 30, step: 1 });
-    fGrid.addInput(params, 'gridCols', { min: 1, max: 30, step: 1 });
-    fGrid.addInput(params, 'gridSpacingX', { min: 10, max: 400 });
-    fGrid.addInput(params, 'gridSpacingY', { min: 10, max: 400 });
-    fGrid.addInput(params, 'stagger');
-
-    const fMotion = main.addFolder({ title: 'MOTION / NOISE' });
-    fMotion.addInput(params, 'noiseStrength', { min: 0, max: 200 });
-    fMotion.addInput(params, 'noiseScale', { min: 0.0001, max: 0.02 });
-    fMotion.addInput(params, 'noiseSpeed', { min: 0, max: 0.1 });
-
-    const fVisual = main.addFolder({ title: 'VISUALS' });
-    fVisual.addInput(params, 'connectDistance', { min: 0, max: 100 });
-    fVisual.addInput(params, 'strokeWeight', { min: 0.1, max: 4 });
-    fVisual.addInput(params, 'color');
-    fVisual.addInput(params, 'bg');
-    fVisual.addInput(params, 'transparent').on('change', (v) => {
-        const canvasEl = document.getElementById('p5-canvas');
-        if (v.value) canvasEl.classList.add('canvas-grid-bg');
-        else canvasEl.classList.remove('canvas-grid-bg');
-    });
-
-    // EXPORT PAGE
-    const exp = tabs.pages[1];
-    exp.addInput(params, 'exportSize', { min: 1, max: 8 });
-    exp.addInput(params, 'exportLength', { min: 1, max: 60 });
-    exp.addButton({ title: 'EXPORT GRAPHICS' });
-
-    // OPTIONS PAGE
-    const opt = tabs.pages[2];
-    opt.addInput(params, 'ratio', { options: { '16:9': '16:9', '4:5': '4:5', '1:1': '1:1' } }).on('change', () => resizeCanvasToRatio());
-    opt.addInput(params, 'margins', { min: 0, max: 1 });
-    opt.addButton({ title: 'FULLSCREEN MODE' });
-}
-
-function getPointsFromPath(path, density) {
-    const pts = [];
-    const commands = path.commands;
-    let curX = 0, curY = 0;
-    for (let i = 0; i < commands.length; i++) {
-        const cmd = commands[i];
-        if (cmd.type === 'M' || cmd.type === 'L') {
-            pts.push({ x: cmd.x, y: cmd.y });
-            curX = cmd.x; curY = cmd.y;
-        } else if (cmd.type === 'Q') {
-            for (let t = 0.1; t <= 1; t += 1 / (density * 50)) {
-                const x = (1-t)**2 * curX + 2*(1-t)*t * cmd.x1 + t**2 * cmd.x;
-                const y = (1-t)**2 * curY + 2*(1-t)*t * cmd.y1 + t**2 * cmd.y;
-                pts.push({ x, y });
-            }
-            curX = cmd.x; curY = cmd.y;
-        } else if (cmd.type === 'C') {
-            for (let t = 0.1; t <= 1; t += 1 / (density * 50)) {
-                const x = (1-t)**3 * curX + 3*(1-t)**2*t * cmd.x1 + 3*(1-t)*t**2 * cmd.x2 + t**3 * cmd.x;
-                const y = (1-t)**3 * curY + 3*(1-t)**2*t * cmd.y1 + 3*(1-t)*t**2 * cmd.y2 + t**3 * cmd.y;
-                pts.push({ x, y });
-            }
-            curX = cmd.x; curY = cmd.y;
-        }
-    }
-    return pts;
-}
-
-document.getElementById('fluxus-btn').addEventListener('click', () => {
-    params.noiseStrength = random(5, 60);
-    params.noiseScale = random(0.001, 0.015);
-    params.gridRows = floor(random(3, 15));
-    params.gridCols = floor(random(3, 15));
-    if (pane) pane.refresh();
-});
 
 function windowResized() {
     resizeCanvasToRatio();
 }
+
+function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+}
+
+document.getElementById('fluxus-btn').addEventListener('click', () => {
+    params.posAmp = random(0, 300);
+    params.posFreq = random(0, 5);
+    params.scaleEnd = random(0.2, 1.5);
+    params.spacingY = random(50, 200);
+    params.color = '#' + floor(random(16777215)).toString(16).padStart(6, '0');
+    pane.refresh();
+});
