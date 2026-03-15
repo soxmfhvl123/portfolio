@@ -162,24 +162,29 @@ function renderText() {
         noStroke();
     }
     
-    // Draw using standard p5 text or opentype path for precision
-    // Switching to standard p5 text for "Solid" feel and better performance in grid
     textAlign(CENTER, CENTER);
-    textFont('Arial'); // Fallback
     textSize(params.fontSize);
     
-    // If opentype font is used, we can draw the path directly for better quality
-    const path = font.getPath(params.text, 0, 0, params.fontSize);
-    const bbox = path.getBoundingBox();
-    const tw = bbox.x2 - bbox.x1;
-    const th = bbox.y2 - bbox.y1;
-    
-    // Drawing at origin (centered)
-    const ctx = canvas.drawingContext;
-    ctx.save();
-    ctx.translate(-tw/2, th/2); // Adjustment for opentype baseline
-    path.draw(ctx);
-    ctx.restore();
+    if (fontLoaded && font) {
+        try {
+            const path = font.getPath(params.text, 0, 0, params.fontSize);
+            const bbox = path.getBoundingBox();
+            const tw = bbox.x2 - bbox.x1;
+            const th = bbox.y2 - bbox.y1;
+            
+            const ctx = canvas.drawingContext;
+            ctx.save();
+            ctx.translate(-tw/2, th/2);
+            path.draw(ctx);
+            ctx.restore();
+        } catch (e) {
+            console.error('Opentype path error, falling back to p5 text:', e);
+            text(params.text, 0, 0);
+        }
+    } else {
+        textFont('sans-serif');
+        text(params.text, 0, 0);
+    }
 }
 
 function drawGuideGrid() {
