@@ -98,7 +98,6 @@ function loadFont(url) {
 
 function draw() {
     background(params.bg);
-    if (!fontLoaded) return;
     
     document.getElementById('fps-val').innerText = floor(frameRate());
     
@@ -117,7 +116,7 @@ function draw() {
             let bx = (c - (params.cols - 1) / 2) * params.spacingX;
             let by = (r - (params.rows - 1) / 2) * params.spacingY;
             
-            if (r % 2 === 1) bx += params.stagger;
+            if (params.rows > 1 && r % 2 === 1) bx += params.stagger;
             
             // Motion Calculations
             const offset = (r * 0.2 + c * 0.1);
@@ -126,7 +125,7 @@ function draw() {
             
             translate(bx + posM * params.posAmp, by);
             
-            const s = lerp(params.scaleStart, params.scaleEnd, scaleM);
+            const s = lerp(params.scaleStart, params.scaleEnd, (scaleM + 1) / 2);
             scale(s);
             
             renderText();
