@@ -149,6 +149,7 @@ function calculateMotion(mode, time, offset, freq) {
 }
 
 function renderText() {
+    push();
     const p5Color = color(params.color);
     p5Color.setAlpha(map(params.opacity, 0, 100, 0, 255));
     
@@ -164,26 +165,11 @@ function renderText() {
     textAlign(CENTER, CENTER);
     textSize(params.fontSize);
     
-    if (fontLoaded && font) {
-        try {
-            const path = font.getPath(params.text, 0, 0, params.fontSize);
-            const bbox = path.getBoundingBox();
-            const tw = bbox.x2 - bbox.x1;
-            const th = bbox.y2 - bbox.y1;
-            
-            const ctx = canvas.drawingContext;
-            ctx.save();
-            ctx.translate(-tw/2, th/2);
-            path.draw(ctx);
-            ctx.restore();
-        } catch (e) {
-            console.error('Opentype path error, falling back to p5 text:', e);
-            text(params.text, 0, 0);
-        }
-    } else {
-        textFont('sans-serif');
-        text(params.text, 0, 0);
-    }
+    // Always use p5 text as primary for 'Solid' feel and reliability
+    // We already have font loaded via opentype if needed for other things, 
+    // but p5 text() with the default or loaded font name is more standard.
+    text(params.text, 0, 0);
+    pop();
 }
 
 function drawGuideGrid() {
