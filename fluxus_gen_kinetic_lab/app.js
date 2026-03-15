@@ -66,20 +66,20 @@ const exportFormats = ['webm', 'png', 'gif'];
 let pane;
 
 function setup() {
-    initLayout();
-    canvas = createCanvas(width, height);
+    const container = document.getElementById('canvas-container');
+    const w = container.offsetWidth || windowWidth;
+    const h = container.offsetHeight || windowHeight;
+    canvas = createCanvas(w, h);
     canvas.parent('p5-canvas');
+    
+    // Maintain ratio immediately
+    resizeCanvasToRatio();
     
     // Initial Font Load
     loadFont('font.ttf');
     
     initTweakpane();
     windowResized();
-}
-
-function initLayout() {
-    const container = document.getElementById('canvas-container');
-    resizeCanvasToRatio();
 }
 
 function loadFont(url) {
@@ -107,7 +107,7 @@ function draw() {
     push();
     translate(width/2, height/2);
     
-    const time = isRecording ? (currentFrame / params.fps) : (frameCount * 0.01);
+    const tBase = isRecording ? (currentFrame / params.fps) : (millis() * 0.001);
     
     for (let r = 0; r < params.rows; r++) {
         for (let c = 0; c < params.cols; c++) {
@@ -121,8 +121,8 @@ function draw() {
             
             // Motion Calculations
             const offset = (r * 0.2 + c * 0.1);
-            const posM = calculateMotion(params.posMode, time * params.posSpeed * 100, offset, params.posFreq);
-            const scaleM = calculateMotion(params.scaleMode, time * params.scaleSpeed * 100, offset, params.scaleFreq);
+            const posM = calculateMotion(params.posMode, tBase * params.posSpeed * 10, offset, params.posFreq);
+            const scaleM = calculateMotion(params.scaleMode, tBase * params.scaleSpeed * 10, offset, params.scaleFreq);
             
             translate(bx + posM * params.posAmp, by);
             
