@@ -39,6 +39,8 @@ const easingFunctions = {
     }
 };
 
+const motionModes = ['None', 'Sinusoid', 'Double Sinusoid', 'Noise', 'Bounce'];
+
 const googleFontList = [
     'Space Grotesk', 'Inter', 'Modak', 'Bungee', 'Outfit', 'Roboto', 
     'Playfair Display', 'Syne', 'Kanit', 'Noto Sans KR', 'Archivo Black'
@@ -301,7 +303,9 @@ function initTweakpane() {
 
     pane.addInput(params, 'preset', {
         options: Object.keys(presets).reduce((a, v) => ({ ...a, [v]: v }), {})
-    }).on('change', (ev) => applyPreset(ev.value));
+    }).on('change', (ev) => {
+        applyPreset(ev.value);
+    });
 
     const tabs = pane.addTab({
         pages: [
