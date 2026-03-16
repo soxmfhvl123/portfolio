@@ -48,23 +48,33 @@ const presets = {
     'Default Engine': {
         text: 'KINETIC', fontSize: 120, rows: 12, cols: 1, spacingY: 100, 
         posMode: 'Double Sinusoid', posAmp: 75, posFreq: 0.8, posEase: 'Linear',
-        scaleMode: 'Noise', scaleStart: 1.0, scaleEnd: 0.5
+        scaleMode: 'Noise', scaleStart: 1.0, scaleEnd: 0.5, gFont: 'Space Grotesk'
     },
     'Round The Clock': {
         text: 'ROUND THE CLOCK', fontSize: 45, rows: 15, cols: 1, spacingY: 60,
         color: '#601cf2', posMode: 'Double Sinusoid', posAmp: 120, posFreq: 1.2,
         posEase: 'Elastic Out', posMirror: true, scaleMode: 'Use Position Data',
-        scaleStart: 1.2, scaleEnd: 0.1, scalePhase: 0.25
+        scaleStart: 1.2, scaleEnd: 0.1, scalePhase: 0.25, gFont: 'Modak'
     },
     'Fluid Noise': {
         text: 'FLUID', fontSize: 180, rows: 5, cols: 1, spacingY: 150,
         posMode: 'Noise', posAmp: 200, posFreq: 0.4, posSpeed: 0.01,
-        scaleMode: 'Noise', scaleStart: 1.5, scaleEnd: 0.3
+        scaleMode: 'Noise', scaleStart: 1.5, scaleEnd: 0.3, gFont: 'Syne'
     },
     'Bounce Grid': {
         text: 'BOUNCE', fontSize: 80, rows: 8, cols: 3, spacingX: 180, spacingY: 100,
         posMode: 'Bounce', posAmp: 100, posFreq: 1.0, posEase: 'Bounce Out',
-        scaleMode: 'None', scaleStart: 1.0
+        scaleMode: 'None', scaleStart: 1.0, gFont: 'Bungee'
+    },
+    'Minimal Wave': {
+        text: 'MINIMAL', fontSize: 60, rows: 20, cols: 1, spacingY: 40,
+        color: '#ffffff', bg: '#000000', posMode: 'Sinusoid', posAmp: 50, 
+        posFreq: 0.5, posEase: 'Quad In-Out', scaleMode: 'None', gFont: 'Inter'
+    },
+    'Staggered Pulse': {
+        text: 'PULSE', fontSize: 100, rows: 10, cols: 1, spacingY: 110,
+        posMode: 'None', scaleMode: 'Sinusoid', scaleStart: 2.0, scaleEnd: 0.2,
+        scaleFreq: 1.5, scaleSpeed: 0.05, gFont: 'Archivo Black'
     }
 };
 
