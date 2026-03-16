@@ -12,6 +12,7 @@ let isRecording = false;
 let recordFrames = 0;
 let currentFrame = 0;
 let activeGoogleFont = 'Space Grotesk';
+let pane;
 
 // --- CONSTANTS ---
 const easingFunctions = {
@@ -39,44 +40,74 @@ const easingFunctions = {
     }
 };
 
-const motionModes = ['None', 'Sinusoid', 'Double Sinusoid', 'Noise', 'Bounce'];
-
 const googleFontList = [
     'Space Grotesk', 'Inter', 'Modak', 'Bungee', 'Outfit', 'Roboto', 
-    'Playfair Display', 'Syne', 'Kanit', 'Noto Sans KR', 'Archivo Black'
+    'Playfair Display', 'Syne', 'Kanit', 'Noto Sans KR', 'Archivo Black', 'Syne Mono'
+];
+
+const motionModes = [
+    'None', 'Sinusoid', 'Double Sinusoid', 'Noise', 'Bounce', 
+    'Laser Scan', 'Topographic', 'Liquid', 'Elastic', 'Magnetic', 
+    'Crumble', 'Echo', 'Kaleidoscope', 'Heartbeat', 'Flow-Field', 'Ripple-Wave'
 ];
 
 const presets = {
-    'Default Engine': {
-        text: 'KINETIC', fontSize: 120, rows: 12, cols: 1, spacingY: 100, 
-        posMode: 'Double Sinusoid', posAmp: 75, posFreq: 0.8, posEase: 'Linear',
-        scaleMode: 'Noise', scaleStart: 1.0, scaleEnd: 0.5, gFont: 'Space Grotesk'
+    'Neural Ripple': {
+        text: 'SYNAPTIC FLOW', fontSize: 40, rows: 35, cols: 2, spacingX: 300, spacingY: 30,
+        posMode: 'Flow-Field', posAmp: 200, posFreq: 2.0, posSpeed: 0.008,
+        scaleMode: 'Sinusoid', scaleStart: 1.1, scaleEnd: 0.2,
+        color: '#00D1FF', bg: '#0A0B10', gFont: 'Syne'
     },
-    'Round The Clock': {
-        text: 'ROUND THE CLOCK', fontSize: 45, rows: 15, cols: 1, spacingY: 60,
-        color: '#601cf2', posMode: 'Double Sinusoid', posAmp: 120, posFreq: 1.2,
-        posEase: 'Elastic Out', posMirror: true, scaleMode: 'Use Position Data',
-        scaleStart: 1.2, scaleEnd: 0.1, scalePhase: 0.25, gFont: 'Modak'
+    'Galactic Flux': {
+        text: 'ZERO GRAVITY', fontSize: 60, rows: 20, cols: 1, spacingY: 50,
+        posMode: 'Ripple-Wave', posAmp: 300, posFreq: 0.8, posSpeed: 0.02,
+        scaleMode: 'Use Position Data', scaleStart: 1.2, scaleEnd: 0.4,
+        color: '#FFFFFF', bg: '#100A1A', gFont: 'Inter'
     },
-    'Fluid Noise': {
-        text: 'FLUID', fontSize: 180, rows: 5, cols: 1, spacingY: 150,
-        posMode: 'Noise', posAmp: 200, posFreq: 0.4, posSpeed: 0.01,
-        scaleMode: 'Noise', scaleStart: 1.5, scaleEnd: 0.3, gFont: 'Syne'
+    'Static Storm': {
+        text: 'SIGNAL LOST', fontSize: 80, rows: 15, cols: 3, spacingX: 380, spacingY: 90,
+        posMode: 'Magnetic', posAmp: 350, posFreq: 1.8, posSpeed: 0.012,
+        scaleMode: 'Noise', scaleStart: 1.6, scaleEnd: 0.1,
+        color: '#FF3D00', bg: '#050505', gFont: 'Space Grotesk'
     },
-    'Bounce Grid': {
-        text: 'BOUNCE', fontSize: 80, rows: 8, cols: 3, spacingX: 180, spacingY: 100,
-        posMode: 'Bounce', posAmp: 100, posFreq: 1.0, posEase: 'Bounce Out',
-        scaleMode: 'None', scaleStart: 1.0, gFont: 'Bungee'
+    'Melted Reality': {
+        text: 'LIQUID FORM', fontSize: 50, rows: 30, cols: 4, spacingX: 200, spacingY: 40,
+        posMode: 'Double Sinusoid', posAmp: 100, posFreq: 4.0, posSpeed: 0.015,
+        scaleMode: 'Sinusoid', scaleStart: 1.3, scaleEnd: 0.3,
+        color: '#FF00F5', bg: '#1A0033', gFont: 'Modak'
     },
-    'Minimal Wave': {
-        text: 'MINIMAL', fontSize: 60, rows: 20, cols: 1, spacingY: 40,
-        color: '#ffffff', bg: '#000000', posMode: 'Sinusoid', posAmp: 50, 
-        posFreq: 0.5, posEase: 'Quad In-Out', scaleMode: 'None', gFont: 'Inter'
+    'Scanning Laser': {
+        text: 'SCANNING', fontSize: 100, rows: 25, cols: 1, spacingY: 40,
+        posMode: 'Laser Scan', posAmp: 250, posFreq: 1.2, posSpeed: 0.02,
+        scaleMode: 'Use Position Data', scaleStart: 1.3, scaleEnd: 0.05,
+        color: '#00FF41', bg: '#000000', gFont: 'Space Grotesk',
+        posStretch: 0.5
     },
-    'Staggered Pulse': {
-        text: 'PULSE', fontSize: 100, rows: 10, cols: 1, spacingY: 110,
-        posMode: 'None', scaleMode: 'Sinusoid', scaleStart: 2.0, scaleEnd: 0.2,
-        scaleFreq: 1.5, scaleSpeed: 0.05, gFont: 'Archivo Black'
+    'Topographic Fold': {
+        text: 'TERRAIN', fontSize: 180, rows: 20, cols: 1, spacingY: 30,
+        posMode: 'Topographic', posAmp: 400, posFreq: 0.6, posSpeed: 0.015,
+        scaleMode: 'Sinusoid', scaleStart: 1.1, scaleEnd: 0.7,
+        color: '#FFFFFF', bg: '#111111', gFont: 'Syne',
+        posShear: 0.2
+    },
+    'Elastic String': {
+        text: 'TENSION', fontSize: 130, rows: 15, cols: 1, spacingY: 90,
+        posMode: 'Elastic', posAmp: 300, posFreq: 1.2, posSpeed: 0.03,
+        posEase: 'Elastic Out', scaleMode: 'None',
+        color: '#FFFF00', bg: '#000000', gFont: 'Bungee',
+        posStretch: 1.5
+    },
+    'Pixel Crumble': {
+        text: 'FRAGMENT', fontSize: 110, rows: 18, cols: 1, spacingY: 110,
+        posMode: 'Crumble', posAmp: 600, posFreq: 1.2, posSpeed: 0.02,
+        scaleMode: 'None', color: '#FFFFFF', bg: '#000000', gFont: 'Archivo Black'
+    },
+    'Void Echo': {
+        text: 'INFINITE', fontSize: 250, rows: 6, cols: 1, spacingY: 150,
+        posMode: 'Echo', posAmp: 400, posFreq: 0.5, posSpeed: 0.05,
+        scaleMode: 'Sinusoid', scaleStart: 1.1, scaleEnd: 0.1,
+        color: '#FF00FF', bg: '#000000', gFont: 'Playfair Display',
+        posStretch: 0.5
     }
 };
 
@@ -111,6 +142,8 @@ const params = {
     posMirror: true,
     posOffset: 0,
     posSpeed: 0.02,
+    posStretch: 0, // NEW
+    posShear: 0,   // NEW
 
     // MOTION - SCALE
     scaleMode: 'Noise',
@@ -132,7 +165,8 @@ const params = {
     exportDuration: 5,
     fps: 30,
     ratio: '16:9',
-    showGrid: false
+    showGrid: false,
+    startTime: 0 // Track when preset was applied
 };
 
 // --- CORE ---
@@ -169,78 +203,117 @@ function loadGoogleFont(fontName) {
 }
 
 function draw() {
-    background(params.bg);
+    if (params.posMode === 'Echo') {
+        push();
+        fill(color(params.bg + '22')); 
+        noStroke();
+        rect(0, 0, width, height);
+        pop();
+    } else {
+        background(params.bg);
+    }
     
     document.getElementById('fps-val').innerText = floor(frameRate());
     if (params.showGrid) drawGuideGrid();
     
-    push();
-    translate(width/2, height/2);
-    
     const tBase = isRecording ? (currentFrame / params.fps) : (millis() * 0.001);
     
-    for (let r = 0; r < params.rows; r++) {
-        for (let c = 0; c < params.cols; c++) {
-            push();
-            
-            // 1. Calculate Grid Base Position
-            let bx = (c - (params.cols - 1) / 2) * params.spacingX;
-            let by = (r - (params.rows - 1) / 2) * params.spacingY;
-            if (params.rows > 1 && r % 2 === 1) bx += params.stagger;
-            
-            // 2. Normalized row/column factor [0, 1]
-            const nr = params.rows > 1 ? r / (params.rows - 1) : 0.5;
-            const nc = params.cols > 1 ? c / (params.cols - 1) : 0.5;
-            
-            // Distance from center factor (for Amp Modulation)
-            const distFromCenter = dist(nr, nc, 0.5, 0.5) * 2; // [0, 1.414...]
-            let ampFactor = 1;
-            if (params.posAmpMod === 'Center Easing') {
-                ampFactor = 1 - Math.min(distFromCenter, 1);
-            }
-            
-            // 3. Position Motion
-            const posTime = tBase * params.posSpeed * 50;
-            const posOffset = (r * params.posCycles + c * params.posCyclesAdd) * 0.1;
-            const posFreq = params.posFreq + (r * params.posFreqAdd * 0.1);
-            
-            let posVal = calculateMotionVal(params.posMode, posTime, posOffset, posFreq);
-            
-            // Apply Easing to calculated wave
-            const easedPos = applyEasing(params.posEase, (posVal + 1) / 2) * 2 - 1;
-            
-            // Apply Mirroring
-            let finalPosVal = easedPos;
-            if (params.posMirror && nr > 0.5) finalPosVal *= -1;
-            
-            translate(bx + finalPosVal * params.posAmp * ampFactor, by);
-            
-            // 4. Scale Motion
-            let finalScale;
-            if (params.scaleMode === 'Use Position Data') {
-                // Link scale to position, possibly with phase offset
-                const phaseT = posTime + params.scalePhase * PI;
-                let sVal = calculateMotionVal(params.posMode, phaseT, posOffset, posFreq);
-                const easedS = applyEasing(params.scaleEase, (sVal + 1) / 2);
-                finalScale = lerp(params.scaleStart, params.scaleEnd, easedS);
-            } else {
-                const sTime = tBase * params.scaleSpeed * 50;
-                const sOffset = posOffset + params.scalePhase * PI;
-                let sVal = calculateMotionVal(params.scaleMode, sTime, sOffset, params.scaleFreq);
-                const easedS = applyEasing(params.scaleEase, (sVal + 1) / 2);
-                finalScale = lerp(params.scaleStart, params.scaleEnd, easedS);
-            }
-            
-            if (params.scaleMirror && nr > 0.5) finalScale = params.scaleStart + params.scaleEnd - finalScale;
-            
-            scale(finalScale);
-            
-            // 5. Rendering
-            renderTextNode();
-            pop();
-        }
+    // Performance Optimization: Reduce kaleidoscope symmetry if layout is dense
+    let kCycles = 1;
+    if (params.posMode === 'Kaleidoscope') {
+        kCycles = (params.rows * params.cols > 40) ? 4 : 6;
     }
-    pop();
+
+    // Heartbeat Screen Shake/Recoil
+    if (params.posMode === 'Heartbeat') {
+        let recoil = pow(sin(tBase * PI * 2.0), 12) * 5;
+        translate(random(-recoil, recoil), random(-recoil, recoil));
+    }
+
+    for (let k = 0; k < kCycles; k++) {
+        push();
+        translate(width/2, height/2);
+        if (params.posMode === 'Kaleidoscope') {
+            rotate(k * TWO_PI / kCycles + tBase * 0.15);
+        }
+
+        for (let r = 0; r < params.rows; r++) {
+            for (let c = 0; c < params.cols; c++) {
+                push();
+                
+                let bx = (c - (params.cols - 1) / 2) * params.spacingX;
+                let by = (r - (params.rows - 1) / 2) * params.spacingY;
+                if (params.rows > 1 && r % 2 === 1) bx += params.stagger;
+                
+                const nr = params.rows > 1 ? r / (params.rows - 1) : 0.5;
+                const nc = params.cols > 1 ? c / (params.cols - 1) : 0.5;
+                
+                const posTime = tBase * params.posSpeed * 50;
+                const posOffset = (r * params.posCycles + c * params.posCyclesAdd) * 0.1;
+                const posFreq = params.posFreq + (r * params.posFreqAdd * 0.1);
+                
+                let posVal = calculateMotionVal(params.posMode, posTime, posOffset, posFreq, nr, nc);
+                const easedPos = applyEasing(params.posEase, (posVal + 1) / 2) * 2 - 1;
+                
+                let finalPosVal = easedPos;
+                if (params.posMirror && nr > 0.5) finalPosVal *= -1;
+                
+                // --- SPECIAL DISPLACEMENTS ---
+                if (params.posMode === 'Crumble') {
+                    // Reset every 10 seconds or relative to startTime
+                    let elapsed = (tBase - params.startTime) % 10;
+                    let gravity = pow(max(0, elapsed * 2 - posOffset * 0.5), 2) * 40;
+                    translate(bx + (posVal * params.posAmp * 0.05), by + gravity);
+                    rotate(elapsed * 0.5 * nr); 
+                } else if (params.posMode === 'Laser Scan') {
+                    let scanLine = (sin(posTime * 0.5) * 0.5 + 0.5) * height - height/2;
+                    let distToLine = abs(by - scanLine);
+                    let jitter = distToLine < 50 ? random(-15, 15) : 0;
+                    translate(bx + finalPosVal * params.posAmp + jitter, by);
+                } else {
+                    translate(bx + finalPosVal * params.posAmp, by);
+                }
+                
+                // DEFORMATIONS - Stretch & Shear
+                shearX(params.posShear * finalPosVal);
+                scale(1, 1 + params.posStretch * abs(finalPosVal));
+
+                // --- SCALE & READABILITY REFINEMENTS ---
+                let finalScale;
+                if (params.scaleMode === 'Use Position Data') {
+                    const phaseT = posTime + params.scalePhase * PI;
+                    let sVal = calculateMotionVal(params.posMode, phaseT, posOffset, posFreq, nr, nc);
+                    const easedS = applyEasing(params.scaleEase, (sVal + 1) / 2);
+                    finalScale = lerp(params.scaleStart, params.scaleEnd, easedS);
+                } else if (params.scaleMode === 'Heartbeat') {
+                    let hVal = pow(sin(tBase * PI * 2.0), 8);
+                    finalScale = lerp(params.scaleStart, params.scaleEnd, hVal);
+                } else {
+                    const sTime = tBase * params.scaleSpeed * 50;
+                    const sOffset = posOffset + params.scalePhase * PI;
+                    let sVal = calculateMotionVal(params.scaleMode, sTime, sOffset, params.scaleFreq, nr, nc);
+                    const easedS = applyEasing(params.scaleEase, (sVal + 1) / 2);
+                    finalScale = lerp(params.scaleStart, params.scaleEnd, easedS);
+                }
+                
+                if (params.scaleMirror && nr > 0.5) finalScale = params.scaleStart + params.scaleEnd - finalScale;
+                
+                if (params.posMode === 'Laser Scan') {
+                    let scanLine = (sin(posTime * 0.5) * 0.5 + 0.5) * height - height/2;
+                    let distToLine = abs(by - scanLine);
+                    let visibility = map(distToLine, 0, 80, 1, 0, true);
+                    params.opacity = visibility * 100;
+                    scale(finalScale * (0.05 + visibility * 1.5)); 
+                } else {
+                    scale(finalScale);
+                }
+                
+                renderTextNode();
+                pop();
+            }
+        }
+        pop();
+    } 
 
     handleExport();
 }
@@ -248,13 +321,29 @@ function draw() {
 /**
  * Core wave calculator based on mode
  */
-function calculateMotionVal(mode, time, offset, freq) {
+function calculateMotionVal(mode, time, offset, freq, nr, nc) {
     const t = time + offset * freq;
     switch(mode) {
         case 'Sinusoid': return sin(t);
         case 'Double Sinusoid': return sin(t) * cos(t * 0.5);
         case 'Noise': return noise(t * 0.5) * 2 - 1;
         case 'Bounce': return abs(sin(t)) * 2 - 1;
+        case 'Laser Scan': return sin(t); 
+        case 'Topographic': return noise(nr * 5, t * 0.2) * 2 - 1;
+        case 'Liquid': return noise(nr * 2, nc * 2, t * 0.5) * 2 - 1;
+        case 'Elastic': 
+            let delay = nr * 10.0;
+            return sin(time - delay) * exp(-delay * 0.1);
+        case 'Magnetic': 
+            return noise(nr * 10, nc * 10, t * 0.1) * 2 - 1;
+        case 'Crumble': 
+            return (noise(nr * 20, time * 0.5) * 2 - 1);
+        case 'Heartbeat':
+            return (pow(sin(time * 5), 8) + pow(sin(time * 5 + 0.5), 16)) - 0.5;
+        case 'Flow-Field':
+            return (noise(nc * 2, nr * 2, time * 0.2) * 2 - 1);
+        case 'Ripple-Wave':
+            return sin(nc * PI * 2 + time);
         default: return 0;
     }
 }
@@ -345,10 +434,12 @@ function initTweakpane() {
     const mPos = mTabs.pages[0];
     mPos.addInput(params, 'posMode', { options: motionModes.reduce((a,v) => ({...a, [v]:v}), {}) });
     mPos.addInput(params, 'posEase', { options: Object.keys(easingFunctions).reduce((a,v) => ({...a,[v]:v}), {}) });
-    mPos.addInput(params, 'posAmpMod', { options: { 'None': 'None', 'Center Easing': 'Center Easing' } });
     
     mPos.addInput(params, 'posAmp', { min: 0, max: 1000 });
     mPos.addInput(params, 'posFreq', { min: 0, max: 10 });
+    mPos.addInput(params, 'posStretch', { min: -2, max: 2, label: 'Vertical Stretch' });
+    mPos.addInput(params, 'posShear', { min: -1, max: 1, label: 'Shear' });
+    
     mPos.addInput(params, 'posCycles', { min: -10, max: 10, step: 1 });
     mPos.addInput(params, 'posFreqAdd', { min: -5, max: 5 });
     mPos.addInput(params, 'posCyclesAdd', { min: -10, max: 10 });
@@ -379,11 +470,13 @@ function initTweakpane() {
     opt.addInput(params, 'strokeOnly');
     opt.addInput(params, 'showGrid');
     opt.addButton({ title: 'ENTER FULLSCREEN' }).on('click', () => toggleFullScreen());
+
 }
 
 function applyPreset(name) {
     const p = presets[name];
     if (!p) return;
+    params.startTime = (millis() * 0.001); // Reset effect time
     Object.assign(params, p);
     params.interval = params.spacingY; // sync
     if (p.gFont) {
