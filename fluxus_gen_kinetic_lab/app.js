@@ -53,7 +53,7 @@ const motionModes = [
 
 const presets = {
     'Neural Ripple': {
-        text: 'SYNAPTIC FLOW', fontSize: 40, rows: 35, cols: 2, spacingX: 300, spacingY: 30,
+        text: 'SYNAPTIC FLOW', fontSize: 40, rows: 45, cols: 15, spacingX: 200, spacingY: 30,
         posMode: 'Flow-Field', posAmp: 200, posFreq: 2.0, posSpeed: 0.008,
         scaleMode: 'Sinusoid', scaleStart: 1.1, scaleEnd: 0.2,
         color: '#00D1FF', bg: '#0A0B10', gFont: 'Syne'
@@ -98,12 +98,12 @@ const presets = {
         posStretch: 0.8
     },
     'Pixel Crumble': {
-        text: 'FRAGMENT', fontSize: 110, rows: 18, cols: 1, spacingY: 110,
+        text: 'FRAGMENT', fontSize: 110, rows: 90, cols: 1, spacingY: 110,
         posMode: 'Crumble', posAmp: 700, posFreq: 1.5, posSpeed: 0.03,
         scaleMode: 'None', color: '#FFFFFF', bg: '#000000', gFont: 'Archivo Black'
     },
     'Void Echo': {
-        text: 'INFINITE', fontSize: 180, rows: 8, cols: 1, spacingY: 120,
+        text: 'INFINITE', fontSize: 250, rows: 30, cols: 20, spacingX: 300, spacingY: 150,
         posMode: 'Echo', posAmp: 300, posFreq: 0.5, posSpeed: 0.05,
         scaleMode: 'Sinusoid', scaleStart: 1.0, scaleEnd: 0.2,
         color: '#FF00FF', bg: '#000000', gFont: 'Playfair Display',
@@ -116,22 +116,22 @@ const params = {
     preset: 'Default Engine',
     
     // MAIN / CONTENT
-    text: 'KINETIC',
-    fontSize: 120,
-    interval: 100, // logic links to spacingY if vertical
-    color: '#FF6600',
-    bg: '#0a0a0a',
-    gFont: 'Space Grotesk',
+    text: 'SYNAPTIC FLOW',
+    fontSize: 40,
+    interval: 30, 
+    color: '#00D1FF',
+    bg: '#0A0B10',
+    gFont: 'Syne',
     
     // GRID / LAYOUT
-    rows: 12,
-    cols: 1,
-    spacingY: 100,
-    spacingX: 0,
+    rows: 45,
+    cols: 15,
+    spacingY: 30,
+    spacingX: 200,
     stagger: 0,
     
     // MOTION - POSITION
-    posMode: 'Double Sinusoid',
+    posMode: 'Flow-Field',
     posEase: 'Linear',
     posAmpMod: 'None',
     posAmp: 75,
