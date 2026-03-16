@@ -92,22 +92,22 @@ const presets = {
     },
     'Elastic String': {
         text: 'TENSION', fontSize: 130, rows: 15, cols: 1, spacingY: 90,
-        posMode: 'Elastic', posAmp: 300, posFreq: 1.2, posSpeed: 0.03,
-        posEase: 'Elastic Out', scaleMode: 'None',
+        posMode: 'Elastic', posAmp: 400, posFreq: 1.5, posSpeed: 0.03,
+        posEase: 'Linear', scaleMode: 'None',
         color: '#FFFF00', bg: '#000000', gFont: 'Bungee',
-        posStretch: 1.5
+        posStretch: 0.8
     },
     'Pixel Crumble': {
         text: 'FRAGMENT', fontSize: 110, rows: 18, cols: 1, spacingY: 110,
-        posMode: 'Crumble', posAmp: 600, posFreq: 1.2, posSpeed: 0.02,
+        posMode: 'Crumble', posAmp: 700, posFreq: 1.5, posSpeed: 0.03,
         scaleMode: 'None', color: '#FFFFFF', bg: '#000000', gFont: 'Archivo Black'
     },
     'Void Echo': {
-        text: 'INFINITE', fontSize: 250, rows: 6, cols: 1, spacingY: 150,
-        posMode: 'Echo', posAmp: 400, posFreq: 0.5, posSpeed: 0.05,
-        scaleMode: 'Sinusoid', scaleStart: 1.1, scaleEnd: 0.1,
+        text: 'INFINITE', fontSize: 180, rows: 8, cols: 1, spacingY: 120,
+        posMode: 'Echo', posAmp: 300, posFreq: 0.5, posSpeed: 0.05,
+        scaleMode: 'Sinusoid', scaleStart: 1.0, scaleEnd: 0.2,
         color: '#FF00FF', bg: '#000000', gFont: 'Playfair Display',
-        posStretch: 0.5
+        posStretch: 0.3
     }
 };
 
@@ -205,7 +205,7 @@ function loadGoogleFont(fontName) {
 function draw() {
     if (params.posMode === 'Echo') {
         push();
-        fill(color(params.bg + '22')); 
+        fill(params.bg + '11'); // Lighter alpha for cleaner trails
         noStroke();
         rect(0, 0, width, height);
         pop();
@@ -258,13 +258,20 @@ function draw() {
                 let finalPosVal = easedPos;
                 if (params.posMirror && nr > 0.5) finalPosVal *= -1;
                 
-                // --- SPECIAL DISPLACEMENTS ---
                 if (params.posMode === 'Crumble') {
-                    // Reset every 10 seconds or relative to startTime
-                    let elapsed = (tBase - params.startTime) % 10;
-                    let gravity = pow(max(0, elapsed * 2 - posOffset * 0.5), 2) * 40;
-                    translate(bx + (posVal * params.posAmp * 0.05), by + gravity);
-                    rotate(elapsed * 0.5 * nr); 
+                    // RESET LOOP for continuous crumble
+                    let cycle = 8; // 8 second cycle
+                    let elapsed = (tBase - params.startTime) % cycle;
+                    let phase = elapsed / cycle;
+                    
+                    let gravity = pow(max(0, elapsed * 3 - posOffset * 0.8), 2.2) * 50;
+                    if (elapsed > cycle * 0.8) {
+                        // Fade out/reset lift
+                        gravity *= map(elapsed, cycle * 0.8, cycle, 1, 0);
+                    }
+                    
+                    translate(bx + (posVal * params.posAmp * 0.1), by + gravity);
+                    rotate(elapsed * nr * 0.5); 
                 } else if (params.posMode === 'Laser Scan') {
                     let scanLine = (sin(posTime * 0.5) * 0.5 + 0.5) * height - height/2;
                     let distToLine = abs(by - scanLine);
@@ -332,8 +339,8 @@ function calculateMotionVal(mode, time, offset, freq, nr, nc) {
         case 'Topographic': return noise(nr * 5, t * 0.2) * 2 - 1;
         case 'Liquid': return noise(nr * 2, nc * 2, t * 0.5) * 2 - 1;
         case 'Elastic': 
-            let delay = nr * 10.0;
-            return sin(time - delay) * exp(-delay * 0.1);
+            // Better stable oscillation without decay
+            return sin(t * 1.5 + nr * PI) * cos(t * 0.5);
         case 'Magnetic': 
             return noise(nr * 10, nc * 10, t * 0.1) * 2 - 1;
         case 'Crumble': 
