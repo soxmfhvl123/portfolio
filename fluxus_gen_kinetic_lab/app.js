@@ -476,7 +476,16 @@ function toggleFullScreen() {
 document.getElementById('fluxus-btn').addEventListener('click', () => {
     params.posAmp = random(50, 400);
     params.posFreq = random(0.2, 3);
+    params.posCycles = floor(random(-5, 5));
+    params.posEase = random(Object.keys(easingFunctions));
     params.scaleEnd = random(0.1, 2);
+    params.scalePhase = random(-1, 1);
     params.color = '#' + floor(random(16777215)).toString(16).padStart(6, '0');
+    
+    // Randomize Font too
+    const nextFont = random(googleFontList);
+    params.gFont = nextFont;
+    loadGoogleFont(nextFont);
+    
     pane.refresh();
 });
