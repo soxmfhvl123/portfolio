@@ -1,4 +1,8 @@
+/**
+ * FLUX-GEN: Kinetic Type Lab 3.0.1
+ * Professional Kinetic Typography Engine
  * Based on TEXTR Benchmarking v3.0.1
+ */
 
 let font;
 let fontLoaded = false;
