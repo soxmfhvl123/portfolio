@@ -1,8 +1,4 @@
-/**
- * FLUX-GEN: Kinetic Type Lab 3.0
- * Professional Kinetic Typography Engine
- * Based on TEXTR Benchmarking v3
- */
+ * Based on TEXTR Benchmarking v3.0.1
 
 let font;
 let fontLoaded = false;
@@ -113,7 +109,7 @@ const presets = {
 
 // Parameters & State
 const params = {
-    preset: 'Default Engine',
+    preset: 'Neural Ripple',
     
     // MAIN / CONTENT
     text: 'SYNAPTIC FLOW',
@@ -182,6 +178,7 @@ function setup() {
     loadGoogleFont(params.gFont);
     
     initTweakpane();
+    applyPreset('Neural Ripple'); // Force initial preset apply
     windowResized();
 }
 
