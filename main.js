@@ -109,19 +109,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initParticles() {
-        const count = Math.min(400, Math.floor(pCanvas.width * pCanvas.height / 4000));
+        const count = Math.min(180, Math.floor(pCanvas.width * pCanvas.height / 6000));
         particles = [];
         for (let i = 0; i < count; i++) particles.push(new Particle());
     }
     function drawLines() {
-        for (let i = 0; i < particles.length; i++) {
-            for (let j = i + 1; j < particles.length; j++) {
-                const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+        const len = particles.length;
+        const maxDist = 80;
+        const maxDistSq = 6400;
+        
+        for (let i = 0; i < len; i++) {
+            const p1 = particles[i];
+            for (let j = i + 1; j < len; j++) {
+                const p2 = particles[j];
+                const dx = p1.x - p2.x;
+                if (dx > maxDist || dx < -maxDist) continue;
+                const dy = p1.y - p2.y;
+                if (dy > maxDist || dy < -maxDist) continue;
+                
                 const distSq = dx * dx + dy * dy;
-                if (distSq < 6400) {
+                if (distSq < maxDistSq) {
                     pCtx.beginPath();
-                    pCtx.moveTo(particles[i].x, particles[i].y);
-                    pCtx.lineTo(particles[j].x, particles[j].y);
+                    pCtx.moveTo(p1.x, p1.y);
+                    pCtx.lineTo(p2.x, p2.y);
                     pCtx.strokeStyle = `rgba(254, 229, 0, ${(1 - Math.sqrt(distSq) / 80) * 0.07})`;
                     pCtx.lineWidth = 0.4;
                     pCtx.stroke();
