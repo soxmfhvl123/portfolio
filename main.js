@@ -30,16 +30,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
     document.addEventListener('touchend', () => { mx = -9999; my = -9999; }, { passive: true });
 
-    function getTextColliders() {
+    let baseTextColliders = [];
+    function cacheTextColliders() {
         const chars = document.querySelectorAll('[data-kinetic], [data-kinetic-future]');
-        const rects = [];
-        chars.forEach(ch => {
+        const sX = window.scrollX || 0;
+        const sY = window.scrollY || 0;
+        baseTextColliders = Array.from(chars).map(ch => {
+            const oldT = ch.style.transform;
+            ch.style.transform = '';
             const r = ch.getBoundingClientRect();
-            rects.push({ x: r.left, y: r.top, w: r.width, h: r.height });
+            ch.style.transform = oldT;
+            return { baseX: r.left + sX, baseY: r.top + sY, w: r.width, h: r.height };
         });
-        return rects;
     }
-    let textColliders = getTextColliders();
+    setTimeout(cacheTextColliders, 300);
+    window.addEventListener('resize', cacheTextColliders);
     let frameCount = 0;
 
     class Particle {
@@ -70,10 +75,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.x -= (dx / dist) * force * 5;
                 this.y -= (dy / dist) * force * 5;
             }
-            for (let i = 0; i < textColliders.length; i++) {
-                const c = textColliders[i];
-                if (this.x > c.x - 2 && this.x < c.x + c.w + 2 && this.y > c.y - 2 && this.y < c.y + c.h + 2) {
-                    const cx = c.x + c.w / 2, cy = c.y + c.h / 2;
+            const sX = window.scrollX || document.documentElement.scrollLeft || 0;
+            const sY = window.scrollY || document.documentElement.scrollTop || 0;
+
+            for (let i = 0; i < baseTextColliders.length; i++) {
+                const b = baseTextColliders[i];
+                const cx_left = b.baseX - sX;
+                const cy_top = b.baseY - sY;
+                
+                if (this.x > cx_left - 2 && this.x < cx_left + b.w + 2 && this.y > cy_top - 2 && this.y < cy_top + b.h + 2) {
+                    const cx = cx_left + b.w / 2, cy = cy_top + b.h / 2;
                     const pdx = this.x - cx, pdy = this.y - cy;
                     const pd = Math.sqrt(pdx * pdx + pdy * pdy) || 1;
                     this.x += (pdx / pd) * 2.5; this.y += (pdy / pd) * 2.5;
@@ -121,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function animateParticles() {
         pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
         frameCount++;
-        if (frameCount % 15 === 0) textColliders = getTextColliders();
+        
         particles.forEach(p => { p.update(); p.draw(); });
         drawLines();
         requestAnimationFrame(animateParticles);
@@ -168,67 +179,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===== Kinetic Typography — Particle-Dodge Letters =====
     const kineticChars = document.querySelectorAll('[data-kinetic]');
-    const heroSection = document.getElementById('hero');
     const DODGE_RADIUS = 200;
     const DODGE_FORCE = 50;
     const charStates = [];
     kineticChars.forEach(() => {
-        charStates.push({ x: 0, y: 0, targetX: 0, targetY: 0, rot: 0, targetRot: 0 });
+        charStates.push({ x: 0, y: 0, targetX: 0, targetY: 0, rot: 0, targetRot: 0, baseX: 0, baseY: 0 });
     });
-    function updateKineticChars() {
-        kineticChars.forEach((char, i) => {
-            const r = char.getBoundingClientRect();
-            const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-            const dx = mx - cx, dy = my - cy;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const state = charStates[i];
-            if (dist < DODGE_RADIUS && dist > 0) {
-                const force = (1 - dist / DODGE_RADIUS) * DODGE_FORCE;
-                state.targetX = -(dx / dist) * force;
-                state.targetY = -(dy / dist) * force;
-                state.targetRot = (dx / dist) * force * 0.15;
-            } else {
-                state.targetX = 0; state.targetY = 0; state.targetRot = 0;
-            }
-            state.x += (state.targetX - state.x) * 0.08;
-            state.y += (state.targetY - state.y) * 0.08;
-            state.rot += (state.targetRot - state.rot) * 0.08;
-            char.style.transform = `translate(${state.x}px, ${state.y}px) rotate(${state.rot}deg)`;
-        });
-        requestAnimationFrame(updateKineticChars);
-    }
-    updateKineticChars();
-
 
     // ===== Future of GD — Particle-Dodge Letters =====
     const futureKineticChars = document.querySelectorAll('[data-kinetic-future]');
     const futureCharStates = [];
     futureKineticChars.forEach(() => {
-        futureCharStates.push({ x: 0, y: 0, targetX: 0, targetY: 0, rot: 0, targetRot: 0 });
+        futureCharStates.push({ x: 0, y: 0, targetX: 0, targetY: 0, rot: 0, targetRot: 0, baseX: 0, baseY: 0 });
     });
-    function updateFutureKineticChars() {
-        futureKineticChars.forEach((char, i) => {
-            const r = char.getBoundingClientRect();
-            const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-            const dx = mx - cx, dy = my - cy;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const state = futureCharStates[i];
-            if (dist < DODGE_RADIUS && dist > 0) {
-                const force = (1 - dist / DODGE_RADIUS) * DODGE_FORCE;
-                state.targetX = -(dx / dist) * force;
-                state.targetY = -(dy / dist) * force;
-                state.targetRot = (dx / dist) * force * 0.15;
-            } else {
-                state.targetX = 0; state.targetY = 0; state.targetRot = 0;
-            }
-            state.x += (state.targetX - state.x) * 0.08;
-            state.y += (state.targetY - state.y) * 0.08;
-            state.rot += (state.targetRot - state.rot) * 0.08;
-            char.style.transform = `translate(${state.x}px, ${state.y}px) rotate(${state.rot}deg)`;
-        });
-        requestAnimationFrame(updateFutureKineticChars);
+
+    // Unified cache function to avoid layout thrashing
+    function cacheBaseCenters() {
+        const sX = window.scrollX || document.documentElement.scrollLeft || 0;
+        const sY = window.scrollY || document.documentElement.scrollTop || 0;
+        
+        const cacheFor = (chars, states) => {
+            chars.forEach((char, i) => {
+                const oldT = char.style.transform;
+                char.style.transform = ''; // reset
+                const r = char.getBoundingClientRect();
+                states[i].baseX = r.left + sX + r.width / 2;
+                states[i].baseY = r.top + sY + r.height / 2;
+                char.style.transform = oldT; // restore
+            });
+        };
+        cacheFor(kineticChars, charStates);
+        cacheFor(futureKineticChars, futureCharStates);
     }
-    updateFutureKineticChars();
+    // Initialize cache and update on resize
+    setTimeout(cacheBaseCenters, 300); // give it a moment to render
+    window.addEventListener('resize', cacheBaseCenters);
+
+    function DODGE_UPDATE() {
+        const sX = window.scrollX || document.documentElement.scrollLeft || 0;
+        const sY = window.scrollY || document.documentElement.scrollTop || 0;
+
+        const applyDodge = (chars, states) => {
+            chars.forEach((char, i) => {
+                const state = states[i];
+                if (!state.baseX) return; // not cached yet
+
+                const cx = state.baseX - sX;
+                const cy = state.baseY - sY;
+                const dx = mx - cx, dy = my - cy;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < DODGE_RADIUS && dist > 0) {
+                    const force = (1 - dist / DODGE_RADIUS) * DODGE_FORCE;
+                    state.targetX = -(dx / dist) * force;
+                    state.targetY = -(dy / dist) * force;
+                    state.targetRot = (dx / dist) * force * 0.15;
+                } else {
+                    state.targetX = 0; state.targetY = 0; state.targetRot = 0;
+                }
+                state.x += (state.targetX - state.x) * 0.08;
+                state.y += (state.targetY - state.y) * 0.08;
+                state.rot += (state.targetRot - state.rot) * 0.08;
+                char.style.transform = `translate(${state.x}px, ${state.y}px) rotate(${state.rot}deg)`;
+            });
+        };
+        
+        applyDodge(kineticChars, charStates);
+        applyDodge(futureKineticChars, futureCharStates);
+        requestAnimationFrame(DODGE_UPDATE);
+    }
+    DODGE_UPDATE();
 
 
     // ===== Hero Mouse Trail — Ghost Images =====
@@ -445,7 +465,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     updateSectionBounds();
-    window.addEventListener('scroll', updateSectionBounds, { passive: true });
     window.addEventListener('resize', updateSectionBounds);
 
     function isInNoRainbowZone(absY) {
