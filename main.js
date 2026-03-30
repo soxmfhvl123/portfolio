@@ -179,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===== Kinetic Typography — Particle-Dodge Letters =====
     const kineticChars = document.querySelectorAll('[data-kinetic]');
+    const heroSection = document.getElementById('hero');
     const DODGE_RADIUS = 200;
     const DODGE_FORCE = 50;
     const charStates = [];
