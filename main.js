@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initParticles() {
-        const count = Math.min(180, Math.floor(pCanvas.width * pCanvas.height / 6000));
+        const count = Math.min(100, Math.floor(pCanvas.width * pCanvas.height / 9000));
         particles = [];
         for (let i = 0; i < count; i++) particles.push(new Particle());
     }
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.x += (state.targetX - state.x) * 0.08;
                 state.y += (state.targetY - state.y) * 0.08;
                 state.rot += (state.targetRot - state.rot) * 0.08;
-                char.style.transform = `translate(${state.x}px, ${state.y}px) rotate(${state.rot}deg)`;
+                char.style.transform = `translate3d(${state.x}px, ${state.y}px, 0) rotate(${state.rot}deg)`;
             });
         };
         
