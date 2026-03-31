@@ -156,13 +156,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const cursorDot = cursor.querySelector('.cursor-dot');
     const cursorRing = cursor.querySelector('.cursor-ring');
     let cursorX = 0, cursorY = 0, ringX = 0, ringY = 0;
+    let lastCursorDotX = 0, lastCursorDotY = 0;
+    
     document.addEventListener('mousemove', (e) => {
         cursorX = e.clientX; cursorY = e.clientY;
-        cursorDot.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
+        if (Math.abs(cursorX - lastCursorDotX) > 0.5 || Math.abs(cursorY - lastCursorDotY) > 0.5) {
+            cursorDot.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
+            lastCursorDotX = cursorX;
+            lastCursorDotY = cursorY;
+        }
     });
+
     function animateCursor() {
         ringX += (cursorX - ringX) * 0.12; ringY += (cursorY - ringY) * 0.12;
-        cursorRing.style.transform = `translate(${ringX}px, ${ringY}px)`;
+        if (Math.abs(cursorX - ringX) > 0.1 || Math.abs(cursorY - ringY) > 0.1) {
+            cursorRing.style.transform = `translate(${ringX.toFixed(2)}px, ${ringY.toFixed(2)}px)`;
+        }
         requestAnimationFrame(animateCursor);
     }
     animateCursor();
@@ -248,10 +257,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     state.targetX = 0; state.targetY = 0; state.targetRot = 0;
                 }
-                state.x += (state.targetX - state.x) * 0.08;
-                state.y += (state.targetY - state.y) * 0.08;
-                state.rot += (state.targetRot - state.rot) * 0.08;
-                char.style.transform = `translate3d(${state.x}px, ${state.y}px, 0) rotate(${state.rot}deg)`;
+                
+                state.x += (state.targetX - state.x) * 0.1;
+                state.y += (state.targetY - state.y) * 0.1;
+                state.rot += (state.targetRot - state.rot) * 0.1;
+                
+                // Only update DOM if the movement is significant to stop constant thrashing
+                if (Math.abs(state.x) > 0.05 || Math.abs(state.y) > 0.05 || Math.abs(state.rot) > 0.05 || Math.abs(state.targetX) > 0.05) {
+                    char.style.transform = `translate3d(${state.x.toFixed(2)}px, ${state.y.toFixed(2)}px, 0) rotate(${state.rot.toFixed(2)}deg)`;
+                } else if (char.style.transform !== '') {
+                    state.x = 0; state.y = 0; state.rot = 0;
+                    char.style.transform = '';
+                }
             });
         };
         
@@ -493,8 +510,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    let isRainbowClear = true;
     function animateRainbowTrail() {
-        rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
         const now = Date.now();
 
         while (trailPoints.length > 0 && now - trailPoints[0].time > TRAIL_LIFETIME) {
@@ -502,6 +519,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (trailPoints.length > 2) {
+            rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
+            isRainbowClear = false;
             rCtx.lineWidth = 3;
             rCtx.lineCap = 'round';
             rCtx.lineJoin = 'round';
@@ -532,6 +551,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 rCtx.strokeStyle = `hsla(${hue}, 90%, 60%, ${alpha})`;
                 rCtx.stroke();
             }
+        } else if (!isRainbowClear) {
+            rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
+            isRainbowClear = true;
         }
 
         requestAnimationFrame(animateRainbowTrail);
