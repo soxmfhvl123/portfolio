@@ -606,7 +606,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===== Nav Status =====
     const navStatus = document.getElementById('navStatus');
-    const sectionNames = { hero: 'PORTFOLIO 2026', about: 'ABOUT', experience: 'EXPERIENCE', futureofgd: 'FUTURE OF GD', contact: 'CONTACT' };
+    const sectionNames = { 
+        hero: 'PORTFOLIO 2026', 
+        about: 'ABOUT', 
+        experience: 'EXPERIENCE', 
+        mastermind: 'MASTERMIND',
+        'vibecoding-gallery': 'VIBE CODING',
+        'research-section': 'RESEARCH',
+        futureofgd: 'FUTURE OF GD', 
+        contact: 'CONTACT' 
+    };
     const sectionObs = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting && navStatus && sectionNames[entry.target.id])

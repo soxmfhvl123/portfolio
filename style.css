@@ -856,6 +856,64 @@ button {
     color: var(--accent);
 }
 
+/* ===== MASTERMIND PLAYLIST ===== */
+.mastermind {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+}
+
+.mastermind-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #000;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    border: 1px solid var(--border);
+    transition: border-color 0.4s ease;
+}
+
+.video-wrapper:hover {
+    border-color: var(--accent);
+}
+
+.video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.mastermind-text {
+    margin-top: 40px;
+    max-width: 600px;
+}
+
+.mastermind-title {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.mastermind-desc {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--text-secondary);
+}
+
 /* ===== V-SIDE FEATURE ===== */
 .vside-feature {
     background: var(--bg);
