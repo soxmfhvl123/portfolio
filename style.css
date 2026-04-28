@@ -174,9 +174,10 @@ button {
 
 .nav-logo {
     font-family: var(--font-display);
-    font-size: 20px;
+    font-size: 13px;
     font-weight: 800;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
 }
 
 .accent {
@@ -386,41 +387,69 @@ button {
     overflow: hidden;
 }
 
-.hero-bg {
+/* Hero Image Grid Background */
+.hero-image-grid {
     position: absolute;
     inset: 0;
     z-index: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--grid-cols, 16), 1fr);
+    grid-template-rows: repeat(var(--grid-rows, 16), 1fr);
+    gap: 0;
+    will-change: transform;
+    transform: scale(1.05);
+    overflow: hidden;
 }
 
-.hero-grid-lines {
+.hero-grid-cell {
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+
+.hero-grid-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(30%) brightness(0.8);
+    transition: filter 0.3s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+}
+
+.hero-grid-cell:hover img {
+    filter: grayscale(0%) brightness(1.1);
+    transform: scale(1.08);
+}
+
+/* Subtle overlay for readability */
+.hero-grid-overlay {
     position: absolute;
     inset: 0;
-    background-image:
-        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-    background-size: 80px 80px;
-    animation: gridDrift 20s linear infinite;
-}
-
-@keyframes gridDrift {
-    0% {
-        transform: translate(0, 0);
-    }
-
-    100% {
-        transform: translate(80px, 80px);
-    }
+    z-index: 1;
+    background: linear-gradient(
+        135deg,
+        rgba(5, 5, 5, 0.55) 0%,
+        rgba(5, 5, 5, 0.35) 50%,
+        rgba(5, 5, 5, 0.55) 100%
+    );
+    pointer-events: none;
 }
 
 .hero-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: 100px 40px 40px;
+    pointer-events: none; /* Allow mouse events to pass through to the grid */
+}
+
+.hero-content > * {
+    pointer-events: none; /* Tags and labels should not block hover on the background grid */
 }
 
 .hero-top {
@@ -472,50 +501,41 @@ button {
     transform: translateY(-8px) rotate(-3deg) scale(1.1);
 }
 
-/* Hero Mouse Trail Ghost Images */
-.hero-trail {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1;
-    overflow: hidden;
-}
-
-.hero-trail-img {
-    position: absolute;
-    width: 180px;
-    height: 240px;
-    object-fit: cover;
+/* Hero Centered Popup */
+.hero-popup {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     pointer-events: none;
     opacity: 0;
-    transform: scale(0.7) rotate(0deg);
-    animation: trailFade 1.2s ease forwards;
-    border-radius: 4px;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s;
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.3);
 }
 
-@keyframes trailFade {
-    0% {
-        opacity: 0;
-        transform: scale(0.5) rotate(-5deg);
-    }
+.hero-popup.active {
+    opacity: 1;
+    visibility: visible;
+}
 
-    15% {
-        opacity: 0.85;
-        transform: scale(1) rotate(0deg);
-    }
+.hero-popup img {
+    width: min(55vw, 480px);
+    height: min(70vh, 600px);
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(254,229,0,0.15);
+    transform: scale(0.92);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+    pointer-events: none;
+    display: block;
+}
 
-    60% {
-        opacity: 0.6;
-        transform: scale(1.02) rotate(1deg);
-    }
-
-    100% {
-        opacity: 0;
-        transform: scale(1.05) rotate(3deg);
-    }
+.hero-popup.active img {
+    transform: scale(1);
 }
 
 .hero-bottom {

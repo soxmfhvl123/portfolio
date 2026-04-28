@@ -1,154 +1,110 @@
 /**
- * DONG JIN CHOI — Portfolio 2026
- * Particle System · Particle-Dodge Letters · Hero Mouse Trail
- * Future of GD Section · Analog Clock · Rainbow Trail
- * EN/KR Toggle · Experience Hover Slideshow
+ * DONG JIN CHOI ??Portfolio 2026
+ * Particle System 쨌 Particle-Dodge Letters 쨌 Hero Mouse Trail
+ * Future of GD Section 쨌 Analog Clock 쨌 Rainbow Trail
+ * EN/KR Toggle 쨌 Experience Hover Slideshow
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ===== Full-Page Particle System =====
-    const pCanvas = document.getElementById('particleCanvas');
-    const pCtx = pCanvas.getContext('2d');
+    // ===== Rainbow Trail Canvas only (particles removed) =====
     const rCanvas = document.getElementById('rainbowTrailCanvas');
     const rCtx = rCanvas.getContext('2d');
-    let particles = [];
-    let mx = -9999, my = -9999;
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
 
     function resizeCanvas() {
-        pCanvas.width = window.innerWidth;
-        pCanvas.height = window.innerHeight;
         rCanvas.width = window.innerWidth;
         rCanvas.height = window.innerHeight;
     }
     resizeCanvas();
-    window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+    window.addEventListener('resize', resizeCanvas);
 
     document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
     document.addEventListener('touchmove', (e) => {
         if (e.touches.length) { mx = e.touches[0].clientX; my = e.touches[0].clientY; }
     }, { passive: true });
-    document.addEventListener('touchend', () => { mx = -9999; my = -9999; }, { passive: true });
+    document.addEventListener('touchend', () => { mx = window.innerWidth/2; my = window.innerHeight/2; }, { passive: true });
 
-    let baseTextColliders = [];
-    function cacheTextColliders() {
-        const chars = document.querySelectorAll('[data-kinetic], [data-kinetic-future]');
-        const sX = window.scrollX || 0;
-        const sY = window.scrollY || 0;
-        baseTextColliders = Array.from(chars).map(ch => {
-            const oldT = ch.style.transform;
-            ch.style.transform = '';
-            const r = ch.getBoundingClientRect();
-            ch.style.transform = oldT;
-            return { baseX: r.left + sX, baseY: r.top + sY, w: r.width, h: r.height };
-        });
-    }
-    setTimeout(cacheTextColliders, 300);
-    window.addEventListener('resize', cacheTextColliders);
     let frameCount = 0;
 
-    class Particle {
-        constructor() { this.spawn(); }
-        spawn() {
-            this.x = Math.random() * pCanvas.width;
-            this.y = Math.random() * pCanvas.height;
-            this.size = Math.random() * 2 + 0.6;
-            this.vx = (Math.random() - 0.5) * 1.2;
-            this.vy = (Math.random() - 0.5) * 1.2;
-            this.opacity = Math.random() * 0.3 + 0.06;
-            this.p1 = Math.random() * Math.PI * 2;
-            this.p2 = Math.random() * Math.PI * 2;
-            this.s1 = Math.random() * 0.015 + 0.008;
-            this.s2 = Math.random() * 0.025 + 0.01;
-            this.amp1 = Math.random() * 0.5 + 0.2;
-            this.amp2 = Math.random() * 0.3 + 0.1;
-        }
-        update() {
-            this.p1 += this.s1;
-            this.p2 += this.s2;
-            this.x += this.vx + Math.sin(this.p1) * this.amp1 + Math.cos(this.p2) * this.amp2;
-            this.y += this.vy + Math.cos(this.p1 * 0.8) * this.amp1 * 0.7 + Math.sin(this.p2 * 1.2) * this.amp2;
-            const dx = mx - this.x, dy = my - this.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 120 && dist > 0) {
-                const force = (120 - dist) / 120;
-                this.x -= (dx / dist) * force * 5;
-                this.y -= (dy / dist) * force * 5;
-            }
-            const sX = window.scrollX || document.documentElement.scrollLeft || 0;
-            const sY = window.scrollY || document.documentElement.scrollTop || 0;
+    // ===== Hero Image Grid (all 243 images via window.HERO_IMAGES) =====
+    const heroImageGrid = document.getElementById('heroImageGrid');
+    const heroPopup = document.getElementById('heroPopup');
+    const heroPopupImg = document.getElementById('heroPopupImg');
+    const allHeroImages = window.HERO_IMAGES || [];
+    const GRID_COLS = 16;
+    const GRID_ROWS = 16;
+    const TOTAL_CELLS = GRID_COLS * GRID_ROWS;
 
-            for (let i = 0; i < baseTextColliders.length; i++) {
-                const b = baseTextColliders[i];
-                const cx_left = b.baseX - sX;
-                const cy_top = b.baseY - sY;
-                
-                if (this.x > cx_left - 2 && this.x < cx_left + b.w + 2 && this.y > cy_top - 2 && this.y < cy_top + b.h + 2) {
-                    const cx = cx_left + b.w / 2, cy = cy_top + b.h / 2;
-                    const pdx = this.x - cx, pdy = this.y - cy;
-                    const pd = Math.sqrt(pdx * pdx + pdy * pdy) || 1;
-                    this.x += (pdx / pd) * 2.5; this.y += (pdy / pd) * 2.5;
-                    this.vx += (pdx / pd) * 0.15; this.vy += (pdy / pd) * 0.15;
-                    this.opacity = Math.min(this.opacity + 0.08, 0.5);
-                    break;
-                }
+    if (heroImageGrid && allHeroImages.length) {
+        heroImageGrid.style.setProperty('--grid-cols', GRID_COLS);
+        heroImageGrid.style.setProperty('--grid-rows', GRID_ROWS);
+        const shuffled = [...allHeroImages].sort(() => Math.random() - 0.5);
+        const gridCells = [];
+        for (let i = 0; i < TOTAL_CELLS; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'hero-grid-cell';
+            const imgEl = document.createElement('img');
+            imgEl.src = shuffled[i % shuffled.length];
+            imgEl.alt = '';
+            imgEl.loading = i < 32 ? 'eager' : 'lazy';
+            cell.appendChild(imgEl);
+            heroImageGrid.appendChild(cell);
+            gridCells.push({ el: cell, src: shuffled[i % shuffled.length] });
+        }
+        
+        // Popup on hover logic
+        let popupHideTimer = null;
+
+        const showPopup = (src) => {
+            // Clear any pending hide timer
+            if (popupHideTimer) {
+                clearTimeout(popupHideTimer);
+                popupHideTimer = null;
             }
-            this.vx *= 0.999; this.vy *= 0.999;
-            if (this.opacity > 0.3) this.opacity -= 0.002;
-            if (this.x < -40) this.x = pCanvas.width + 40;
-            if (this.x > pCanvas.width + 40) this.x = -40;
-            if (this.y < -40) this.y = pCanvas.height + 40;
-            if (this.y > pCanvas.height + 40) this.y = -40;
+            
+            // Only update src if it's different to avoid redundant loads
+            if (heroPopupImg.getAttribute('src') !== src) {
+                heroPopupImg.src = src;
+            }
+            
+            heroPopup.classList.add('active');
+        };
+
+        const hidePopup = () => {
+            // Delay the hiding to allow moving between cells without flickering
+            if (popupHideTimer) clearTimeout(popupHideTimer);
+            popupHideTimer = setTimeout(() => {
+                heroPopup.classList.remove('active');
+                popupHideTimer = null;
+            }, 120); // User specifically asked for 120ms
+        };
+
+        gridCells.forEach(({ el, src }) => {
+            el.addEventListener('mouseenter', () => showPopup(src));
+            el.addEventListener('mouseleave', hidePopup);
+        });
+
+        // Ensure popup is hidden if mouse leaves the whole hero section
+        const heroSect = document.getElementById('hero');
+        if (heroSect) {
+            heroSect.addEventListener('mouseleave', () => {
+                if (popupHideTimer) clearTimeout(popupHideTimer);
+                heroPopup.classList.remove('active');
+            });
         }
-        draw() {
-            pCtx.beginPath();
-            pCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            pCtx.fillStyle = `rgba(254, 229, 0, ${this.opacity})`;
-            pCtx.fill();
+        let gTX = 0, gTY = 0, gCX = 0, gCY = 0;
+        function animateHeroGrid() {
+            gTX = (mx / window.innerWidth - 0.5) * 14;
+            gTY = (my / window.innerHeight - 0.5) * 14;
+            gCX += (gTX - gCX) * 0.05;
+            gCY += (gTY - gCY) * 0.05;
+            heroImageGrid.style.transform = `scale(1.05) translate(${gCX.toFixed(2)}px,${gCY.toFixed(2)}px)`;
+            requestAnimationFrame(animateHeroGrid);
         }
+        animateHeroGrid();
     }
 
-    function initParticles() {
-        const count = Math.min(100, Math.floor(pCanvas.width * pCanvas.height / 9000));
-        particles = [];
-        for (let i = 0; i < count; i++) particles.push(new Particle());
-    }
-    function drawLines() {
-        const len = particles.length;
-        const maxDist = 80;
-        const maxDistSq = 6400;
-        
-        for (let i = 0; i < len; i++) {
-            const p1 = particles[i];
-            for (let j = i + 1; j < len; j++) {
-                const p2 = particles[j];
-                const dx = p1.x - p2.x;
-                if (dx > maxDist || dx < -maxDist) continue;
-                const dy = p1.y - p2.y;
-                if (dy > maxDist || dy < -maxDist) continue;
-                
-                const distSq = dx * dx + dy * dy;
-                if (distSq < maxDistSq) {
-                    pCtx.beginPath();
-                    pCtx.moveTo(p1.x, p1.y);
-                    pCtx.lineTo(p2.x, p2.y);
-                    pCtx.strokeStyle = `rgba(254, 229, 0, ${(1 - Math.sqrt(distSq) / 80) * 0.07})`;
-                    pCtx.lineWidth = 0.4;
-                    pCtx.stroke();
-                }
-            }
-        }
-    }
-    function animateParticles() {
-        pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
-        frameCount++;
-        
-        particles.forEach(p => { p.update(); p.draw(); });
-        drawLines();
-        requestAnimationFrame(animateParticles);
-    }
-    initParticles();
-    animateParticles();
 
 
     // ===== Custom Cursor =====
@@ -182,21 +138,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ===== EN / KR Language Toggle =====
-    let currentLang = 'kr';
+    let currentLang = 'en';
     const langToggle = document.getElementById('langToggle');
     const langLabels = langToggle.querySelectorAll('.lang-label');
-    langToggle.addEventListener('click', () => {
-        currentLang = currentLang === 'kr' ? 'en' : 'kr';
+    
+    function updateLanguage() {
+        if (!langToggle || !langLabels.length) return;
         langLabels.forEach(l => l.classList.remove('lang-active'));
-        langLabels[currentLang === 'kr' ? 0 : 1].classList.add('lang-active');
+        const activeIdx = currentLang === 'kr' ? 0 : 1;
+        if (langLabels[activeIdx]) langLabels[activeIdx].classList.add('lang-active');
+        
         document.documentElement.lang = currentLang === 'kr' ? 'ko' : 'en';
         document.querySelectorAll('[data-kr][data-en]').forEach(el => {
             el.textContent = currentLang === 'kr' ? el.dataset.kr : el.dataset.en;
         });
+    }
+
+    langToggle.addEventListener('click', () => {
+        currentLang = currentLang === 'kr' ? 'en' : 'kr';
+        updateLanguage();
     });
 
+    // Initialize with default language
+    updateLanguage();
 
-    // ===== Kinetic Typography — Particle-Dodge Letters =====
+
+    // ===== Kinetic Typography ??Particle-Dodge Letters =====
     const kineticChars = document.querySelectorAll('[data-kinetic]');
     const heroSection = document.getElementById('hero');
     const DODGE_RADIUS = 200;
@@ -206,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         charStates.push({ x: 0, y: 0, targetX: 0, targetY: 0, rot: 0, targetRot: 0, baseX: 0, baseY: 0 });
     });
 
-    // ===== Future of GD — Particle-Dodge Letters =====
+    // ===== Future of GD ??Particle-Dodge Letters =====
     const futureKineticChars = document.querySelectorAll('[data-kinetic-future]');
     const futureCharStates = [];
     futureKineticChars.forEach(() => {
@@ -279,90 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
     DODGE_UPDATE();
 
 
-    // ===== Hero Mouse Trail — Ghost Images =====
-    const heroTrail = document.getElementById('heroTrail');
-    const heroImages = [
-        'img/HERO/djinc_A_calm_portrait_of_a_person_with_soft_lilac_hair_and_pale_01d9fe5e-3bdb-4cca-b854-85b68844e50d.png',
-        'img/HERO/djinc_A_calm_portrait_of_a_person_with_soft_lilac_hair_and_pale_71f80256-c9e6-45d2-940b-d7d13ef29270.png',
-        'img/HERO/djinc_A_cinematic_portrait_of_a_girl_framed_by_storm-colored_cl_abf0145e-fe75-4cd9-86b5-c4fb6efa7f21.png',
-        'img/HERO/djinc_A_cinematic_portrait_of_a_woman_lying_among_garden_foliag_3607426e-3709-4735-817b-37276869a6a9.png',
-        'img/HERO/djinc_A_clean_polished_portrait_of_a_woman_dressed_in_muted_gre_7aa8b43b-382a-4d7e-b4dc-5314a5c10671.png',
-        'img/HERO/djinc_A_close-up_of_eyes_framed_by_pastel_star_and_moon_pigment_dddbde3c-046a-4478-96ff-57650ebf2b09.png',
-        'img/HERO/djinc_A_close-up_portrait_where_bands_of_warm_sunlight_carve_ac_007defd3-89b7-425e-8e28-90ba83010494.png',
-        'img/HERO/djinc_A_close_contemplative_portrait_of_an_Andean_model_her_fea_89aa022c-89d0-446f-9c2d-80de007afacb.png',
-        'img/HERO/djinc_A_close_portrait_of_a_young_woman_in_a_gray_sweater_and_s_dea9a48a-efe6-41fc-bc9f-4f66795e38e1.png',
-        'img/HERO/djinc_A_close_studio_portrait_of_a_woman_with_a_vintage_80s_hai_790bb870-49c2-40d9-b452-cc176635dcec.png',
-        'img/HERO/djinc_A_crisp_studio_headshot_of_a_woman_against_a_gradient_blu_82adf8f9-b258-4d65-a571-6308e27bfb1e.png',
-        'img/HERO/djinc_A_cyber-inspired_close-up_of_a_woman_with_neon-green_hair_243c33eb-b2c6-42fa-bb65-141f2aca3981.png',
-        'img/HERO/djinc_A_dark-winged_figure_stands_beneath_an_open_sky_her_hair__d39a5dda-4073-4d27-a227-8f10c4f7095e.png',
-        'img/HERO/djinc_A_delicate_yet_unsettling_portrait_of_a_woman_with_tear-s_1585c3f9-9d95-4c3b-ad3e-90ba001cfca5.png',
-        'img/HERO/djinc_A_doll-like_portrait_of_a_young_woman_with_inky_lashes_an_005a75b6-81bc-4d52-af83-15b20780a880.png',
-        'img/HERO/djinc_A_graceful_woman_draped_in_a_beige_coat_sits_against_a_pa_7bd7ad10-687e-4d70-a972-af798b2ee711.png',
-        'img/HERO/djinc_A_minimalist_portrait_of_a_woman_draped_in_luxurious_fabr_e9b42c2d-4605-4436-bad3-92585a5d5994.png',
-        'img/HERO/djinc_A_monochrome_portrait_echoing_high_fashion_editorial_mini_c0c7b9e7-e20b-4ddc-9f58-e3963970a264.png',
-        'img/HERO/djinc_A_pale_woman_with_white_hair_and_silver_chains_gazes_into_22641a4f-4594-471e-8530-85d509b594cd.png',
-        'img/HERO/djinc_A_playful_portrait_of_a_girl_with_curly_red_hair_and_retr_b2b62b9c-44b8-4b43-9b9f-e9bf05b91b8e.png',
-        'img/HERO/djinc_A_portrait_centered_on_a_person_with_split-tone_pastel_ha_38409f66-5909-4ee4-9bc6-5667315dec52.png',
-        'img/HERO/djinc_A_portrait_emphasizing_a_woman_adorned_with_delicate_flow_8a8a16c7-c9b2-4c30-b0b4-2ada336c00e0.png',
-        'img/HERO/djinc_A_regal_woman_with_silver-washed_hair_poses_under_a_deep__6f0ac2b1-50c4-4b43-9347-e2de7b138b6f.png',
-        'img/HERO/djinc_A_regal_woman_with_silver-washed_hair_poses_under_a_deep__8c67e8d5-51b9-4680-9fa8-c4681d1831fc.png',
-        'img/HERO/djinc_A_serene_portrait_of_a_woman_with_shimmering_blonde_hair__87a69282-3ea0-4a4f-a9dd-20e3799d3e81.png',
-        'img/HERO/djinc_A_serene_studio_portrait_blending_a_womans_face_with_the__6b385b3d-1123-4ee9-8db7-914f4d3c3b72.png',
-        'img/HERO/djinc_A_soft_pastel-soaked_portrait_of_a_woman_with_cropped_pin_84e95729-1f49-4b8f-8532-577816f0cb9f.png',
-        'img/HERO/djinc_A_striking_fashion_image_of_a_woman_adorned_with_large_ci_dc9b5d63-94e9-4f38-ba6d-ad0b1e8848c9.png',
-        'img/HERO/djinc_A_studio_portrait_highlighting_a_woman_dressed_in_dark_at_b04139f2-5e05-4f6a-b95f-a7f31f9294ef.png',
-        'img/HERO/djinc_A_surreal_vintage-tinted_portrait_of_a_girl_with_a_bob_cu_adc98a5a-b765-411a-96ec-5ff6445cdbad.png',
-        'img/HERO/djinc_A_tightly_framed_portrait_of_a_woman_in_a_red-lit_studio__4b2efdee-0e0f-4453-9b47-a47250bd9209.png',
-        'img/HERO/djinc_A_vibrant_portrait_of_a_woman_with_orange-and-blue_hair_h_63ee0034-30b4-4f52-bb98-a220797d6a5a.png',
-        'img/HERO/djinc_A_vibrant_punk-inspired_portrait_of_a_girl_with_bright_pi_05e32473-bdd4-4a87-81ee-83a5ccb5dafe.png',
-        'img/HERO/djinc_A_whimsical_portrait_of_a_girl_with_curled_green_hair_her_037dff09-7062-41b6-8ac6-d8e976fe2b4e.png',
-        'img/HERO/djinc_A_woman_appears_as_if_drifting_through_the_dark_tiny_star_7cbbb06d-3ea6-42ae-8173-662521f6caae.png',
-        'img/HERO/djinc_A_woman_floats_in_a_cosmic_void_her_figure_surrounded_by__c1aa5cd5-3487-43f6-a643-a5fa50671b5a.png',
-        'img/HERO/djinc_A_woman_in_a_colorful_geometric_sweater_rests_her_chin_li_6005dde3-0c49-4ad0-aa70-b9a694e70d07.png',
-        'img/HERO/djinc_A_woman_rests_in_a_sun-drenched_garden_gentle_golden_ligh_00398855-0348-4ef6-96ad-e452920f9ec3.png',
-        'img/HERO/djinc_A_woman_wearing_oversized_geometric_earrings_stands_benea_f10c6191-fc14-4193-a178-e0dc178e698f.png',
-        'img/HERO/djinc_A_young_woman_stands_by_a_windswept_mountain_slope_her_ca_b99e0e32-dc33-4582-bb81-d180fec8e6a1.png',
-        'img/HERO/djinc_A_young_woman_with_elongated_emerald_hair_stands_beneath__04c1961b-def5-4f82-ab9f-0874f89847e2.png',
-        'img/HERO/djinc_A_young_woman_with_tinted_glasses_is_framed_against_a_ric_cc1b4ed1-e58a-4a95-9a56-4f990700fadc.png',
-        'img/HERO/djinc_Close-up_portrait_of_a_young_woman_tilting_her_face_towar_c01d7b12-be73-4f60-8863-13d1ee38d216.png',
-        'img/HERO/djinc_Portrait_of_a_person_with_pastel-pink_hair_and_crystallin_64036677-5578-4aca-915d-5274be6c4b65.png'
-    ];
-
-    // Preload hero trail images
-    heroImages.forEach((src, i) => {
-        setTimeout(() => { const img = new Image(); img.src = src; }, i * 50);
-    });
-
-    let heroTrailIndex = 0;
-    let lastTrailTime = 0;
-    let lastTrailX = 0, lastTrailY = 0;
-
-    if (heroTrail) {
-        heroSection.addEventListener('mousemove', (e) => {
-            const now = Date.now();
-            const dx = e.clientX - lastTrailX, dy = e.clientY - lastTrailY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (now - lastTrailTime > 120 && dist > 60) {
-                lastTrailTime = now;
-                lastTrailX = e.clientX; lastTrailY = e.clientY;
-                const rect = heroSection.getBoundingClientRect();
-                const x = e.clientX - rect.left, y = e.clientY - rect.top;
-                const img = document.createElement('img');
-                img.className = 'hero-trail-img';
-                img.src = heroImages[heroTrailIndex % heroImages.length];
-                heroTrailIndex++;
-                img.style.left = (x - 90 + (Math.random() - 0.5) * 40) + 'px';
-                img.style.top = (y - 120 + (Math.random() - 0.5) * 40) + 'px';
-                heroTrail.appendChild(img);
-                const trailImgs = heroTrail.querySelectorAll('.hero-trail-img');
-                if (trailImgs.length > 8) trailImgs[0].remove();
-                img.addEventListener('animationend', () => img.remove());
-            }
-        });
-    }
-
-
-    // ===== Future of GD — Image Trail =====
+    // ===== Future of GD ??Image Trail =====
     const futureofgdSection = document.getElementById('futureofgd');
     const futureofgdTrail = document.getElementById('futureofgdTrail');
     const futureImages = [
@@ -652,6 +536,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSrcs = [];
     let videoEndHandler = null;
 
+
+
     function advanceSlide() {
         if (!currentSrcs.length) return;
         slideIndex = (slideIndex + 1) % currentSrcs.length;
@@ -701,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
             expPreviewVideo.style.display = 'block';
             expPreviewVideo.src = videoSrc;
             expPreviewVideo.muted = true;
-            expPreviewVideo.loop = false; // don't loop video — let it play once then advance
+            expPreviewVideo.loop = false; // don't loop video ??let it play once then advance
             expPreviewVideo.play().catch(() => { });
         } else {
             expPreviewVideo.style.display = 'none';
@@ -730,9 +616,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (expPreview && window.innerWidth > 768) {
-        // Preload cache — track which source arrays have been preloaded
+        // Preload cache ??track which source arrays have been preloaded
         const preloadedSets = new WeakSet();
-        const loadedImages = new Map(); // src → Image (fully loaded)
+        const loadedImages = new Map(); // src ??Image (fully loaded)
 
         function staggeredPreload(srcs) {
             srcs.forEach((src, i) => {

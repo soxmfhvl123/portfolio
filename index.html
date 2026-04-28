@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DONG JIN CHOI — Art Director</title>
     <meta name="description"
-        content="최동진 포트폴리오. Art Director & Graphic Designer. Brand Identity, Motion Graphics, AI Artwork.">
+        content="Dong Jin Choi Portfolio. Art Director & Graphic Designer. Brand Identity, Motion Graphics, AI Artwork.">
     <meta property="og:title" content="DONG JIN CHOI — Portfolio">
     <meta property="og:description" content="Art Director & Graphic Designer · NYC × Seoul">
     <meta property="og:type" content="website">
@@ -37,9 +37,6 @@
         <div class="cursor-ring"></div>
     </div>
 
-    <!-- Particle Canvas (Full Page) -->
-    <canvas class="particle-canvas" id="particleCanvas"></canvas>
-
     <!-- Rainbow Trail Canvas -->
     <canvas class="particle-canvas" id="rainbowTrailCanvas" style="z-index:3;"></canvas>
 
@@ -48,16 +45,16 @@
 
     <!-- Navigation -->
     <nav class="nav" id="nav">
-        <a href="#hero" class="nav-logo" data-magnetic>DJ<span class="accent">.</span></a>
+        <a href="#hero" class="nav-logo" data-magnetic>DONG JIN CHOI<span class="accent">.</span></a>
         <div class="nav-center">
             <span class="nav-status" id="navStatus">PORTFOLIO 2026</span>
         </div>
         <div class="nav-right">
             <a href="portfolio/index.html" class="portfolio-direct-link" data-magnetic>VIEW IMAGE ONLY PORTFOLIO</a>
             <button class="lang-toggle" id="langToggle" data-magnetic aria-label="EN/KR toggle">
-                <span class="lang-label lang-active">KR</span>
+                <span class="lang-label">KR</span>
                 <span class="lang-divider">/</span>
-                <span class="lang-label">EN</span>
+                <span class="lang-label lang-active">EN</span>
             </button>
             <button class="nav-menu-btn" id="menuBtn" data-magnetic aria-label="Menu">
                 <div class="menu-line"></div>
@@ -105,30 +102,19 @@
 
     <!-- ===== HERO ===== -->
     <section class="hero" id="hero">
-        <div class="hero-bg">
-            <div class="hero-grid-lines"></div>
+        <!-- Image Grid Background -->
+        <div class="hero-image-grid" id="heroImageGrid"></div>
+        <!-- Grid overlay for darkening -->
+        <div class="hero-grid-overlay"></div>
+        <!-- Centered image popup on hover -->
+        <div class="hero-popup" id="heroPopup">
+            <img src="" alt="" id="heroPopupImg">
         </div>
         <div class="hero-content">
             <div class="hero-top">
                 <span class="hero-tag reveal-text">ART DIRECTOR</span>
                 <span class="hero-tag reveal-text">× DESIGNER</span>
             </div>
-            <h1 class="hero-name" id="heroName">
-                <div class="name-line">
-                    <span class="char-wrap" data-kinetic>D</span><span class="char-wrap" data-kinetic>O</span><span
-                        class="char-wrap" data-kinetic>N</span><span class="char-wrap" data-kinetic>G</span>
-                </div>
-                <div class="name-line">
-                    <span class="char-wrap" data-kinetic>J</span><span class="char-wrap" data-kinetic>I</span><span
-                        class="char-wrap" data-kinetic>N</span>
-                </div>
-                <div class="name-line">
-                    <span class="char-wrap" data-kinetic>C</span><span class="char-wrap" data-kinetic>H</span><span
-                        class="char-wrap" data-kinetic>O</span><span class="char-wrap" data-kinetic>I</span>
-                </div>
-            </h1>
-            <!-- Hero Mouse Trail Images -->
-            <div class="hero-trail" id="heroTrail"></div>
             <div class="hero-bottom">
                 <div class="hero-location reveal-text">
                     <span class="location-dot"></span>
@@ -214,7 +200,7 @@
                 <div class="about-tags reveal-up">
                     <span class="tag">Graphis Silver Award</span>
                     <span class="tag">SVA NYC · BFA</span>
-                    <span class="tag">홍익대 IDAS</span>
+                    <span class="tag" data-kr="홍익대 IDAS" data-en="Hongik Univ. IDAS">홍익대 IDAS</span>
                     <span class="tag">KR / EN Fluent</span>
                 </div>
             </div>
@@ -630,14 +616,18 @@
         <div class="futureofgd-text">
             <h3 class="futureofgd-subtitle reveal-up">From Hands to Eyes: The Era of the Creative Architect</h3>
             <div class="futureofgd-body">
-                <p class="reveal-up">AI 시대의 그래픽 디자이너는 더 이상 시각물을 만드는 기술자가 아니라고 생각한다. 우리는 AI라는 강력한 도구를 지휘하여 브랜드의 내러티브를 시각적
-                    경험으로 번역하는 크리에이티브 아키텍트로 진화하고 있다.</p>
-                <p class="reveal-up">미래의 경쟁력은 픽셀을 다루는 '손'이 아니라, 수만 개의 생성물 중 브랜드 맥락에 완벽히 부합하는 것을 찾아내는 '눈(Insight)'과, 그
-                    감성적 선택을 비즈니스 언어로 증명해내는 '논리'에 있고, 그런 관점에서 우리는 이제 단순히 그림을 그리는 사람이 아니라, 시각 언어를 통해 비즈니스 문제를 해결하고 사용자 경험을
-                    설계하는 전략가로 변하고 있다.</p>
-                <p class="reveal-up">나는 단순히 보기 좋은 결과물을 전달하는 것에 그치지 않고, 데이터와 논리를 기반으로 브랜드의 문제를 정의하고 해결하는 비즈니스 성과를 설계할
-                    것입니다. AI를 통해 무한한 시각적 가능성을 탐색하면서, 브랜드의 고유한 서사를 지키는 결정자(Director)로서, 당신의 비즈니스에 '설득력 있는 아름다움'을 더하는 파트너가
-                    되겠습니다.</p>
+                <p class="reveal-up" 
+                   data-kr="AI 시대의 그래픽 디자이너는 더 이상 시각물을 만드는 기술자가 아니라고 생각한다. 우리는 AI라는 강력한 도구를 지휘하여 브랜드의 내러티브를 시각적 경험으로 번역하는 크리에이티브 아키텍트로 진화하고 있다."
+                   data-en="In the AI era, I believe graphic designers are no longer just visual technicians. We are evolving into creative architects who direct powerful AI tools to translate brand narratives into visual experiences.">
+                   AI 시대의 그래픽 디자이너는 더 이상 시각물을 만드는 기술자가 아니라고 생각한다. 우리는 AI라는 강력한 도구를 지휘하여 브랜드의 내러티브를 시각적 경험으로 번역하는 크리에이티브 아키텍트로 진화하고 있다.</p>
+                <p class="reveal-up"
+                   data-kr="미래의 경쟁력은 픽셀을 다루는 '손'이 아니라, 수만 개의 생성물 중 브랜드 맥락에 완벽히 부합하는 것을 찾아내는 '눈(Insight)'과, 그 감성적 선택을 비즈니스 언어로 증명해내는 '논리'에 있고, 그런 관점에서 우리는 이제 단순히 그림을 그리는 사람이 아니라, 시각 언어를 통해 비즈니스 문제를 해결하고 사용자 경험을 설계하는 전략가로 변하고 있다."
+                   data-en="Future competitiveness lies not in 'hands' that manipulate pixels, but in 'eyes (insight)' that select what fits the brand context perfectly among thousands of outputs, and 'logic' that justifies emotional choices in business language. We are evolving into strategists who solve business problems and design user experiences through visual language.">
+                   미래의 경쟁력은 픽셀을 다루는 '손'이 아니라, 수만 개의 생성물 중 브랜드 맥락에 완벽히 부합하는 것을 찾아내는 '눈(Insight)'과, 그 감성적 선택을 비즈니스 언어로 증명해내는 '논리'에 있고, 그런 관점에서 우리는 이제 단순히 그림을 그리는 사람이 아니라, 시각 언어를 통해 비즈니스 문제를 해결하고 사용자 경험을 설계하는 전략가로 변하고 있다.</p>
+                <p class="reveal-up"
+                   data-kr="나는 단순히 보기 좋은 결과물을 전달하는 것에 그치지 않고, 데이터와 논리를 기반으로 브랜드의 문제를 정의하고 해결하는 비즈니스 성과를 설계할 것입니다. AI를 통해 무한한 시각적 가능성을 탐색하면서, 브랜드의 고유한 서사를 지키는 결정자(Director)로서, 당신의 비즈니스에 '설득력 있는 아름다움'을 더하는 파트너가 되겠습니다."
+                   data-en="I aim beyond just delivering aesthetic results; I design business outcomes that define and solve brand problems based on data and logic. As a director exploring infinite visual possibilities through AI while preserving the brand's unique narrative, I will be a partner who adds 'persuasive beauty' to your business.">
+                   나는 단순히 보기 좋은 결과물을 전달하는 것에 그치지 않고, 데이터와 논리를 기반으로 브랜드의 문제를 정의하고 해결하는 비즈니스 성과를 설계할 것입니다. AI를 통해 무한한 시각적 가능성을 탐색하면서, 브랜드의 고유한 서사를 지키는 결정자(Director)로서, 당신의 비즈니스에 '설득력 있는 아름다움'을 더하는 파트너가 되겠습니다.</p>
             </div>
         </div>
     </section>
@@ -665,7 +655,9 @@
         </div>
     </section>
 
+    <script src="hero-images.js"></script>
     <script src="main.js?v=20260331v2"></script>
+
 </body>
 
 </html>
