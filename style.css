@@ -722,7 +722,7 @@ button {
     font-size: clamp(36px, 5vw, 56px);
     font-weight: 800;
     color: var(--accent);
-    display: block;
+    display: inline;
 }
 
 .stat-plus {
@@ -978,6 +978,17 @@ button {
     height: 100%;
     border: 0;
     pointer-events: none;
+}
+
+/* Mobile: overlay always blocks touch so iframe doesn't steal scroll */
+@media (max-width: 768px) {
+    .onlylove-overlay {
+        pointer-events: all;
+        background: rgba(0, 0, 0, 0) !important;
+    }
+    .onlylove-iframe-wrap iframe {
+        pointer-events: none !important;
+    }
 }
 
 .onlylove-overlay {
