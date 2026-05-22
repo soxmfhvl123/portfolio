@@ -463,12 +463,10 @@ document.addEventListener('DOMContentLoaded', () => {
     menuBtn.addEventListener('click', () => {
         menuBtn.classList.toggle('active');
         fullscreenMenu.classList.toggle('active');
-        document.body.style.overflow = fullscreenMenu.classList.contains('active') ? 'hidden' : '';
     });
     fullscreenMenu.querySelectorAll('.menu-link').forEach(link => {
         link.addEventListener('click', () => {
             menuBtn.classList.remove('active'); fullscreenMenu.classList.remove('active');
-            document.body.style.overflow = '';
         });
     });
     document.querySelectorAll('a[href^="#"]').forEach(a => {
