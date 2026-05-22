@@ -491,6 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sectionNames = { 
         hero: 'PORTFOLIO 2026', 
         about: 'ABOUT', 
+        cdjstudio: 'CDJ STUDIO',
         experience: 'EXPERIENCE', 
         mastermind: 'MASTERMIND',
         'vibecoding-gallery': 'VIBE CODING',
