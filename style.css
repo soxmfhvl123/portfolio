@@ -1211,22 +1211,23 @@ button {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 1rem 1rem;
+    border-bottom: none;
     color: inherit;
     text-decoration: none;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: background 0.25s ease, color 0.25s ease;
     gap: 24px;
+    border-radius: 6px;
 }
 
 .vibe-list-item:first-child {
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: none;
 }
 
 .vibe-list-left {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.35rem;
     flex: 1;
 }
 
@@ -1238,7 +1239,7 @@ button {
     line-height: 1.15;
     color: rgba(255, 255, 255, 0.55);
     margin: 0;
-    transition: color 0.35s ease;
+    transition: color 0.25s ease;
     white-space: normal;
 }
 
@@ -1249,7 +1250,7 @@ button {
     color: rgba(255, 255, 255, 0.25);
     margin: 0;
     letter-spacing: 0.04em;
-    transition: color 0.35s ease;
+    transition: color 0.25s ease;
 }
 
 .vibe-list-right {
@@ -1263,24 +1264,24 @@ button {
     font-size: 0.8rem;
     letter-spacing: 0.12em;
     color: rgba(255, 255, 255, 0.2);
-    transition: color 0.35s ease;
+    transition: color 0.25s ease;
 }
 
 /* Hover States */
 .vibe-list-item:hover {
-    padding-left: 8px;
+    background: var(--accent);
 }
 
 .vibe-list-item:hover .vibe-list-title {
-    color: #ffffff;
+    color: #000000;
 }
 
 .vibe-list-item:hover .vibe-list-desc {
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(0, 0, 0, 0.6);
 }
 
 .vibe-list-item:hover .vibe-list-year {
-    color: var(--accent);
+    color: rgba(0, 0, 0, 0.5);
 }
 
 /* Responsive Tablet */
@@ -1289,7 +1290,7 @@ button {
         font-size: clamp(1.2rem, 3.5vw, 2rem);
     }
     .vibe-list-item {
-        padding: 1.6rem 0;
+        padding: 0.8rem 1rem;
     }
 }
 
@@ -1305,7 +1306,7 @@ button {
         font-size: 0.75rem;
     }
     .vibe-list-item {
-        padding: 1.2rem 0;
+        padding: 0.6rem 1rem;
     }
 }
 
