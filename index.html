@@ -310,7 +310,7 @@
         model.position.sub(center);
 
         FRAME_LOAD = frameFor(0.20, 0.09, 1.35);   // face/head fills the screen, clear of edge clipping while it rotates
-        FRAME_SCROLL = frameFor(0.60, 0.28, 1.15); // pulled back to head + torso
+        FRAME_SCROLL = frameFor(0.98, 0.5, 1.05);  // pulled all the way back, full figure head-to-toe
 
         camera.position.set(0, FRAME_LOAD.y, FRAME_LOAD.dist);
         camera.lookAt(0, FRAME_LOAD.y, 0);
@@ -350,7 +350,7 @@
       var TOP_LOAD = 50;    // vertical center, % of viewport, while still fixed
       var TOP_SCROLL = 42;  // sits over the text column, overlapping it on purpose
       var SIZE_LOAD = 88;   // vh/vw at load - huge, face fills the screen
-      var SIZE_SCROLL = 52; // vh/vw once scrolled - big, reads clearly over the text
+      var SIZE_SCROLL = 70; // vh/vw once scrolled - big, full figure reads clearly over the text
 
       function updateFrame() {
         if (!FRAME_LOAD || !FRAME_SCROLL) return;
