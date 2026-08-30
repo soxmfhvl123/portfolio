@@ -309,7 +309,7 @@
         var center = box.getCenter(new THREE.Vector3());
         model.position.sub(center);
 
-        FRAME_LOAD = frameFor(0.20, 0.09, 1.05);   // face/head fills the screen
+        FRAME_LOAD = frameFor(0.20, 0.09, 1.35);   // face/head fills the screen, clear of edge clipping while it rotates
         FRAME_SCROLL = frameFor(0.60, 0.28, 1.15); // pulled back to head + torso
 
         camera.position.set(0, FRAME_LOAD.y, FRAME_LOAD.dist);
@@ -348,9 +348,9 @@
       // figure sits (centered -> tucked up near the top), and its on-screen
       // size (huge on load -> a compact badge once scrolled).
       var TOP_LOAD = 50;    // vertical center, % of viewport, while still fixed
-      var TOP_SCROLL = 10;  // near the very top, right before it docks into the page
+      var TOP_SCROLL = 32;  // upper-middle of the screen, clearly visible when it docks
       var SIZE_LOAD = 88;   // vh/vw at load - huge, face fills the screen
-      var SIZE_SCROLL = 28; // vh/vw once docked - a compact, persistent badge
+      var SIZE_SCROLL = 42; // vh/vw once docked - bigger, still reads clearly
 
       // Below one viewport height of scroll, the canvas is `position:fixed`
       // and interpolates from the huge centered load state to a small badge
