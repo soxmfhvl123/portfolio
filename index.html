@@ -258,6 +258,7 @@
     import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
     var canvas = document.getElementById('astroboy-canvas');
+    var closingLogoEl = document.querySelector('.closing-logo');
 
     if (canvas && window.WebGLRenderingContext) {
       var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
@@ -316,8 +317,8 @@
         camera.lookAt(0, FRAME_LOAD.y, 0);
 
         scene.add(model);
+        canvas.style.opacity = '1';
         updateFrame();
-        updateFade();
       }, undefined, function (err) {
         console.warn('golden astroboy failed to load', err);
       });
@@ -352,9 +353,43 @@
       // figure sits (centered -> tucked up near the top), and its on-screen
       // size (huge on load -> a compact badge once scrolled).
       var TOP_LOAD = 50;    // vertical center, % of viewport, while still fixed
-      var TOP_SCROLL = 42;  // sits over the text column, overlapping it on purpose
+      var TOP_SCROLL = 46;  // stays close to true screen center while scrolling
       var SIZE_LOAD = 88;   // vh/vw at load - huge, face fills the screen
-      var SIZE_SCROLL = 70; // vh/vw once scrolled - big, full figure reads clearly over the text
+      var SIZE_SCROLL = 78; // vh/vw once scrolled - big, full figure, centered on screen
+      var MIN_SIZE_VMIN = 30; // never shrinks below this, even right above the footer
+
+      // Keeps the rotating figure from ever being covered by the opaque
+      // closing-logo/footer block: as that section's top edge approaches
+      // (or scrolls past) the canvas, this shrinks/re-centers the canvas so
+      // it always sits fully above it - no fading out, no hard cropping.
+      function keepClearOfFooter(topPercent, sizeVal) {
+        if (!closingLogoEl) return { top: topPercent, size: sizeVal };
+        var vh = window.innerHeight || 1;
+        var vw = window.innerWidth || 1;
+        var vmin = Math.min(vh, vw);
+        var margin = 28; // px gap always kept between the figure and the closing section
+        var limit = closingLogoEl.getBoundingClientRect().top - margin;
+        if (limit >= vh) return { top: topPercent, size: sizeVal }; // closing section still far below
+
+        var availableLimit = Math.max(limit, 0);
+        var minHalfPx = (MIN_SIZE_VMIN / 100 * vmin) / 2;
+        var naturalHalfPx = (sizeVal / 100 * vmin) / 2;
+
+        var halfPx, centerY;
+        if (availableLimit >= naturalHalfPx * 2) {
+          halfPx = naturalHalfPx;
+          centerY = Math.min((topPercent / 100) * vh, availableLimit - halfPx);
+          centerY = Math.max(centerY, halfPx); // keep the top edge on-screen too
+        } else if (availableLimit >= minHalfPx * 2) {
+          halfPx = availableLimit / 2;
+          centerY = availableLimit / 2;
+        } else {
+          halfPx = minHalfPx;
+          centerY = minHalfPx;
+        }
+
+        return { top: (centerY / vh) * 100, size: (halfPx * 2) / vmin * 100 };
+      }
 
       function updateFrame() {
         if (!FRAME_LOAD || !FRAME_SCROLL) return;
@@ -370,33 +405,12 @@
 
         var top = TOP_LOAD + (TOP_SCROLL - TOP_LOAD) * ease;
         var size = SIZE_LOAD + (SIZE_SCROLL - SIZE_LOAD) * ease;
-        canvas.style.top = top + '%';
-        canvas.style.width = 'min(' + size + 'vw, ' + size + 'vh)';
-        canvas.style.height = 'min(' + size + 'vw, ' + size + 'vh)';
+        var clamped = keepClearOfFooter(top, size);
+        canvas.style.top = clamped.top + '%';
+        canvas.style.width = 'min(' + clamped.size + 'vw, ' + clamped.size + 'vh)';
+        canvas.style.height = 'min(' + clamped.size + 'vw, ' + clamped.size + 'vh)';
       }
-      var closingLogoEl = document.querySelector('.closing-logo');
-      var FADE_BUFFER = 40; // px of extra runway before the closing section reaches the figure
-
-      // Fade out anchored to the document's actual max scroll position (not
-      // to the closing section reaching some fixed point on the figure) --
-      // the closing section + footer aren't tall enough to scroll the whole
-      // way past the figure before hitting the bottom of the page, so a
-      // fade tied only to their position never finished. Anchoring to max
-      // scroll guarantees the figure is fully invisible by the time the
-      // user actually reaches the bottom, whatever the page's exact height.
-      function updateFade() {
-        if (!closingLogoEl) return;
-        var canvasRect = canvas.getBoundingClientRect();
-        var closingTopDoc = closingLogoEl.getBoundingClientRect().top + window.scrollY;
-        var maxScroll = Math.max(document.body.scrollHeight - window.innerHeight, 0);
-        var fadeStartScrollY = closingTopDoc - canvasRect.bottom - FADE_BUFFER;
-        var span = maxScroll - fadeStartScrollY;
-        var opacity = span > 0 ? (maxScroll - window.scrollY) / span : 0;
-        opacity = Math.min(Math.max(opacity, 0), 1);
-        canvas.style.opacity = String(opacity);
-      }
-
-      window.addEventListener('scroll', function () { updateFrame(); updateFade(); }, { passive: true });
+      window.addEventListener('scroll', updateFrame, { passive: true });
       updateFrame();
     }
   </script>
