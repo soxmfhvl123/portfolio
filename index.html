@@ -309,15 +309,15 @@
         var center = box.getCenter(new THREE.Vector3());
         model.position.sub(center);
 
-        FRAME_LOAD = frameFor(0.20, 0.09, 1.35);   // face/head fills the screen, clear of edge clipping while it rotates
+        FRAME_LOAD = frameFor(0.30, 0.12, 1.4);    // face/head fills the screen with more shoulder/collar margin, clear of edge clipping while it rotates
         FRAME_SCROLL = frameFor(0.90, 0.5, 1.25);  // pulled all the way back, full figure head-to-toe with real margin
 
         camera.position.set(0, FRAME_LOAD.y, FRAME_LOAD.dist);
         camera.lookAt(0, FRAME_LOAD.y, 0);
 
         scene.add(model);
-        canvas.style.opacity = '1';
         updateFrame();
+        updateFade();
       }, undefined, function (err) {
         console.warn('golden astroboy failed to load', err);
       });
@@ -374,7 +374,29 @@
         canvas.style.width = 'min(' + size + 'vw, ' + size + 'vh)';
         canvas.style.height = 'min(' + size + 'vw, ' + size + 'vh)';
       }
-      window.addEventListener('scroll', updateFrame, { passive: true });
+      var closingLogoEl = document.querySelector('.closing-logo');
+      var FADE_BUFFER = 40; // px of extra runway before the closing section reaches the figure
+
+      // Fade out anchored to the document's actual max scroll position (not
+      // to the closing section reaching some fixed point on the figure) --
+      // the closing section + footer aren't tall enough to scroll the whole
+      // way past the figure before hitting the bottom of the page, so a
+      // fade tied only to their position never finished. Anchoring to max
+      // scroll guarantees the figure is fully invisible by the time the
+      // user actually reaches the bottom, whatever the page's exact height.
+      function updateFade() {
+        if (!closingLogoEl) return;
+        var canvasRect = canvas.getBoundingClientRect();
+        var closingTopDoc = closingLogoEl.getBoundingClientRect().top + window.scrollY;
+        var maxScroll = Math.max(document.body.scrollHeight - window.innerHeight, 0);
+        var fadeStartScrollY = closingTopDoc - canvasRect.bottom - FADE_BUFFER;
+        var span = maxScroll - fadeStartScrollY;
+        var opacity = span > 0 ? (maxScroll - window.scrollY) / span : 0;
+        opacity = Math.min(Math.max(opacity, 0), 1);
+        canvas.style.opacity = String(opacity);
+      }
+
+      window.addEventListener('scroll', function () { updateFrame(); updateFade(); }, { passive: true });
       updateFrame();
     }
   </script>
