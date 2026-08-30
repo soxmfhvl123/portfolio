@@ -38,7 +38,7 @@
     gap:16px;
     padding:28px 32px;
     position:relative;
-    z-index:2;
+    z-index:10;
     background:var(--paper);
   }
   .wordmark{
@@ -85,15 +85,15 @@
     position:fixed;
     top:50%;
     left:50%;
-    width:min(58vw, 58vh, 620px);
-    height:min(58vw, 58vh, 620px);
-    transform:translate(-50%, -50%) scale(1);
+    width:min(88vw, 88vh);
+    height:min(88vw, 88vh);
+    transform:translate(-50%, -50%);
     transform-origin:center center;
-    z-index:1;
+    z-index:5;
     pointer-events:none;
     opacity:0;
     transition:opacity 1s ease;
-    will-change:transform;
+    will-change:top;
   }
 
   /* ===== INTRO ===== */
@@ -103,8 +103,7 @@
     align-items:center;
     padding:6vw 32px;
     position:relative;
-    z-index:2;
-    background:var(--paper);
+    z-index:1;
   }
   .intro-inner{
     max-width:920px;
@@ -122,13 +121,13 @@
   /* ===== CLOSING LOGO (full bleed) ===== */
   .closing-logo{
     position:relative;
-    z-index:2;
+    z-index:6;
     background:var(--paper);
     display:flex;
     align-items:center;
     justify-content:space-between;
     width:100%;
-    padding:12vh 0;
+    padding:12vh 0 3vh;
     overflow:hidden;
   }
   .closing-word{
@@ -152,7 +151,7 @@
     letter-spacing:0.08em;
     color:var(--dim);
     position:relative;
-    z-index:2;
+    z-index:6;
     background:var(--paper);
   }
   .site-footer a{
@@ -171,7 +170,7 @@
     }
     .wordmark, .clock, .resume-link{ justify-self:center; }
     .intro{ padding:14vw 20px 8vw; }
-    .closing-logo{ padding:10vh 0; }
+    .closing-logo{ padding:10vh 0 2.5vh; }
     .closing-word{ font-size:13vw; }
     .site-footer{ padding:16px 20px 22px; flex-direction:column; align-items:flex-start; gap:8px; }
   }
@@ -281,24 +280,44 @@
       scene.add(new THREE.AmbientLight(0xffffff, 0.35));
 
       var model = null;
+      var fov = camera.fov * Math.PI / 180;
+
+      // Two framing states, computed once the model's real size is known:
+      //  FRAME_LOAD  - tight close-up on the head/face, huge on first paint
+      //  FRAME_SCROLL - pulled back a bit (upper body), sits higher on screen
+      var FRAME_LOAD = null;
+      var FRAME_SCROLL = null;
+
+      function frameFor(heightFraction, centerFromTop, padding) {
+        // heightFraction: portion of the model's total height to frame in view
+        // centerFromTop: 0 = very top of model, 1 = very bottom
+        var regionHeight = modelSize.y * heightFraction;
+        var regionCenterY = (modelSize.y / 2) - (modelSize.y * centerFromTop);
+        var dist = (regionHeight / 2) / Math.tan(fov / 2) * padding;
+        return { dist: dist, y: regionCenterY };
+      }
+
+      var modelSize = null;
+
       var loader = new GLTFLoader();
       loader.setMeshoptDecoder(MeshoptDecoder);
       loader.load('assets/golden-astroboy.glb', function (gltf) {
         model = gltf.scene;
 
         var box = new THREE.Box3().setFromObject(model);
-        var size = box.getSize(new THREE.Vector3());
+        modelSize = box.getSize(new THREE.Vector3());
         var center = box.getCenter(new THREE.Vector3());
         model.position.sub(center);
 
-        var maxDim = Math.max(size.x, size.y, size.z);
-        var fov = camera.fov * Math.PI / 180;
-        var fitDist = (maxDim / 2) / Math.tan(fov / 2) * 1.4;
-        camera.position.set(0, 0, fitDist);
-        camera.lookAt(0, 0, 0);
+        FRAME_LOAD = frameFor(0.20, 0.09, 1.05);   // face/head fills the screen
+        FRAME_SCROLL = frameFor(0.60, 0.28, 1.15); // pulled back to head + torso
+
+        camera.position.set(0, FRAME_LOAD.y, FRAME_LOAD.dist);
+        camera.lookAt(0, FRAME_LOAD.y, 0);
 
         scene.add(model);
         canvas.style.opacity = '1';
+        updateFrame();
       }, undefined, function (err) {
         console.warn('golden astroboy failed to load', err);
       });
@@ -324,15 +343,70 @@
       }
       requestAnimationFrame(animate);
 
-      var MIN_SCALE = 0.42;
-      function updateScale() {
-        var vh = window.innerHeight || 1;
-        var t = Math.min(Math.max(window.scrollY / vh, 0), 1);
-        var scale = 1 - t * (1 - MIN_SCALE);
-        canvas.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
+      // Scroll progress (0 at top -> 1 after one viewport height) drives the
+      // camera zoom (face close-up -> upper-body), how high on screen the
+      // figure sits (centered -> tucked up near the top), and its on-screen
+      // size (huge on load -> a compact badge once scrolled).
+      var TOP_LOAD = 50;    // vertical center, % of viewport, while still fixed
+      var TOP_SCROLL = 10;  // near the very top, right before it docks into the page
+      var SIZE_LOAD = 88;   // vh/vw at load - huge, face fills the screen
+      var SIZE_SCROLL = 28; // vh/vw once docked - a compact, persistent badge
+
+      // Below one viewport height of scroll, the canvas is `position:fixed`
+      // and interpolates from the huge centered load state to a small badge
+      // near the top. At exactly one viewport height it "docks": we snap it
+      // to `position:absolute` at that same on-screen spot, so from then on
+      // it scrolls away together with the text underneath it instead of
+      // staying pinned in front of it forever.
+      var docked = false;
+
+      function undock() {
+        docked = false;
+        canvas.style.position = 'fixed';
       }
-      window.addEventListener('scroll', updateScale, { passive: true });
-      updateScale();
+
+      function dockAt(scrollY, vh) {
+        docked = true;
+        var centerPagePx = scrollY + (TOP_SCROLL / 100) * vh;
+        canvas.style.position = 'absolute';
+        canvas.style.top = centerPagePx + 'px';
+        canvas.style.width = 'min(' + SIZE_SCROLL + 'vw, ' + SIZE_SCROLL + 'vh)';
+        canvas.style.height = 'min(' + SIZE_SCROLL + 'vw, ' + SIZE_SCROLL + 'vh)';
+
+        var dist = FRAME_SCROLL.dist;
+        var y = FRAME_SCROLL.y;
+        camera.position.set(0, y, dist);
+        camera.lookAt(0, y, 0);
+      }
+
+      function updateFrame() {
+        if (!FRAME_LOAD || !FRAME_SCROLL) return;
+        var vh = window.innerHeight || 1;
+        var scrollY = window.scrollY || 0;
+
+        if (scrollY >= vh) {
+          if (!docked) dockAt(scrollY, vh);
+          return;
+        }
+
+        if (docked) undock();
+
+        var t = Math.min(Math.max(scrollY / vh, 0), 1);
+        var ease = t * t * (3 - 2 * t); // smoothstep
+
+        var dist = FRAME_LOAD.dist + (FRAME_SCROLL.dist - FRAME_LOAD.dist) * ease;
+        var y = FRAME_LOAD.y + (FRAME_SCROLL.y - FRAME_LOAD.y) * ease;
+        camera.position.set(0, y, dist);
+        camera.lookAt(0, y, 0);
+
+        var top = TOP_LOAD + (TOP_SCROLL - TOP_LOAD) * ease;
+        var size = SIZE_LOAD + (SIZE_SCROLL - SIZE_LOAD) * ease;
+        canvas.style.top = top + '%';
+        canvas.style.width = 'min(' + size + 'vw, ' + size + 'vh)';
+        canvas.style.height = 'min(' + size + 'vw, ' + size + 'vh)';
+      }
+      window.addEventListener('scroll', updateFrame, { passive: true });
+      updateFrame();
     }
   </script>
 
