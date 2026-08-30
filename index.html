@@ -146,7 +146,7 @@
     align-items:center;
     justify-content:space-between;
     gap:16px;
-    padding:6px 32px 28px;
+    padding:2px 32px 10px;
     font-size:0.7rem;
     letter-spacing:0.08em;
     color:var(--dim);
@@ -172,7 +172,7 @@
     .intro{ padding:14vw 20px 8vw; }
     .closing-logo{ padding:10vh 0 0.5vh; }
     .closing-word{ font-size:13vw; }
-    .site-footer{ padding:4px 20px 22px; flex-direction:column; align-items:flex-start; gap:8px; }
+    .site-footer{ padding:2px 20px 10px; flex-direction:column; align-items:flex-start; gap:8px; }
   }
 </style>
 </head>
@@ -310,7 +310,7 @@
         model.position.sub(center);
 
         FRAME_LOAD = frameFor(0.20, 0.09, 1.35);   // face/head fills the screen, clear of edge clipping while it rotates
-        FRAME_SCROLL = frameFor(0.98, 0.5, 1.05);  // pulled all the way back, full figure head-to-toe
+        FRAME_SCROLL = frameFor(0.90, 0.5, 1.25);  // pulled all the way back, full figure head-to-toe with real margin
 
         camera.position.set(0, FRAME_LOAD.y, FRAME_LOAD.dist);
         camera.lookAt(0, FRAME_LOAD.y, 0);
@@ -322,9 +322,12 @@
         console.warn('golden astroboy failed to load', err);
       });
 
+      var lastResizeW = 0, lastResizeH = 0;
       function resize() {
         var w = canvas.clientWidth || 1;
         var h = canvas.clientHeight || 1;
+        if (w === lastResizeW && h === lastResizeH) return;
+        lastResizeW = w; lastResizeH = h;
         renderer.setSize(w, h, false);
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
@@ -338,6 +341,7 @@
         var dt = (now - last) / 1000;
         last = now;
         if (model) model.rotation.y += ANGULAR_SPEED * dt;
+        resize(); // keep the render resolution in sync with the current CSS size every frame
         renderer.render(scene, camera);
         requestAnimationFrame(animate);
       }
