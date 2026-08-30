@@ -348,49 +348,14 @@
       // figure sits (centered -> tucked up near the top), and its on-screen
       // size (huge on load -> a compact badge once scrolled).
       var TOP_LOAD = 50;    // vertical center, % of viewport, while still fixed
-      var TOP_SCROLL = 32;  // upper-middle of the screen, clearly visible when it docks
+      var TOP_SCROLL = 42;  // sits over the text column, overlapping it on purpose
       var SIZE_LOAD = 88;   // vh/vw at load - huge, face fills the screen
-      var SIZE_SCROLL = 42; // vh/vw once docked - bigger, still reads clearly
-
-      // Below one viewport height of scroll, the canvas is `position:fixed`
-      // and interpolates from the huge centered load state to a small badge
-      // near the top. At exactly one viewport height it "docks": we snap it
-      // to `position:absolute` at that same on-screen spot, so from then on
-      // it scrolls away together with the text underneath it instead of
-      // staying pinned in front of it forever.
-      var docked = false;
-
-      function undock() {
-        docked = false;
-        canvas.style.position = 'fixed';
-      }
-
-      function dockAt(scrollY, vh) {
-        docked = true;
-        var centerPagePx = scrollY + (TOP_SCROLL / 100) * vh;
-        canvas.style.position = 'absolute';
-        canvas.style.top = centerPagePx + 'px';
-        canvas.style.width = 'min(' + SIZE_SCROLL + 'vw, ' + SIZE_SCROLL + 'vh)';
-        canvas.style.height = 'min(' + SIZE_SCROLL + 'vw, ' + SIZE_SCROLL + 'vh)';
-
-        var dist = FRAME_SCROLL.dist;
-        var y = FRAME_SCROLL.y;
-        camera.position.set(0, y, dist);
-        camera.lookAt(0, y, 0);
-      }
+      var SIZE_SCROLL = 52; // vh/vw once scrolled - big, reads clearly over the text
 
       function updateFrame() {
         if (!FRAME_LOAD || !FRAME_SCROLL) return;
         var vh = window.innerHeight || 1;
         var scrollY = window.scrollY || 0;
-
-        if (scrollY >= vh) {
-          if (!docked) dockAt(scrollY, vh);
-          return;
-        }
-
-        if (docked) undock();
-
         var t = Math.min(Math.max(scrollY / vh, 0), 1);
         var ease = t * t * (3 - 2 * t); // smoothstep
 
