@@ -75,11 +75,20 @@
   }
   .resume-link:hover{ opacity:0.5; }
 
-  /* ===== HERO (3D golden astroboy stage) ===== */
+  /* ===== HERO (3D golden astroboy stage + background image wheel) ===== */
   .hero-stage{
     position:relative;
     height:100vh;
     width:100%;
+    overflow:hidden;
+  }
+  #wheel-canvas{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    display:block;
+    z-index:1;
   }
   #astroboy-canvas{
     position:fixed;
@@ -189,7 +198,9 @@
   </header>
 
   <canvas id="astroboy-canvas"></canvas>
-  <section class="hero-stage" aria-hidden="true"></section>
+  <section class="hero-stage" aria-hidden="true">
+    <canvas id="wheel-canvas"></canvas>
+  </section>
 
   <main class="intro">
     <div class="intro-inner">
@@ -412,6 +423,134 @@
       }
       window.addEventListener('scroll', updateFrame, { passive: true });
       updateFrame();
+    }
+  </script>
+
+  <script type="module">
+    // ===== Background 3D image wheel (hero section only) =====
+    import * as THREE from 'three';
+
+    var wheelCanvas = document.getElementById('wheel-canvas');
+    var heroStage = document.querySelector('.hero-stage');
+
+    if (wheelCanvas && heroStage && window.WebGLRenderingContext) {
+      var renderer = new THREE.WebGLRenderer({ canvas: wheelCanvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(52, 1, 0.1, 100);
+      camera.position.set(0, 0.3, 6.6);
+      camera.lookAt(0, 0.3, 0);
+
+      // ---- the ring of cards ----
+      var COUNT = 12;
+      var CARD_W = 1.7, CARD_H = 2.3;
+      var RADIUS = (COUNT * CARD_W * 1.18) / (Math.PI * 2);
+
+      var group = new THREE.Group();
+      scene.add(group);
+
+      var geometry = new THREE.PlaneGeometry(CARD_W, CARD_H);
+
+      function placeholderTexture(index, hue) {
+        var c = document.createElement('canvas');
+        c.width = 512;
+        c.height = Math.round(512 * (CARD_H / CARD_W));
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = 'hsl(' + hue + ', 60%, 55%)';
+        ctx.fillRect(0, 0, c.width, c.height);
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.font = '700 ' + Math.round(c.width * 0.16) + 'px Helvetica, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(index + 1).padStart(2, '0'), c.width / 2, c.height / 2);
+        var tex = new THREE.CanvasTexture(c);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        return tex;
+      }
+
+      // Crops a loaded texture to fill the card fully (like CSS background-size:cover)
+      // instead of stretching it to the card's aspect ratio.
+      function coverFit(tex, imgW, imgH) {
+        var imgAspect = imgW / imgH;
+        var cardAspect = CARD_W / CARD_H;
+        if (imgAspect > cardAspect) {
+          tex.repeat.set(cardAspect / imgAspect, 1);
+          tex.offset.set((1 - tex.repeat.x) / 2, 0);
+        } else {
+          tex.repeat.set(1, imgAspect / cardAspect);
+          tex.offset.set(0, (1 - tex.repeat.y) / 2);
+        }
+        tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+        tex.needsUpdate = true;
+      }
+
+      for (var i = 0; i < COUNT; i++) {
+        var theta = (i / COUNT) * Math.PI * 2;
+        var hue = Math.round((i / COUNT) * 360);
+        var material = new THREE.MeshBasicMaterial({ map: placeholderTexture(i, hue), toneMapped: false });
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(Math.sin(theta) * RADIUS, 0, Math.cos(theta) * RADIUS);
+        mesh.rotation.y = theta;
+        group.add(mesh);
+
+        // Real photos live in assets/wheel/wheel-01.jpg ... wheel-12.jpg.
+        // If a slot's file doesn't exist yet, silently keep the placeholder.
+        (function (mesh, slot) {
+          var url = 'assets/wheel/wheel-' + String(slot).padStart(2, '0') + '.jpg';
+          new THREE.TextureLoader().load(url, function (tex) {
+            tex.colorSpace = THREE.SRGBColorSpace;
+            coverFit(tex, tex.image.width, tex.image.height);
+            mesh.material.map = tex;
+            mesh.material.needsUpdate = true;
+          }, undefined, function () {
+            // no photo at this slot yet - keep the colored placeholder
+          });
+        })(mesh, i + 1);
+      }
+
+      // ---- resize ----
+      var lastW = 0, lastH = 0;
+      function resize() {
+        var w = wheelCanvas.clientWidth || 1;
+        var h = wheelCanvas.clientHeight || 1;
+        if (w === lastW && h === lastH) return;
+        lastW = w; lastH = h;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      // ---- only render while the hero section is actually on screen ----
+      var heroVisible = true;
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          heroVisible = entries[0].isIntersecting;
+        }, { threshold: 0 });
+        io.observe(heroStage);
+      }
+
+      // ---- scroll drives the spin, eased for a smooth feel ----
+      var ROT_PER_PX = 0.0022;
+      var targetRotation = 0;
+      var currentRotation = 0;
+      function updateRotation() {
+        targetRotation = (window.scrollY || 0) * ROT_PER_PX;
+      }
+      window.addEventListener('scroll', updateRotation, { passive: true });
+      updateRotation();
+
+      function animate() {
+        currentRotation += (targetRotation - currentRotation) * 0.08;
+        group.rotation.y = currentRotation;
+        resize();
+        if (heroVisible) renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
     }
   </script>
 
