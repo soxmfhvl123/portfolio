@@ -81,13 +81,25 @@
     height:230vh;
     width:100%;
   }
-  #wheel-canvas{
-    position:sticky;
+  #wheel-canvas-back{
+    position:fixed;
     top:0;
+    left:0;
+    width:100%;
+    height:100vh;
+    display:block;
+    z-index:2;
+    transition:opacity 0.4s ease;
+  }
+  #wheel-canvas{
+    position:fixed;
+    top:0;
+    left:0;
     width:100%;
     height:100vh;
     display:block;
     z-index:4;
+    transition:opacity 0.4s ease;
   }
   #astroboy-canvas{
     position:fixed;
@@ -198,6 +210,7 @@
 
   <canvas id="astroboy-canvas"></canvas>
   <section class="hero-stage" aria-hidden="true">
+    <canvas id="wheel-canvas-back"></canvas>
     <canvas id="wheel-canvas"></canvas>
   </section>
 
@@ -413,20 +426,29 @@
 
   <script type="module">
     // ===== Background 3D image wheel (hero section only) =====
+    // Rendered to TWO stacked canvases sharing the same scene/camera: cards
+    // currently on the near side of the ring draw on the canvas in FRONT of
+    // the golden figure, cards on the far side draw on the canvas BEHIND it -
+    // so the figure genuinely sits in the middle of the ring, not just on
+    // top of it.
     import * as THREE from 'three';
 
-    var wheelCanvas = document.getElementById('wheel-canvas');
+    var wheelCanvasFront = document.getElementById('wheel-canvas');
+    var wheelCanvasBack = document.getElementById('wheel-canvas-back');
     var heroStage = document.querySelector('.hero-stage');
 
-    if (wheelCanvas && heroStage && window.WebGLRenderingContext) {
-      var renderer = new THREE.WebGLRenderer({ canvas: wheelCanvas, antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.outputColorSpace = THREE.SRGBColorSpace;
+    if (wheelCanvasFront && wheelCanvasBack && heroStage && window.WebGLRenderingContext) {
+      var rendererFront = new THREE.WebGLRenderer({ canvas: wheelCanvasFront, antialias: true, alpha: true, preserveDrawingBuffer: true });
+      var rendererBack = new THREE.WebGLRenderer({ canvas: wheelCanvasBack, antialias: true, alpha: true, preserveDrawingBuffer: true });
+      [rendererFront, rendererBack].forEach(function (r) {
+        r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        r.outputColorSpace = THREE.SRGBColorSpace;
+      });
 
       var scene = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera(68, 1, 0.1, 100);
-      camera.position.set(0, 1.6, 10.5);
-      camera.lookAt(0, -0.1, 0);
+      var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+      camera.position.set(0, 0.6, 8.2);
+      camera.lookAt(0, 0.2, 0);
 
       // ---- the ring of cards ----
       var COUNT = 12;
@@ -435,6 +457,7 @@
 
       var group = new THREE.Group();
       scene.add(group);
+      var cardMeshes = [];
 
       var geometry = new THREE.PlaneGeometry(CARD_W, CARD_H);
 
@@ -479,6 +502,7 @@
         mesh.position.set(Math.sin(theta) * RADIUS, 0, Math.cos(theta) * RADIUS);
         mesh.rotation.y = theta;
         group.add(mesh);
+        cardMeshes.push(mesh);
 
         // Real photos live in assets/wheel/wheel-01.jpg ... wheel-12.jpg.
         // If a slot's file doesn't exist yet, silently keep the placeholder.
@@ -495,25 +519,30 @@
         })(mesh, i + 1);
       }
 
-      // ---- resize ----
+      // ---- resize (both canvases always share the same size) ----
       var lastW = 0, lastH = 0;
       function resize() {
-        var w = wheelCanvas.clientWidth || 1;
-        var h = wheelCanvas.clientHeight || 1;
+        var w = wheelCanvasFront.clientWidth || 1;
+        var h = wheelCanvasFront.clientHeight || 1;
         if (w === lastW && h === lastH) return;
         lastW = w; lastH = h;
-        renderer.setSize(w, h, false);
+        rendererFront.setSize(w, h, false);
+        rendererBack.setSize(w, h, false);
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
       }
       window.addEventListener('resize', resize);
       resize();
 
-      // ---- only render while the hero section is actually on screen ----
+      // ---- only visible/rendering while the hero section is on screen ----
+      // (the canvases are position:fixed now, so this fade is what confines
+      // them to the hero instead of the section's own scroll clipping)
       var heroVisible = true;
       if ('IntersectionObserver' in window) {
         var io = new IntersectionObserver(function (entries) {
           heroVisible = entries[0].isIntersecting;
+          wheelCanvasFront.style.opacity = heroVisible ? '1' : '0';
+          wheelCanvasBack.style.opacity = heroVisible ? '1' : '0';
         }, { threshold: 0 });
         io.observe(heroStage);
       }
@@ -533,11 +562,30 @@
       window.addEventListener('scroll', updateRotation, { passive: true });
       updateRotation();
 
+      var _scratchVec = new THREE.Vector3();
+
+      // Splits the ring into a "near" half (in front of the character) and a
+      // "far" half (behind it), using each card's current world Z after the
+      // ring's rotation - then renders each half to its own canvas so the
+      // fixed astroboy layer sandwiched between them shows real depth.
+      function renderSplit() {
+        group.updateMatrixWorld(true);
+        for (var i = 0; i < cardMeshes.length; i++) {
+          cardMeshes[i].getWorldPosition(_scratchVec);
+          cardMeshes[i].userData.front = _scratchVec.z >= 0;
+        }
+        for (var i = 0; i < cardMeshes.length; i++) cardMeshes[i].visible = cardMeshes[i].userData.front;
+        rendererFront.render(scene, camera);
+        for (var i = 0; i < cardMeshes.length; i++) cardMeshes[i].visible = !cardMeshes[i].userData.front;
+        rendererBack.render(scene, camera);
+        for (var i = 0; i < cardMeshes.length; i++) cardMeshes[i].visible = true;
+      }
+
       function animate() {
         currentRotation += (targetRotation - currentRotation) * 0.08;
         group.rotation.y = currentRotation;
         resize();
-        if (heroVisible) renderer.render(scene, camera);
+        if (heroVisible) renderSplit();
         requestAnimationFrame(animate);
       }
       requestAnimationFrame(animate);
