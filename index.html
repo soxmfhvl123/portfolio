@@ -446,9 +446,11 @@
       });
 
       var scene = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+      var CAMERA_FOV = 45;
+      var camera = new THREE.PerspectiveCamera(CAMERA_FOV, 1, 0.1, 100);
       camera.position.set(0, 0, 8.2);
       camera.lookAt(0, 0, 0);
+      var cameraFovRad = CAMERA_FOV * Math.PI / 180;
 
       // ---- the ring of cards ----
       var COUNT = 12;
@@ -538,6 +540,12 @@
       }
 
       // ---- resize (both canvases always share the same size) ----
+      // The near card's distance from the camera is recomputed on every
+      // resize so it always fully covers the viewport - like CSS
+      // background-size:cover, but for the card itself - instead of a
+      // fixed distance that can leave a sliver of the next card peeking
+      // through at the edges (top/bottom on a tall window, left/right on
+      // an extra-wide one).
       var lastW = 0, lastH = 0;
       function resize() {
         var w = wheelCanvasFront.clientWidth || 1;
@@ -546,8 +554,14 @@
         lastW = w; lastH = h;
         rendererFront.setSize(w, h, false);
         rendererBack.setSize(w, h, false);
-        camera.aspect = w / h;
+        var aspect = w / h;
+        camera.aspect = aspect;
         camera.updateProjectionMatrix();
+
+        var maxDistForHeight = CARD_H / (2 * Math.tan(cameraFovRad / 2));
+        var maxDistForWidth = CARD_W / (2 * Math.tan(cameraFovRad / 2) * aspect);
+        var dist = Math.min(maxDistForHeight, maxDistForWidth) * 0.98; // small overflow margin
+        camera.position.z = RADIUS + dist;
       }
       window.addEventListener('resize', resize);
       resize();
