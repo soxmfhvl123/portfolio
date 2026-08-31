@@ -41,6 +41,18 @@
     z-index:10;
     background:var(--paper);
   }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    justify-self:start;
+  }
+  #brand-logo-canvas{
+    width:30px;
+    height:30px;
+    display:block;
+    flex-shrink:0;
+  }
   .wordmark{
     font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-weight:700;
@@ -49,7 +61,6 @@
     color:var(--ink);
     text-decoration:none;
     white-space:nowrap;
-    justify-self:start;
   }
   .clock{
     display:flex;
@@ -192,7 +203,7 @@
       padding:22px 20px;
       text-align:center;
     }
-    .wordmark, .clock, .resume-link{ justify-self:center; }
+    .brand, .clock, .resume-link{ justify-self:center; }
     .intro{ padding:14vw 20px 8vw; }
     .closing-logo{ padding:10vh 20px 0.5vh; }
     .closing-word{ font-size:13vw; }
@@ -203,7 +214,10 @@
 <body>
 
   <header class="site-header">
-    <a class="wordmark" href="index.html">FLUXUS</a>
+    <div class="brand">
+      <canvas id="brand-logo-canvas" aria-hidden="true"></canvas>
+      <a class="wordmark" href="index.html">FLUXUS</a>
+    </div>
     <div class="clock">
       <span id="clockCity">SEOUL</span>
       <span class="dot">&middot;</span>
@@ -706,6 +720,66 @@
         requestAnimationFrame(animate);
       }
       requestAnimationFrame(animate);
+    }
+  </script>
+
+  <script type="module">
+    // ===== Small spinning 3D FLUXUS logo mark, top-left of the header =====
+    // A thin extruded "card" (not just a flat spinning image) so it reads as
+    // a real object as it turns - constant-speed ("linear") rotation, always
+    // spinning regardless of scroll, independent of every other animation
+    // on the page.
+    import * as THREE from 'three';
+
+    var logoCanvas = document.getElementById('brand-logo-canvas');
+    if (logoCanvas && window.WebGLRenderingContext) {
+      var logoRenderer = new THREE.WebGLRenderer({ canvas: logoCanvas, antialias: true, alpha: true });
+      logoRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      logoRenderer.outputColorSpace = THREE.SRGBColorSpace;
+
+      var logoScene = new THREE.Scene();
+      var logoCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 10);
+      logoCamera.position.set(0, 0, 3.2);
+      logoCamera.lookAt(0, 0, 0);
+
+      // logo mark is 964x1927 (about 1:2) - give it a bit of real depth
+      var LOGO_ASPECT = 964 / 1927;
+      var LOGO_H = 1.6, LOGO_W = LOGO_H * LOGO_ASPECT, LOGO_DEPTH = 0.06;
+
+      var edgeMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
+      var faceMat = new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.5, side: THREE.DoubleSide });
+      var logoGeo = new THREE.BoxGeometry(LOGO_W, LOGO_H, LOGO_DEPTH);
+      // BoxGeometry face order: +x, -x, +y, -y, +z, -z - front/back get the
+      // logo texture, the four thin edges around it get a plain dark fill
+      var logoMesh = new THREE.Mesh(logoGeo, [edgeMat, edgeMat, edgeMat, edgeMat, faceMat, faceMat]);
+      logoScene.add(logoMesh);
+
+      new THREE.TextureLoader().load('assets/fluxus-logo.png', function (tex) {
+        tex.colorSpace = THREE.SRGBColorSpace;
+        faceMat.map = tex;
+        faceMat.needsUpdate = true;
+      });
+
+      function resizeLogo() {
+        var w = logoCanvas.clientWidth || 1;
+        var h = logoCanvas.clientHeight || 1;
+        logoRenderer.setSize(w, h, false);
+        logoCamera.aspect = w / h;
+        logoCamera.updateProjectionMatrix();
+      }
+      window.addEventListener('resize', resizeLogo);
+      resizeLogo();
+
+      var LOGO_SPIN_SPEED = 0.9; // radians / second - constant, not eased
+      var lastLogoT = performance.now();
+      function animateLogo(t) {
+        var dt = Math.min((t - lastLogoT) / 1000, 0.1);
+        lastLogoT = t;
+        logoMesh.rotation.y += LOGO_SPIN_SPEED * dt;
+        logoRenderer.render(logoScene, logoCamera);
+        requestAnimationFrame(animateLogo);
+      }
+      requestAnimationFrame(animateLogo);
     }
   </script>
 
