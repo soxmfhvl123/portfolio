@@ -747,11 +747,17 @@
       var LOGO_H = 1.6, LOGO_W = LOGO_H * LOGO_ASPECT, LOGO_DEPTH = 0.06;
 
       var edgeMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
-      var faceMat = new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.5, side: THREE.DoubleSide });
+      // Front-only, single-sided: with alpha-cutout art, a double-sided
+      // material on both +z AND -z faces let the back face's copy of the
+      // logo show through the cutouts in the front face (looked like two
+      // overlapping logos). Only the +z face gets the texture; the back
+      // and the four thin edges are a plain dark fill.
+      var faceMat = new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.5, side: THREE.FrontSide });
       var logoGeo = new THREE.BoxGeometry(LOGO_W, LOGO_H, LOGO_DEPTH);
-      // BoxGeometry face order: +x, -x, +y, -y, +z, -z - front/back get the
-      // logo texture, the four thin edges around it get a plain dark fill
-      var logoMesh = new THREE.Mesh(logoGeo, [edgeMat, edgeMat, edgeMat, edgeMat, faceMat, faceMat]);
+      // BoxGeometry face order: +x, -x, +y, -y, +z, -z - only the front
+      // (+z) gets the logo texture, everything else (back + 4 edges) is a
+      // plain dark fill so nothing textured can show through the cutouts
+      var logoMesh = new THREE.Mesh(logoGeo, [edgeMat, edgeMat, edgeMat, edgeMat, faceMat, edgeMat]);
       logoScene.add(logoMesh);
 
       new THREE.TextureLoader().load('assets/fluxus-logo.png', function (tex) {
