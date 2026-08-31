@@ -78,15 +78,14 @@
   /* ===== HERO (3D golden astroboy stage + background image wheel) ===== */
   .hero-stage{
     position:relative;
-    height:100vh;
+    height:230vh;
     width:100%;
-    overflow:hidden;
   }
   #wheel-canvas{
-    position:absolute;
-    inset:0;
+    position:sticky;
+    top:0;
     width:100%;
-    height:100%;
+    height:100vh;
     display:block;
     z-index:1;
   }
@@ -440,12 +439,12 @@
 
       var scene = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera(52, 1, 0.1, 100);
-      camera.position.set(0, 0.3, 6.6);
+      camera.position.set(0, 0.3, 8.6);
       camera.lookAt(0, 0.3, 0);
 
       // ---- the ring of cards ----
       var COUNT = 12;
-      var CARD_W = 1.7, CARD_H = 2.3;
+      var CARD_W = 2.7, CARD_H = 1.52; // 16:9
       var RADIUS = (COUNT * CARD_W * 1.18) / (Math.PI * 2);
 
       var group = new THREE.Group();
@@ -534,11 +533,16 @@
       }
 
       // ---- scroll drives the spin, eased for a smooth feel ----
-      var ROT_PER_PX = 0.0022;
+      // Tied to scroll progress through the hero section itself, so the wheel
+      // always turns through almost a full revolution (rather than a handful
+      // of cards) by the time the hero scrolls out of view.
+      var HERO_TURNS = 0.92; // fraction of a full 360 degree spin across the hero's scroll range
       var targetRotation = 0;
       var currentRotation = 0;
       function updateRotation() {
-        targetRotation = (window.scrollY || 0) * ROT_PER_PX;
+        var heroHeight = heroStage.offsetHeight || window.innerHeight;
+        var progress = Math.min(Math.max((window.scrollY || 0) / heroHeight, 0), 1);
+        targetRotation = progress * HERO_TURNS * Math.PI * 2;
       }
       window.addEventListener('scroll', updateRotation, { passive: true });
       updateRotation();
