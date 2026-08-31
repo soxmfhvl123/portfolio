@@ -78,7 +78,7 @@
   /* ===== HERO (3D golden astroboy stage + background image wheel) ===== */
   .hero-stage{
     position:relative;
-    height:230vh;
+    height:260vh;
     width:100%;
   }
   #wheel-canvas-back{
@@ -89,7 +89,7 @@
     height:100vh;
     display:block;
     z-index:2;
-    transition:opacity 0.4s ease;
+    will-change:transform;
   }
   #wheel-canvas{
     position:fixed;
@@ -99,7 +99,7 @@
     height:100vh;
     display:block;
     z-index:4;
-    transition:opacity 0.4s ease;
+    will-change:transform;
   }
   #astroboy-canvas{
     position:fixed;
@@ -534,30 +534,41 @@
       window.addEventListener('resize', resize);
       resize();
 
-      // ---- only visible/rendering while the hero section is on screen ----
-      // (the canvases are position:fixed now, so this fade is what confines
-      // them to the hero instead of the section's own scroll clipping)
+      // ---- only rendering while the hero section is on screen (perf) ----
       var heroVisible = true;
       if ('IntersectionObserver' in window) {
         var io = new IntersectionObserver(function (entries) {
           heroVisible = entries[0].isIntersecting;
-          wheelCanvasFront.style.opacity = heroVisible ? '1' : '0';
-          wheelCanvasBack.style.opacity = heroVisible ? '1' : '0';
         }, { threshold: 0 });
         io.observe(heroStage);
       }
 
-      // ---- scroll drives the spin, eased for a smooth feel ----
-      // Tied to scroll progress through the hero section itself, so the wheel
-      // always turns through almost a full revolution (rather than a handful
-      // of cards) by the time the hero scrolls out of view.
-      var HERO_TURNS = 0.92; // fraction of a full 360 degree spin across the hero's scroll range
-      var targetRotation = 0;
-      var currentRotation = 0;
+      // ---- scroll drives the spin, then releases the wheel to slide away ----
+      // Tied to scroll progress through the hero section itself. The first
+      // part of that scroll spins the ring through almost a full turn; once
+      // the spin is done, the rest of the scroll slides the whole wheel
+      // straight up and off the screen (instead of fading out) - and both
+      // finish with room to spare before the intro text underneath can be
+      // seen, so the wheel is always fully done spinning and gone before the
+      // copy shows.
+      var HERO_TURNS = 0.92;  // fraction of a full 360 degree spin
+      var ROTATE_END = 0.42;  // fraction of the hero's scroll spent spinning
+      var EXIT_END = 0.56;    // fraction of the hero's scroll by which the wheel is fully off-screen
+      var targetRotation = 0, currentRotation = 0;
       function updateRotation() {
         var heroHeight = heroStage.offsetHeight || window.innerHeight;
         var progress = Math.min(Math.max((window.scrollY || 0) / heroHeight, 0), 1);
-        targetRotation = progress * HERO_TURNS * Math.PI * 2;
+        var rotateProgress = Math.min(progress / ROTATE_END, 1);
+        var exitProgress = Math.min(Math.max((progress - ROTATE_END) / (EXIT_END - ROTATE_END), 0), 1);
+        targetRotation = rotateProgress * HERO_TURNS * Math.PI * 2;
+
+        // Slide the wheel straight up and off the screen once it's done
+        // spinning. Applied directly (no easing lag) so it always finishes
+        // exactly in step with scroll - never left trailing behind - well
+        // before the intro text underneath can be seen.
+        var offset = (-exitProgress * 105).toFixed(2) + 'vh';
+        wheelCanvasFront.style.transform = 'translateY(' + offset + ')';
+        wheelCanvasBack.style.transform = 'translateY(' + offset + ')';
       }
       window.addEventListener('scroll', updateRotation, { passive: true });
       updateRotation();
