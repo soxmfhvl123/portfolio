@@ -89,6 +89,8 @@
     height:100vh;
     display:block;
     z-index:2;
+    opacity:0;
+    transition:opacity 0.5s ease;
     will-change:transform;
   }
   #wheel-canvas{
@@ -99,6 +101,8 @@
     height:100vh;
     display:block;
     z-index:4;
+    opacity:0;
+    transition:opacity 0.5s ease;
     will-change:transform;
   }
   #astroboy-canvas{
@@ -462,6 +466,19 @@
       var cardMeshes = [];
       var wheelVideos = []; // real <video> clips, so they can be paused when off-screen
 
+      // The canvases start invisible so the colored number placeholders never
+      // flash on screen - revealed as soon as the front-most card (slot 1 at
+      // load) actually has a video frame ready, or after a short timeout if
+      // that clip is slow/missing, so the hero is never stuck hidden.
+      var wheelRevealed = false;
+      function revealWheel() {
+        if (wheelRevealed) return;
+        wheelRevealed = true;
+        wheelCanvasFront.style.opacity = '1';
+        wheelCanvasBack.style.opacity = '1';
+      }
+      setTimeout(revealWheel, 1500);
+
       var geometry = new THREE.PlaneGeometry(CARD_W, CARD_H);
 
       function placeholderTexture(index, hue) {
@@ -527,6 +544,12 @@
             mesh.material.map = tex;
             mesh.material.needsUpdate = true;
           });
+          if (slot === 1) {
+            // this is the front-most card at load - wait for an actual
+            // decoded frame (not just metadata) before revealing the wheel
+            video.addEventListener('loadeddata', revealWheel);
+            video.addEventListener('error', revealWheel);
+          }
           video.addEventListener('error', function () {
             // no clip at this slot yet - keep the colored placeholder
           });
