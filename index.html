@@ -87,7 +87,7 @@
     width:100%;
     height:100vh;
     display:block;
-    z-index:1;
+    z-index:4;
   }
   #astroboy-canvas{
     position:fixed;
@@ -97,7 +97,7 @@
     height:min(88vw, 88vh);
     transform:translate(-50%, -50%);
     transform-origin:center center;
-    z-index:5;
+    z-index:3;
     pointer-events:none;
     opacity:0;
     transition:opacity 1s ease;
@@ -366,12 +366,12 @@
       var TOP_SCROLL = 46;  // stays close to true screen center while scrolling
       var SIZE_LOAD = 88;   // vh/vw at load - huge, face fills the screen
       var SIZE_SCROLL = 78; // vh/vw once scrolled - big, full figure, centered on screen
-      var MIN_SIZE_VMIN = 30; // never shrinks below this, even right above the footer
 
       // Keeps the rotating figure from ever being covered by the opaque
-      // closing-logo/footer block: as that section's top edge approaches
-      // (or scrolls past) the canvas, this shrinks/re-centers the canvas so
-      // it always sits fully above it - no fading out, no hard cropping.
+      // closing-logo/footer block, without ever shrinking it below its
+      // normal docked size: as that section's top edge approaches, this
+      // slides the figure upward (off the top of the screen if it has to)
+      // so its bottom edge never dips into the closing section.
       function keepClearOfFooter(topPercent, sizeVal) {
         if (!closingLogoEl) return { top: topPercent, size: sizeVal };
         var vh = window.innerHeight || 1;
@@ -381,24 +381,10 @@
         var limit = closingLogoEl.getBoundingClientRect().top - margin;
         if (limit >= vh) return { top: topPercent, size: sizeVal }; // closing section still far below
 
-        var availableLimit = Math.max(limit, 0);
-        var minHalfPx = (MIN_SIZE_VMIN / 100 * vmin) / 2;
-        var naturalHalfPx = (sizeVal / 100 * vmin) / 2;
+        var halfPx = (sizeVal / 100 * vmin) / 2;
+        var centerY = Math.min((topPercent / 100) * vh, limit - halfPx);
 
-        var halfPx, centerY;
-        if (availableLimit >= naturalHalfPx * 2) {
-          halfPx = naturalHalfPx;
-          centerY = Math.min((topPercent / 100) * vh, availableLimit - halfPx);
-          centerY = Math.max(centerY, halfPx); // keep the top edge on-screen too
-        } else if (availableLimit >= minHalfPx * 2) {
-          halfPx = availableLimit / 2;
-          centerY = availableLimit / 2;
-        } else {
-          halfPx = minHalfPx;
-          centerY = minHalfPx;
-        }
-
-        return { top: (centerY / vh) * 100, size: (halfPx * 2) / vmin * 100 };
+        return { top: (centerY / vh) * 100, size: sizeVal };
       }
 
       function updateFrame() {
