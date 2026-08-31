@@ -381,8 +381,8 @@
       // size (huge on load -> a compact badge once scrolled).
       var TOP_LOAD = 50;    // vertical center, % of viewport, while still fixed
       var TOP_SCROLL = 46;  // stays close to true screen center while scrolling
-      var SIZE_LOAD = 88;   // vh/vw at load - huge, face fills the screen
-      var SIZE_SCROLL = 78; // vh/vw once scrolled - big, full figure, centered on screen
+      var SIZE_LOAD = 104;   // vh/vw at load - huge, face fills the screen
+      var SIZE_SCROLL = 92;  // vh/vw once scrolled - big, full figure, centered on screen
 
       // Keeps the rotating figure from ever being covered by the opaque
       // closing-logo/footer block, without ever shrinking it below its
@@ -583,7 +583,12 @@
 
         var maxDistForHeight = CARD_H / (2 * Math.tan(cameraFovRad / 2));
         var maxDistForWidth = CARD_W / (2 * Math.tan(cameraFovRad / 2) * aspect);
-        var dist = Math.min(maxDistForHeight, maxDistForWidth) * 0.98; // small overflow margin
+        var coverDist = Math.min(maxDistForHeight, maxDistForWidth) * 0.98; // distance at which the card exactly fills the viewport
+        // Pull back beyond that "full cover" distance so the card reads at
+        // roughly half its previous on-screen size, with the ring and the
+        // figure visible around it, instead of edge-to-edge.
+        var CARD_DISPLAY_SCALE = 0.5;
+        var dist = coverDist / CARD_DISPLAY_SCALE;
         camera.position.z = RADIUS + dist;
       }
       window.addEventListener('resize', resize);
