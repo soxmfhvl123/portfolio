@@ -7,3 +7,8 @@ config.secret.js
 credentials/
 .ssh_temp/
 node_modules/
+
+# raw source clips for the wheel (uncompressed originals, some 100s of MB -
+# would break the GitHub push limit) - compressed assets/wheel/wheel-NN.mp4
+# built from these are what's actually committed and used on the site
+assets/wheel/[0-9][0-9]/

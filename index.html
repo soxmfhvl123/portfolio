@@ -78,7 +78,7 @@
   /* ===== HERO (3D golden astroboy stage + background image wheel) ===== */
   .hero-stage{
     position:relative;
-    height:260vh;
+    height:380vh;
     width:100%;
   }
   #wheel-canvas-back{
@@ -147,7 +147,7 @@
     align-items:center;
     justify-content:space-between;
     width:100%;
-    padding:12vh 0 0.5vh;
+    padding:12vh 32px 0.5vh;
     overflow:hidden;
   }
   .closing-word{
@@ -190,7 +190,7 @@
     }
     .wordmark, .clock, .resume-link{ justify-self:center; }
     .intro{ padding:14vw 20px 8vw; }
-    .closing-logo{ padding:10vh 0 0.5vh; }
+    .closing-logo{ padding:10vh 20px 0.5vh; }
     .closing-word{ font-size:13vw; }
     .site-footer{ padding:2px 20px 10px; flex-direction:column; align-items:flex-start; gap:8px; }
   }
@@ -447,8 +447,8 @@
 
       var scene = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-      camera.position.set(0, 0.6, 8.2);
-      camera.lookAt(0, 0.2, 0);
+      camera.position.set(0, 0, 8.2);
+      camera.lookAt(0, 0, 0);
 
       // ---- the ring of cards ----
       var COUNT = 12;
@@ -458,6 +458,7 @@
       var group = new THREE.Group();
       scene.add(group);
       var cardMeshes = [];
+      var wheelVideos = []; // real <video> clips, so they can be paused when off-screen
 
       var geometry = new THREE.PlaneGeometry(CARD_W, CARD_H);
 
@@ -504,18 +505,35 @@
         group.add(mesh);
         cardMeshes.push(mesh);
 
-        // Real photos live in assets/wheel/wheel-01.jpg ... wheel-12.jpg.
-        // If a slot's file doesn't exist yet, silently keep the placeholder.
+        // Real clips live at assets/wheel/wheel-01.mp4 ... wheel-12.mp4 - muted,
+        // autoplaying, looping video. If a slot's file doesn't exist yet, silently
+        // keep the colored placeholder.
         (function (mesh, slot) {
-          var url = 'assets/wheel/wheel-' + String(slot).padStart(2, '0') + '.jpg';
-          new THREE.TextureLoader().load(url, function (tex) {
+          var url = 'assets/wheel/wheel-' + String(slot).padStart(2, '0') + '.mp4';
+          var video = document.createElement('video');
+          video.muted = true;
+          video.defaultMuted = true;
+          video.loop = true;
+          video.playsInline = true;
+          video.setAttribute('playsinline', '');
+          video.setAttribute('webkit-playsinline', '');
+          video.preload = 'auto';
+          video.addEventListener('loadedmetadata', function () {
+            var tex = new THREE.VideoTexture(video);
             tex.colorSpace = THREE.SRGBColorSpace;
-            coverFit(tex, tex.image.width, tex.image.height);
+            coverFit(tex, video.videoWidth, video.videoHeight);
             mesh.material.map = tex;
             mesh.material.needsUpdate = true;
-          }, undefined, function () {
-            // no photo at this slot yet - keep the colored placeholder
           });
+          video.addEventListener('error', function () {
+            // no clip at this slot yet - keep the colored placeholder
+          });
+          video.src = url;
+          video.play().catch(function () {
+            // autoplay can be blocked until a user gesture happens - it'll
+            // pick up automatically once one does, since it's muted + looped
+          });
+          wheelVideos.push(video);
         })(mesh, i + 1);
       }
 
@@ -534,11 +552,14 @@
       window.addEventListener('resize', resize);
       resize();
 
-      // ---- only rendering while the hero section is on screen (perf) ----
+      // ---- only rendering (and playing) while the hero section is on screen ----
       var heroVisible = true;
       if ('IntersectionObserver' in window) {
         var io = new IntersectionObserver(function (entries) {
           heroVisible = entries[0].isIntersecting;
+          wheelVideos.forEach(function (v) {
+            if (heroVisible) { v.play().catch(function () {}); } else { v.pause(); }
+          });
         }, { threshold: 0 });
         io.observe(heroStage);
       }
@@ -552,8 +573,8 @@
       // seen, so the wheel is always fully done spinning and gone before the
       // copy shows.
       var HERO_TURNS = 0.92;  // fraction of a full 360 degree spin
-      var ROTATE_END = 0.42;  // fraction of the hero's scroll spent spinning
-      var EXIT_END = 0.56;    // fraction of the hero's scroll by which the wheel is fully off-screen
+      var ROTATE_END = 0.48;  // fraction of the hero's scroll spent spinning (bigger = slower spin per scroll)
+      var EXIT_END = 0.60;    // fraction of the hero's scroll by which the wheel is fully off-screen
       var targetRotation = 0, currentRotation = 0;
       function updateRotation() {
         var heroHeight = heroStage.offsetHeight || window.innerHeight;
