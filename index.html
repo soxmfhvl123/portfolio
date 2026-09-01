@@ -116,6 +116,14 @@
     transition:opacity 0.5s ease;
     will-change:transform;
   }
+  #wheel-video-pool{
+    position:fixed;
+    top:0; left:0;
+    width:1px; height:1px;
+    overflow:hidden;
+    opacity:0;
+    pointer-events:none;
+  }
   #astroboy-canvas{
     position:fixed;
     top:50%;
@@ -194,6 +202,7 @@
     text-decoration:none;
   }
   .site-footer a:hover{ color:var(--ink); }
+  .footer-brief{ display:none; }
 
   @media (max-width:640px){
     .site-header{
@@ -207,7 +216,9 @@
     .intro{ padding:14vw 20px 8vw; }
     .closing-logo{ padding:10vh 20px 0.5vh; }
     .closing-word{ font-size:13vw; }
-    .site-footer{ padding:2px 20px 10px; flex-direction:column; align-items:flex-start; gap:8px; }
+    .site-footer{ padding:2px 20px 10px; justify-content:center; }
+    .footer-full{ display:none; }
+    .footer-brief{ display:inline; }
   }
 </style>
 </head>
@@ -230,6 +241,7 @@
   <section class="hero-stage" aria-hidden="true">
     <canvas id="wheel-canvas-back"></canvas>
     <canvas id="wheel-canvas"></canvas>
+    <div id="wheel-video-pool" aria-hidden="true"></div>
   </section>
 
   <main class="intro">
@@ -247,8 +259,9 @@
   </section>
 
   <footer class="site-footer">
-    <span>&copy; 2026 FLUXUS STUDIO</span>
-    <a href="mailto:soxmfhvl123@gmail.com">soxmfhvl123@gmail.com</a>
+    <span class="footer-full">&copy; 2026 FLUXUS STUDIO</span>
+    <a class="footer-full" href="mailto:soxmfhvl123@gmail.com">soxmfhvl123@gmail.com</a>
+    <span class="footer-brief">FLUXUS</span>
   </footer>
 
   <script type="importmap">
@@ -454,6 +467,7 @@
     var wheelCanvasFront = document.getElementById('wheel-canvas');
     var wheelCanvasBack = document.getElementById('wheel-canvas-back');
     var heroStage = document.querySelector('.hero-stage');
+    var videoPool = document.getElementById('wheel-video-pool');
 
     if (wheelCanvasFront && wheelCanvasBack && heroStage && window.WebGLRenderingContext) {
       var rendererFront = new THREE.WebGLRenderer({ canvas: wheelCanvasFront, antialias: true, alpha: true, preserveDrawingBuffer: true });
@@ -595,8 +609,13 @@
           video.defaultMuted = true;
           video.loop = true;
           video.playsInline = true;
+          // Setting these as real HTML attributes (not just JS properties)
+          // matters on mobile Safari/Chrome - some versions gate autoplay
+          // on the attribute being present at play() time.
+          video.setAttribute('muted', '');
           video.setAttribute('playsinline', '');
           video.setAttribute('webkit-playsinline', '');
+          video.setAttribute('autoplay', '');
           video.preload = 'auto';
           video.addEventListener('loadedmetadata', function () {
             applyVideoFit(mesh, video, hue);
@@ -610,6 +629,12 @@
           video.addEventListener('error', function () {
             // no clip at this slot yet - keep the colored placeholder
           });
+          // Mobile browsers (iOS Safari in particular) are unreliable
+          // about decoding a <video> that was only ever created in JS and
+          // never attached to the document, even when used purely as a
+          // WebGL texture source - so it lives in the off-screen pool,
+          // not display:none, which can itself pause decoding.
+          if (videoPool) videoPool.appendChild(video);
           video.src = url;
           video.play().catch(function () {
             // autoplay can be blocked until a user gesture happens - it'll
@@ -662,6 +687,23 @@
         }, { threshold: 0 });
         io.observe(heroStage);
       }
+
+      // ---- mobile autoplay fallback ----
+      // Even with muted+playsinline, some mobile browsers only actually
+      // start playback after the very first user gesture on the page. If
+      // any clip is still paused once that happens, give it one more
+      // nudge; this listener removes itself after the first gesture.
+      function retryVideoPlayback() {
+        wheelVideos.forEach(function (v) {
+          if (v.paused) v.play().catch(function () {});
+        });
+        window.removeEventListener('touchstart', retryVideoPlayback);
+        window.removeEventListener('click', retryVideoPlayback);
+        window.removeEventListener('scroll', retryVideoPlayback);
+      }
+      window.addEventListener('touchstart', retryVideoPlayback, { passive: true, once: true });
+      window.addEventListener('click', retryVideoPlayback, { once: true });
+      window.addEventListener('scroll', retryVideoPlayback, { passive: true, once: true });
 
       // ---- scroll drives the spin, then releases the wheel to slide away ----
       // Tied to scroll progress through the hero section itself. The first
