@@ -676,27 +676,63 @@
       window.addEventListener('resize', resize);
       resize();
 
+      // ---- only decode the handful of cards actually near the front ----
+      // All 12 clips used to autoplay simultaneously all the time, even
+      // though only the front-facing card (and maybe a sliver of its
+      // neighbors) is ever actually visible - the rest sit edge-on or
+      // behind the astroboy figure. Decoding 12 concurrent H.264 streams
+      // is exactly the kind of thing that stutters on real hardware
+      // (most devices only have a handful of hardware decoder slots
+      // before falling back to slow software decode), especially on
+      // mobile - so only an active window of cards around the current
+      // front position actually plays; everything else is paused
+      // (decoding stops, GPU upload stops) and resumes right where it
+      // left off once it's back in the window.
+      var ACTIVE_HALF_WINDOW = 2; // 2*this+1 clips playing at once
+      function syncVideoPlayback() {
+        if (!heroVisible) {
+          wheelVideos.forEach(function (v) { if (!v.paused) v.pause(); });
+          return;
+        }
+        var twoPi = Math.PI * 2;
+        var best = 0, bestDist = Infinity;
+        for (var i = 0; i < COUNT; i++) {
+          var theta = (i / COUNT) * twoPi;
+          var angle = (theta + currentRotation) % twoPi;
+          if (angle < 0) angle += twoPi;
+          var dist = Math.min(angle, twoPi - angle);
+          if (dist < bestDist) { bestDist = dist; best = i; }
+        }
+        for (var i = 0; i < COUNT; i++) {
+          var d = Math.min(Math.abs(i - best), COUNT - Math.abs(i - best));
+          var v = wheelVideos[i];
+          if (!v) continue;
+          if (d <= ACTIVE_HALF_WINDOW) {
+            if (v.paused) v.play().catch(function () {});
+          } else if (!v.paused) {
+            v.pause();
+          }
+        }
+      }
+
       // ---- only rendering (and playing) while the hero section is on screen ----
       var heroVisible = true;
       if ('IntersectionObserver' in window) {
         var io = new IntersectionObserver(function (entries) {
           heroVisible = entries[0].isIntersecting;
-          wheelVideos.forEach(function (v) {
-            if (heroVisible) { v.play().catch(function () {}); } else { v.pause(); }
-          });
+          syncVideoPlayback();
         }, { threshold: 0 });
         io.observe(heroStage);
       }
 
       // ---- mobile autoplay fallback ----
       // Even with muted+playsinline, some mobile browsers only actually
-      // start playback after the very first user gesture on the page. If
-      // any clip is still paused once that happens, give it one more
-      // nudge; this listener removes itself after the first gesture.
+      // start playback after the very first user gesture on the page.
+      // Re-run the same active-window sync (not a blanket "play
+      // everything") in case the front clips are still paused once that
+      // happens; this listener removes itself after the first gesture.
       function retryVideoPlayback() {
-        wheelVideos.forEach(function (v) {
-          if (v.paused) v.play().catch(function () {});
-        });
+        syncVideoPlayback();
         window.removeEventListener('touchstart', retryVideoPlayback);
         window.removeEventListener('click', retryVideoPlayback);
         window.removeEventListener('scroll', retryVideoPlayback);
@@ -754,14 +790,21 @@
         for (var i = 0; i < cardMeshes.length; i++) cardMeshes[i].visible = true;
       }
 
+      var syncFrameCount = 0;
       function animate() {
         currentRotation += (targetRotation - currentRotation) * 0.08;
         group.rotation.y = currentRotation;
         resize();
         if (heroVisible) renderSplit();
+        // re-check the active playback window every ~200ms rather than
+        // every frame - the ring doesn't move fast enough for that to be
+        // noticeable, and it keeps this from adding its own overhead
+        syncFrameCount++;
+        if (syncFrameCount >= 12) { syncFrameCount = 0; syncVideoPlayback(); }
         requestAnimationFrame(animate);
       }
       requestAnimationFrame(animate);
+      syncVideoPlayback();
     }
   </script>
 
