@@ -161,6 +161,23 @@
   }
   .intro-text:last-child{ margin-bottom:0; }
 
+  /* ===== FEATURE VIDEO (full bleed, between description and footer) ===== */
+  .feature-video{
+    width:100%;
+    line-height:0;
+    position:relative;
+    z-index:1;
+    background:var(--paper);
+  }
+  .feature-video video{
+    display:block;
+    width:100%;
+    height:auto;
+    aspect-ratio:16/9; /* reserves the right height immediately, before
+                           the video's metadata has actually loaded, so
+                           the page doesn't jump once it does */
+  }
+
   /* ===== CLOSING LOGO (full bleed) ===== */
   .closing-logo{
     position:relative;
@@ -252,6 +269,12 @@
       <p class="intro-text">Today, FLUXUS operates as an evolving archive and experimental studio &mdash; a place for works to be collected, developed, released, and revisited.</p>
     </div>
   </main>
+
+  <section class="feature-video">
+    <video autoplay muted loop playsinline webkit-playsinline preload="auto">
+      <source src="assets/feature-video.mp4" type="video/mp4">
+    </video>
+  </section>
 
   <section class="closing-logo">
     <span class="closing-word">FLUXUS</span>
