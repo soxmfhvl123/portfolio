@@ -508,7 +508,7 @@
       var cameraFovRad = CAMERA_FOV * Math.PI / 180;
 
       // ---- the ring of cards ----
-      var COUNT = 12;
+      var COUNT = 13;
       var CARD_W = 2.7, CARD_H = 1.52; // 16:9
       var RADIUS = (COUNT * CARD_W * 1.18) / (Math.PI * 2);
 
@@ -776,7 +776,20 @@
       var ROTATE_END = 0.48;  // fraction of the hero's scroll spent spinning (bigger = slower spin per scroll)
       var EXIT_END = 0.60;    // fraction of the hero's scroll by which the wheel is fully off-screen
       var targetRotation = 0, currentRotation = 0;
+
+      // While the user is actively scrolling, scroll position is the only
+      // thing driving the spin (as before). Once they stop for a moment,
+      // a slow idle spin takes over from wherever scroll left it - and the
+      // instant scrolling resumes, the idle spin drops out with no jump,
+      // handing control straight back to scroll.
+      var IDLE_DELAY_MS = 1200;   // how long to wait after the last scroll before idle-spinning
+      var IDLE_SPIN_SPEED = 0.12; // radians/second - slow
+      var lastScrollAt = Date.now();
+      var idleSpin = 0;
+
       function updateRotation() {
+        lastScrollAt = Date.now();
+        idleSpin = 0; // scroll always takes over immediately, no jump
         var heroHeight = heroStage.offsetHeight || window.innerHeight;
         var progress = Math.min(Math.max((window.scrollY || 0) / heroHeight, 0), 1);
         var rotateProgress = Math.min(progress / ROTATE_END, 1);
@@ -814,8 +827,14 @@
       }
 
       var syncFrameCount = 0;
-      function animate() {
-        currentRotation += (targetRotation - currentRotation) * 0.08;
+      var lastWheelFrameT = performance.now();
+      function animate(t) {
+        var dt = Math.min((t - lastWheelFrameT) / 1000, 0.1);
+        lastWheelFrameT = t;
+        if (Date.now() - lastScrollAt > IDLE_DELAY_MS) {
+          idleSpin += IDLE_SPIN_SPEED * dt;
+        }
+        currentRotation += ((targetRotation + idleSpin) - currentRotation) * 0.08;
         group.rotation.y = currentRotation;
         resize();
         if (heroVisible) renderSplit();
