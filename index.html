@@ -271,10 +271,35 @@
   </main>
 
   <section class="feature-video">
-    <video autoplay muted loop playsinline webkit-playsinline preload="auto">
-      <source src="assets/feature-video.mp4" type="video/mp4">
-    </video>
+    <video muted loop playsinline webkit-playsinline preload="none" data-src="assets/feature-video.mp4"></video>
   </section>
+  <script>
+    // This clip sits well below the fold - fetching it eagerly on page
+    // load competed with the hero wheel's own clips for bandwidth and
+    // made the whole page feel slower to load. Instead its src is only
+    // set once the section is actually getting close to the viewport.
+    (function () {
+      var section = document.querySelector('.feature-video');
+      var video = section ? section.querySelector('video') : null;
+      if (!video) return;
+      var src = video.getAttribute('data-src');
+      var started = false;
+      function activate() {
+        if (started || !src) return;
+        started = true;
+        video.src = src;
+        video.play().catch(function () {});
+      }
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          if (entries[0].isIntersecting) { activate(); io.disconnect(); }
+        }, { rootMargin: '600px 0px' });
+        io.observe(section);
+      } else {
+        activate();
+      }
+    })();
+  </script>
 
   <section class="closing-logo">
     <span class="closing-word">FLUXUS</span>
@@ -533,17 +558,14 @@
       var geometry = new THREE.PlaneGeometry(CARD_W, CARD_H);
 
       function placeholderTexture(index, hue) {
+        // plain flat gray while the real clip is still loading - no
+        // color-per-slot, no number
         var c = document.createElement('canvas');
         c.width = 512;
         c.height = Math.round(512 * (CARD_H / CARD_W));
         var ctx = c.getContext('2d');
-        ctx.fillStyle = 'hsl(' + hue + ', 60%, 55%)';
+        ctx.fillStyle = '#d6d6d6';
         ctx.fillRect(0, 0, c.width, c.height);
-        ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        ctx.font = '700 ' + Math.round(c.width * 0.16) + 'px Helvetica, Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(String(index + 1).padStart(2, '0'), c.width / 2, c.height / 2);
         var tex = new THREE.CanvasTexture(c);
         tex.colorSpace = THREE.SRGBColorSpace;
         return tex;
@@ -622,9 +644,17 @@
         group.add(mesh);
         cardMeshes.push(mesh);
 
-        // Real clips live at assets/wheel/wheel-01.mp4 ... wheel-12.mp4 - muted,
+        // Real clips live at assets/wheel/wheel-01.mp4 ... wheel-13.mp4 - muted,
         // autoplaying, looping video. If a slot's file doesn't exist yet, silently
-        // keep the colored placeholder.
+        // keep the gray placeholder.
+        //
+        // The src is NOT set here - with 13 clips, having every single one
+        // start downloading at once on page load is exactly what was
+        // making the initial load feel slow. Instead each video just sits
+        // ready (via __lazySrc) until syncVideoPlayback() actually brings
+        // its slot into the active window, at which point it's given its
+        // src for the first time and starts fetching - so page load only
+        // ever pays for the handful of clips actually about to be shown.
         (function (mesh, slot, hue) {
           var url = 'assets/wheel/wheel-' + String(slot).padStart(2, '0') + '.mp4';
           var video = document.createElement('video');
@@ -640,6 +670,8 @@
           video.setAttribute('webkit-playsinline', '');
           video.setAttribute('autoplay', '');
           video.preload = 'auto';
+          video.__lazySrc = url;
+          video.__started = false;
           video.addEventListener('loadedmetadata', function () {
             applyVideoFit(mesh, video, hue);
           });
@@ -650,7 +682,7 @@
             video.addEventListener('error', revealWheel);
           }
           video.addEventListener('error', function () {
-            // no clip at this slot yet - keep the colored placeholder
+            // no clip at this slot yet - keep the gray placeholder
           });
           // Mobile browsers (iOS Safari in particular) are unreliable
           // about decoding a <video> that was only ever created in JS and
@@ -658,11 +690,6 @@
           // WebGL texture source - so it lives in the off-screen pool,
           // not display:none, which can itself pause decoding.
           if (videoPool) videoPool.appendChild(video);
-          video.src = url;
-          video.play().catch(function () {
-            // autoplay can be blocked until a user gesture happens - it'll
-            // pick up automatically once one does, since it's muted + looped
-          });
           wheelVideos.push(video);
         })(mesh, i + 1, hue);
       }
@@ -731,6 +758,12 @@
           var v = wheelVideos[i];
           if (!v) continue;
           if (d <= ACTIVE_HALF_WINDOW) {
+            if (!v.__started) {
+              // first time this slot has ever been in the active window -
+              // this is the point it actually starts downloading
+              v.__started = true;
+              v.src = v.__lazySrc;
+            }
             if (v.paused) v.play().catch(function () {});
           } else if (!v.paused) {
             v.pause();
