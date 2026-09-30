@@ -453,7 +453,18 @@
     .footer-full{ display:none; }
     .footer-brief{ display:inline; }
   }
+
+  /* ===== Phones / touch tablets: no image wheel (too heavy there) ===== */
+  .no-wheel .hero-stage{ height:100vh; height:100dvh; }
+  .no-wheel #wheel-canvas, .no-wheel #wheel-canvas-back, .no-wheel #wheel-video-pool{ display:none; }
 </style>
+<script>
+  // Decided once, before anything renders: small screens and touch-only
+  // devices skip the 3D video wheel entirely (it was lagging on phones).
+  if (window.matchMedia && window.matchMedia('(max-width:768px), (hover:none) and (pointer:coarse)').matches) {
+    document.documentElement.classList.add('no-wheel');
+  }
+</script>
 </head>
 <body>
 
@@ -1073,7 +1084,8 @@
     var heroStage = document.querySelector('.hero-stage');
     var videoPool = document.getElementById('wheel-video-pool');
 
-    if (wheelCanvasFront && wheelCanvasBack && heroStage && window.WebGLRenderingContext) {
+    var skipWheel = document.documentElement.classList.contains('no-wheel');
+    if (wheelCanvasFront && wheelCanvasBack && heroStage && window.WebGLRenderingContext && !skipWheel) {
       var rendererFront = new THREE.WebGLRenderer({ canvas: wheelCanvasFront, antialias: true, alpha: true, preserveDrawingBuffer: true });
       var rendererBack = new THREE.WebGLRenderer({ canvas: wheelCanvasBack, antialias: true, alpha: true, preserveDrawingBuffer: true });
       [rendererFront, rendererBack].forEach(function (r) {
