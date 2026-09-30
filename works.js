@@ -219,6 +219,7 @@ window.FLUXUS_WORKS = [
     year: "",
     media: [
       "video:resume/img/OTHERPROJECTS/FLUXUS/Comp_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/FLUXUS/컴포지션_opt.mp4",
       "video:resume/img/OTHERPROJECTS/FLUXUS/MOTION POSTER_opt.mp4",
       "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_1.png",
       "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_2.png",
@@ -315,6 +316,35 @@ window.FLUXUS_WORKS = [
       "video:resume/img/OTHERPROJECTS/SEOUL/efc4fdbe5e04407896363c520d90e6e9_opt.mp4",
       "resume/img/OTHERPROJECTS/SEOUL/seoulrium12.png",
       "video:resume/img/OTHERPROJECTS/SEOUL/fb663623e8c94a42b4be3bd90cbb0dd8_opt.mp4"
+    ]
+  },
+  {
+    project: "DREAM MAKER",
+    client: "Self-initiated",
+    type: "Furniture",
+    year: "",
+    media: [
+      "resume/img/OTHERPROJECTS/FURNITURE/DREAM MAKER/KakaoTalk_20260930_131447497_web.webp",
+      "resume/img/OTHERPROJECTS/FURNITURE/DREAM MAKER/KakaoTalk_20260930_131447497_01_web.webp"
+    ]
+  },
+  {
+    project: "WARM WELCOME",
+    client: "Self-initiated",
+    type: "Furniture",
+    year: "",
+    media: [
+      "video:resume/img/OTHERPROJECTS/FURNITURE/WARM WELCOME/warm welcom_opt.mp4"
+    ]
+  },
+  {
+    project: "YELLOW BOX",
+    client: "Self-initiated",
+    type: "Furniture",
+    year: "",
+    media: [
+      "video:resume/img/OTHERPROJECTS/FURNITURE/YELLOW BOX/yellow box1_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/FURNITURE/YELLOW BOX/yellow box2_opt.mp4"
     ]
   },
   {

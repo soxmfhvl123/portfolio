@@ -561,9 +561,9 @@
       lines[0].appendChild(caret);
 
       var CHAR_MS = 38, LINE_PAUSE_MS = 320;
+      var HOLD_MS = 5000; // full text stays up this long, then it clears and types again
       var started = false;
       function type(lineIdx, charIdx) {
-        if (lineIdx >= lines.length) return; // done: caret keeps blinking on the last line
         var li = lines[lineIdx];
         if (charIdx <= texts[lineIdx].length) {
           li.textContent = texts[lineIdx].slice(0, charIdx);
@@ -571,6 +571,13 @@
           setTimeout(function () { type(lineIdx, charIdx + 1); }, CHAR_MS);
         } else if (lineIdx + 1 < lines.length) {
           setTimeout(function () { type(lineIdx + 1, 0); }, LINE_PAUSE_MS);
+        } else {
+          // all lines written - hold, then wipe and start over from the top
+          setTimeout(function () {
+            lines.forEach(function (l) { l.textContent = ''; });
+            lines[0].appendChild(caret);
+            setTimeout(function () { type(0, 0); }, LINE_PAUSE_MS);
+          }, HOLD_MS);
         }
       }
       function start() { if (started) return; started = true; type(0, 0); }
