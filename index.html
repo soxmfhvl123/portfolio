@@ -11,10 +11,12 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
 <style>
   :root{
-    --ink:#111111;
-    --paper:#ffffff;
-    --dim:#8a8a8a;
-    --hairline:#e4e4e4;
+    --ink:#ededed;
+    --paper:#0b0b0b;
+    --dim:#7a7a7a;
+    --hairline:#242424;
+    --tile:#161616;
+    color-scheme:dark;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -48,6 +50,7 @@
     justify-self:start;
   }
   #brand-logo-canvas{
+    filter:invert(1); /* the logo texture is black - flip it for the dark page */
     width:30px;
     height:30px;
     display:block;
@@ -251,16 +254,19 @@
     cursor:zoom-in;
     display:block;
     line-height:0;
-    background:#ececec;
+    background:var(--tile);
   }
+  .work-media button.is-loaded{ background:transparent; }
+  .work-media button.is-light{ background:#e9e9e9; } /* dark-on-transparent artwork */
+  /* Row height, but never wider than the column (very wide pieces like a
+     logo banner shrink instead of being cropped) - --ar is width/height,
+     set once the file's real size is known. Never cropped (no cover). */
   .work-media img, .work-media video{
     display:block;
-    height:clamp(220px, 30vw, 500px);
+    height:min(clamp(220px, 30vw, 500px), calc((100vw - 64px) / var(--ar, 1.7778)));
     width:auto;
-    max-width:calc(100vw - 64px);
-    object-fit:cover;
   }
-  .work-media video{ aspect-ratio:16/9; }
+  .work-media video{ aspect-ratio:var(--ar, 16 / 9); }
   .work-media button:focus-visible{ outline:2px solid var(--ink); outline-offset:3px; }
   .work-meta{
     display:grid;
@@ -320,7 +326,7 @@
     z-index:100;
     display:none;
     flex-direction:column;
-    background:rgba(255,255,255,0.97);
+    background:rgba(11,11,11,0.97);
   }
   .lightbox.is-open{ display:flex; }
   .lightbox-stage{
@@ -523,7 +529,6 @@
       <ul class="index-list">
         <li><a href="mailto:soxmfhvl123@gmail.com"><span>soxmfhvl123@gmail.com</span><span class="desc">Commissions, collaborations, editions</span><span class="year">EMAIL</span></a></li>
         <li><a href="resume/index.html"><span>Dongjin Choi &mdash; Resume</span><span class="desc">Experience, projects, portfolio</span><span class="year">CV</span></a></li>
-        <li><a href="https://soxmfhvl123.github.io/" target="_blank" rel="noopener"><span>soxmfhvl123.github.io</span><span class="desc">Web experiments</span><span class="year">WEB &nearr;</span></a></li>
       </ul>
     </section>
   </div>
@@ -586,9 +591,28 @@
       var narrow = window.matchMedia('(max-width:640px)').matches;
       var PREVIEW = narrow ? 2 : 4; // media shown inline per project; the rest open in the lightbox
 
+      // Media entries: a path, optionally prefixed with 'video:' (mp4) and/or
+      // 'light:' (dark artwork on a transparent background - shown on a
+      // light tile so it doesn't vanish on the dark page).
       function parse(entry) {
-        var isVideo = entry.indexOf('video:') === 0;
-        return { video: isVideo, src: encodeURI(isVideo ? entry.slice(6) : entry) };
+        var m = { video: false, light: false };
+        var prefix;
+        while ((prefix = /^(video|light):/.exec(entry))) {
+          m[prefix[1]] = true;
+          entry = entry.slice(prefix[0].length);
+        }
+        m.src = encodeURI(entry);
+        return m;
+      }
+      // Size a tile from the file's real dimensions: --ar drives the row
+      // layout, and the max sizes stop low-res files being blown up past
+      // their own pixels (which is what made them look blurry).
+      function fitTo(node, btn, w, h) {
+        if (!w || !h) return;
+        node.style.setProperty('--ar', (w / h).toFixed(4));
+        node.style.maxWidth = w + 'px';
+        node.style.maxHeight = h + 'px';
+        btn.classList.add('is-loaded');
       }
       function el(tag, cls, text) {
         var n = document.createElement(tag);
@@ -605,7 +629,7 @@
         var mediaWrap = el('div', 'work-media');
         w.media.slice(0, PREVIEW).forEach(function (entry, mi) {
           var m = parse(entry);
-          var btn = el('button');
+          var btn = el('button', m.light ? 'is-light' : null);
           btn.type = 'button';
           btn.setAttribute('aria-label', w.project + ' — open image ' + (mi + 1));
           btn.addEventListener('click', function () { openLightbox(wi, mi); });
@@ -617,7 +641,7 @@
             node.preload = 'none';
             node.dataset.src = m.src;
             node.addEventListener('loadedmetadata', function () {
-              if (node.videoWidth) node.style.aspectRatio = node.videoWidth + ' / ' + node.videoHeight;
+              fitTo(node, btn, node.videoWidth, node.videoHeight);
             });
             lazyVideos.push(node);
           } else {
@@ -625,6 +649,9 @@
             node.loading = 'lazy';
             node.decoding = 'async';
             node.alt = w.project;
+            node.addEventListener('load', function () {
+              fitTo(node, btn, node.naturalWidth, node.naturalHeight);
+            });
             node.src = m.src;
           }
           btn.appendChild(node);
@@ -707,6 +734,7 @@
           node.alt = w.project;
           node.src = m.src;
         }
+        if (m.light) node.style.background = '#e9e9e9';
         stage.appendChild(node);
         titleEl.textContent = w.project;
         countEl.textContent = (cur.m + 1) + ' / ' + w.media.length;
@@ -1064,7 +1092,7 @@
         c.width = 512;
         c.height = Math.round(512 * (CARD_H / CARD_W));
         var ctx = c.getContext('2d');
-        ctx.fillStyle = '#d6d6d6';
+        ctx.fillStyle = '#1c1c1c';
         ctx.fillRect(0, 0, c.width, c.height);
         var tex = new THREE.CanvasTexture(c);
         tex.colorSpace = THREE.SRGBColorSpace;
