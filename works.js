@@ -10,7 +10,7 @@ window.FLUXUS_WORKS = [
     project: "DREAM MAKER",
     client: "Self-initiated",
     type: "Furniture",
-    year: "",
+    year: "2026",
     media: [
       "resume/img/OTHERPROJECTS/FURNITURE/DREAM MAKER/KakaoTalk_20260930_131447497_web.webp",
       "resume/img/OTHERPROJECTS/FURNITURE/DREAM MAKER/KakaoTalk_20260930_131447497_01_web.webp"
@@ -20,7 +20,7 @@ window.FLUXUS_WORKS = [
     project: "WARM WELCOME",
     client: "Self-initiated",
     type: "Furniture",
-    year: "",
+    year: "2026",
     media: [
       "video:resume/img/OTHERPROJECTS/FURNITURE/WARM WELCOME/warm welcom_opt.mp4"
     ]
@@ -29,7 +29,7 @@ window.FLUXUS_WORKS = [
     project: "YELLOW BOX",
     client: "Self-initiated",
     type: "Furniture",
-    year: "",
+    year: "2026",
     media: [
       "video:resume/img/OTHERPROJECTS/FURNITURE/YELLOW BOX/yellow box1_opt.mp4",
       "video:resume/img/OTHERPROJECTS/FURNITURE/YELLOW BOX/yellow box2_opt.mp4"
@@ -63,7 +63,7 @@ window.FLUXUS_WORKS = [
   },
   {
     project: "CLAB Brand Identity",
-    client: "CLAB — Prof. Cathy Lee Lab",
+    client: "CLAB",
     type: "Brand Identity",
     year: "2025",
     media: [
@@ -74,7 +74,7 @@ window.FLUXUS_WORKS = [
   },
   {
     project: "Global Design Forum 2025",
-    client: "CLAB — Prof. Cathy Lee Lab",
+    client: "CLAB",
     type: "Key Visual",
     year: "2025",
     media: [
@@ -85,7 +85,7 @@ window.FLUXUS_WORKS = [
     ]
   },
   {
-    project: "CUZ Brand Identity",
+    project: "WAA Brand Identity",
     client: "CUZ Inc.",
     type: "Brand Identity + Guidelines",
     year: "2024",
@@ -142,7 +142,7 @@ window.FLUXUS_WORKS = [
     ]
   },
   {
-    project: "Fashion Artwork",
+    project: "LESUGIATELIER 23SS Artwork",
     client: "Oscar Futura",
     type: "2D/3D Artwork",
     year: "2023",
@@ -153,7 +153,7 @@ window.FLUXUS_WORKS = [
     ]
   },
   {
-    project: "Pop-up Event",
+    project: "LESUGIATELIER Pop-up",
     client: "Oscar Futura",
     type: "Poster + Promotion",
     year: "2023",
@@ -195,7 +195,7 @@ window.FLUXUS_WORKS = [
     ]
   },
   {
-    project: "Collaboration Events",
+    project: "ATOBOY × KASAMA Collab Event",
     client: "NA:EUN Hospitality",
     type: "Visual + Menu Layout",
     year: "2022–23",
@@ -210,7 +210,7 @@ window.FLUXUS_WORKS = [
     ]
   },
   {
-    project: "NARO / SEOUL SALON",
+    project: "NARO",
     client: "NA:EUN Hospitality",
     type: "Logo + Brand Launch",
     year: "2023",
@@ -218,10 +218,7 @@ window.FLUXUS_WORKS = [
       "resume/img/NAEUN/NAEUN_Naro/NAEUN_28_hq.webp",
       "resume/img/NAEUN/NAEUN_Naro/NAEUN_29.png",
       "video:resume/img/NAEUN/NAEUN_Naro/NAEUN_30_opt.mp4",
-      "video:resume/img/NAEUN/NAEUN_Naro/NAEUN_31_opt.mp4",
-      "resume/img/NAEUN/NAEUN_Naro/NAEUN_35.jpg",
-      "resume/img/NAEUN/NAEUN_Naro/NAEUN_36.png",
-      "resume/img/NAEUN/NAEUN_Naro/NAEUN_37.png"
+      "video:resume/img/NAEUN/NAEUN_Naro/NAEUN_31_opt.mp4"
     ]
   },
   {
@@ -233,7 +230,8 @@ window.FLUXUS_WORKS = [
       "resume/img/NAEUN/NAEUN_SEOUL SALON/seoulsalon1_web.webp",
       "resume/img/NAEUN/NAEUN_SEOUL SALON/07 copy_web.webp",
       "resume/img/NAEUN/NAEUN_SEOUL SALON/Square bandana Mockup by @PsdTheo copy_web.webp",
-      "resume/img/NAEUN/NAEUN_SEOUL SALON/Artboard 17.png"
+      "resume/img/NAEUN/NAEUN_SEOUL SALON/Artboard 17.png",
+      "resume/img/NAEUN/NAEUN_Naro/NAEUN_35.jpg"
     ]
   },
   {
@@ -329,7 +327,7 @@ window.FLUXUS_WORKS = [
   },
   {
     project: "P2 SEOUL",
-    client: "P2 — Outfit Station, Dosan",
+    client: "P2 GALLERY",
     type: "Brand Identity",
     year: "",
     media: [
@@ -342,8 +340,8 @@ window.FLUXUS_WORKS = [
     ]
   },
   {
-    project: "SEOULRIUM",
-    client: "Self-initiated",
+    project: "SEOUL POTTERY AR Menu Cards Project",
+    client: "ATOMIX",
     type: "3D Artwork + AR",
     year: "",
     media: [
@@ -466,7 +464,7 @@ window.FLUXUS_WORKS = [
   },
   {
     project: "MOIF",
-    client: "MOIF Museum",
+    client: "Self-initiated",
     type: "Museum Branding",
     year: "",
     media: [
