@@ -139,19 +139,170 @@
     will-change:top;
   }
 
-  /* ===== INTRO ===== */
-  .intro{
-    flex:1;
-    display:flex;
-    align-items:center;
-    padding:6vw 32px;
+  /* ===== MANIFESTO (typed statement stack under the golden figure) ===== */
+  .manifesto{
     position:relative;
-    z-index:1;
+    z-index:5; /* type sits in front of the golden figure (z 3) */
+    pointer-events:none;
+    min-height:100vh;
+    min-height:100dvh;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:14vh 32px 28px;
   }
-  .intro-inner{
+  .manifesto-lines{
+    margin:0;
+    padding:0;
+    list-style:none;
+    font-size:clamp(1.9rem, 5.2vw, 4.6rem);
+    line-height:1.04;
+    font-weight:400;
+    letter-spacing:-0.025em;
+    color:var(--ink);
+  }
+  .manifesto-lines li{ min-height:1.04em; }
+  .manifesto-lines .caret{
+    display:inline-block;
+    width:0.06em;
+    height:0.82em;
+    margin-left:0.04em;
+    background:var(--ink);
+    vertical-align:-0.06em;
+    animation:caret-blink 1s steps(1) infinite;
+  }
+  @keyframes caret-blink{ 50%{ opacity:0; } }
+  .manifesto-caption{
+    max-width:520px;
+    margin:0;
+    font-size:0.7rem;
+    line-height:1.5;
+    letter-spacing:0.04em;
+    color:var(--dim);
+  }
+
+  /* ===== VERTICAL COPYRIGHT (fixed on the right edge) ===== */
+  .edge-mark{
+    position:fixed;
+    right:14px;
+    bottom:32px;
+    z-index:30;
+    writing-mode:vertical-rl;
+    font-size:0.66rem;
+    letter-spacing:0.12em;
+    color:#fff;
+    mix-blend-mode:difference; /* stays legible over both paper and images */
+    pointer-events:none;
+    white-space:nowrap;
+  }
+
+  /* ===== ARCHIVE (everything below the manifesto; opaque, so the fixed
+     golden figure slides away instead of floating over the works) ===== */
+  .archive{
+    position:relative;
+    z-index:6;
+    background:var(--paper);
+  }
+  .section-nav{
+    position:sticky;
+    top:0;
+    z-index:20;
+    display:flex;
+    gap:28px;
+    padding:16px 32px;
+    background:var(--paper);
+    border-bottom:1px solid var(--hairline);
+    font-size:0.8rem;
+    letter-spacing:0.08em;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .section-nav::-webkit-scrollbar{ display:none; }
+  .section-nav a{
+    color:var(--dim);
+    text-decoration:none;
+    white-space:nowrap;
+    transition:color 0.2s ease;
+  }
+  .section-nav a:hover, .section-nav a.is-active{ color:var(--ink); }
+  .section-nav sup{ font-size:0.6em; margin-left:2px; }
+  .archive-section{
+    padding:72px 32px 24px;
+    scroll-margin-top:52px;
+  }
+  .section-label{
+    margin:0 0 40px;
+    font-size:0.7rem;
+    font-weight:400;
+    letter-spacing:0.08em;
+    color:var(--dim);
+  }
+
+  /* works stream */
+  .work{ margin:0 0 96px; }
+  .work-media{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    gap:12px;
+  }
+  .work-media button{
+    all:unset;
+    cursor:zoom-in;
+    display:block;
+    line-height:0;
+    background:#ececec;
+  }
+  .work-media img, .work-media video{
+    display:block;
+    height:clamp(220px, 30vw, 500px);
+    width:auto;
+    max-width:calc(100vw - 64px);
+    object-fit:cover;
+  }
+  .work-media video{ aspect-ratio:16/9; }
+  .work-media button:focus-visible{ outline:2px solid var(--ink); outline-offset:3px; }
+  .work-meta{
+    display:grid;
+    grid-template-columns:90px minmax(0, 520px);
+    column-gap:12px;
+    margin-top:14px;
+    font-size:0.72rem;
+    line-height:1.55;
+    letter-spacing:0.02em;
+  }
+  .work-meta dt{ color:var(--dim); }
+  .work-meta dd{ margin:0; color:var(--ink); }
+  .work-more{
+    all:unset;
+    cursor:pointer;
+    color:var(--dim);
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .work-more:hover{ color:var(--ink); }
+
+  /* experiments / contact lists */
+  .index-list{ list-style:none; margin:0; padding:0; border-top:1px solid var(--hairline); }
+  .index-list li{ border-bottom:1px solid var(--hairline); }
+  .index-list a, .index-list .row{
+    display:grid;
+    grid-template-columns:minmax(0, 1.2fr) minmax(0, 1fr) auto;
+    gap:16px;
+    align-items:baseline;
+    padding:14px 0;
+    color:var(--ink);
+    text-decoration:none;
+    font-size:clamp(1rem, 1.5vw, 1.25rem);
+    transition:opacity 0.2s ease;
+  }
+  .index-list a:hover{ opacity:0.45; }
+  .index-list .desc, .index-list .year{ font-size:0.75rem; letter-spacing:0.04em; color:var(--dim); }
+  .index-list .year{ font-variant-numeric:tabular-nums; }
+
+  /* about */
+  .about-text{
     max-width:920px;
-  }
-  .intro-text{
     font-size:clamp(1.35rem, 2.7vw, 2.3rem);
     line-height:1.38;
     font-weight:400;
@@ -159,7 +310,53 @@
     color:var(--ink);
     margin:0 0 0.6em 0;
   }
-  .intro-text:last-child{ margin-bottom:0; }
+  .about-text:last-child{ margin-bottom:0; }
+  #about{ padding-bottom:12vh; }
+
+  /* lightbox */
+  .lightbox{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:none;
+    flex-direction:column;
+    background:rgba(255,255,255,0.97);
+  }
+  .lightbox.is-open{ display:flex; }
+  .lightbox-stage{
+    flex:1;
+    min-height:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:56px 32px 0;
+  }
+  .lightbox-stage img, .lightbox-stage video{
+    display:block;
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+  }
+  .lightbox-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    padding:16px 32px 20px;
+    font-size:0.75rem;
+    letter-spacing:0.06em;
+  }
+  .lightbox-bar .count{ color:var(--dim); font-variant-numeric:tabular-nums; }
+  .lightbox button{
+    all:unset;
+    cursor:pointer;
+    font-size:0.75rem;
+    letter-spacing:0.08em;
+    color:var(--ink);
+  }
+  .lightbox button:hover{ opacity:0.5; }
+  .lightbox .lightbox-close{ position:absolute; top:20px; right:32px; }
+  .lightbox-nav{ display:flex; gap:24px; }
 
   /* ===== FEATURE VIDEO (full bleed, between description and footer) ===== */
   .feature-video{
@@ -230,7 +427,19 @@
       text-align:center;
     }
     .brand, .clock, .resume-link{ justify-self:center; }
-    .intro{ padding:14vw 20px 8vw; }
+    .manifesto{ padding:12vh 20px 22px; }
+    .edge-mark{ right:6px; font-size:0.58rem; }
+    .section-nav{ padding:14px 20px; gap:16px; font-size:0.7rem; letter-spacing:0.06em; }
+    .archive-section{ padding:56px 20px 16px; }
+    .work{ margin-bottom:72px; }
+    .work-media img, .work-media video{ height:auto; width:100%; max-width:none; }
+    .work-media button{ width:100%; }
+    .work-meta{ grid-template-columns:72px minmax(0, 1fr); }
+    .index-list a, .index-list .row{ grid-template-columns:minmax(0, 1fr) auto; }
+    .index-list .desc{ display:none; }
+    .lightbox-stage{ padding:56px 12px 0; }
+    .lightbox-bar{ padding:14px 20px 18px; }
+    .lightbox .lightbox-close{ right:20px; }
     .closing-logo{ padding:10vh 20px 0.5vh; }
     .closing-word{ font-size:13vw; }
     .site-footer{ padding:2px 20px 10px; justify-content:center; }
@@ -261,18 +470,307 @@
     <div id="wheel-video-pool" aria-hidden="true"></div>
   </section>
 
-  <main class="intro">
-    <div class="intro-inner">
-      <p class="intro-text">FLUXUS [Art Archive &amp; Design Studio] is an independent creative platform founded by Dongjin Choi, documenting experiments across graphic design, objects, digital media, and visual culture.</p>
-      <p class="intro-text">Originally developed as a personal archive, FLUXUS brings together selected works, ongoing experiments, editions, and fragments from Dongjin&rsquo;s practice.</p>
-      <p class="intro-text">Moving between the physical and digital, the platform explores how images, objects, materials, light, and technology can become systems for experiencing ideas.</p>
-      <p class="intro-text">Today, FLUXUS operates as an evolving archive and experimental studio &mdash; a place for works to be collected, developed, released, and revisited.</p>
-    </div>
-  </main>
+  <div class="edge-mark" aria-hidden="true">&copy; FLUXUS STUDIO &mdash; 2026</div>
 
-  <section class="feature-video">
-    <video muted loop playsinline webkit-playsinline preload="none" data-src="assets/feature-video.mp4"></video>
+  <section class="manifesto" aria-label="Manifesto">
+    <!-- Each line is typed out in turn once the section scrolls into view.
+         Edit / add / remove lines here freely. -->
+    <ul class="manifesto-lines">
+      <li>Objects as systems</li>
+      <li>Light as material</li>
+      <li>Images in slow motion</li>
+      <li>The archive as a practice</li>
+      <li>Between the physical and the digital</li>
+      <li>Collected, developed, released, revisited</li>
+    </ul>
+    <p class="manifesto-caption">FLUXUS [Art Archive &amp; Design Studio] is an independent creative platform founded by Dongjin Choi, documenting experiments across graphic design, objects, digital media, and visual culture.</p>
   </section>
+
+  <div class="archive">
+    <nav class="section-nav" aria-label="Sections">
+      <a href="#works">WORKS<sup id="worksCount"></sup></a>
+      <a href="#experiments">EXPERIMENTS<sup id="experimentsCount"></sup></a>
+      <a href="#about">ABOUT</a>
+      <a href="#contact">CONTACT</a>
+    </nav>
+
+    <main>
+      <section class="archive-section" id="works">
+        <h2 class="section-label">SELECTED WORKS</h2>
+        <div id="worksList"></div>
+      </section>
+
+      <section class="archive-section" id="experiments">
+        <h2 class="section-label">EXPERIMENTS &mdash; WEB, CODE, ESSAYS</h2>
+        <ul class="index-list" id="experimentsList"></ul>
+      </section>
+
+      <section class="archive-section" id="about">
+        <h2 class="section-label">ABOUT</h2>
+        <p class="about-text">FLUXUS [Art Archive &amp; Design Studio] is an independent creative platform founded by Dongjin Choi, documenting experiments across graphic design, objects, digital media, and visual culture.</p>
+        <p class="about-text">Originally developed as a personal archive, FLUXUS brings together selected works, ongoing experiments, editions, and fragments from Dongjin&rsquo;s practice.</p>
+        <p class="about-text">Moving between the physical and digital, the platform explores how images, objects, materials, light, and technology can become systems for experiencing ideas.</p>
+        <p class="about-text">Today, FLUXUS operates as an evolving archive and experimental studio &mdash; a place for works to be collected, developed, released, and revisited.</p>
+      </section>
+    </main>
+
+    <section class="feature-video">
+      <video muted loop playsinline webkit-playsinline preload="none" data-src="assets/feature-video.mp4"></video>
+    </section>
+
+    <section class="archive-section" id="contact">
+      <h2 class="section-label">CONTACT</h2>
+      <ul class="index-list">
+        <li><a href="mailto:soxmfhvl123@gmail.com"><span>soxmfhvl123@gmail.com</span><span class="desc">Commissions, collaborations, editions</span><span class="year">EMAIL</span></a></li>
+        <li><a href="resume/index.html"><span>Dongjin Choi &mdash; Resume</span><span class="desc">Experience, projects, portfolio</span><span class="year">CV</span></a></li>
+        <li><a href="https://soxmfhvl123.github.io/" target="_blank" rel="noopener"><span>soxmfhvl123.github.io</span><span class="desc">Web experiments</span><span class="year">WEB &nearr;</span></a></li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Media viewer">
+    <button class="lightbox-close" type="button" data-lb="close">CLOSE &times;</button>
+    <div class="lightbox-stage" id="lightboxStage"></div>
+    <div class="lightbox-bar">
+      <span id="lightboxTitle"></span>
+      <span class="count" id="lightboxCount"></span>
+      <span class="lightbox-nav">
+        <button type="button" data-lb="prev">&larr; PREV</button>
+        <button type="button" data-lb="next">NEXT &rarr;</button>
+      </span>
+    </div>
+  </div>
+
+  <script src="works.js"></script>
+  <script>
+    // ===== Manifesto: type each line out once the section is on screen =====
+    (function () {
+      var lines = Array.prototype.slice.call(document.querySelectorAll('.manifesto-lines li'));
+      if (!lines.length) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var texts = lines.map(function (li) { return li.textContent; });
+      var caret = document.createElement('span');
+      caret.className = 'caret';
+      if (reduce) { lines[lines.length - 1].appendChild(caret); return; }
+      lines.forEach(function (li) { li.textContent = ''; });
+      lines[0].appendChild(caret);
+
+      var CHAR_MS = 38, LINE_PAUSE_MS = 320;
+      var started = false;
+      function type(lineIdx, charIdx) {
+        if (lineIdx >= lines.length) return; // done: caret keeps blinking on the last line
+        var li = lines[lineIdx];
+        if (charIdx <= texts[lineIdx].length) {
+          li.textContent = texts[lineIdx].slice(0, charIdx);
+          li.appendChild(caret);
+          setTimeout(function () { type(lineIdx, charIdx + 1); }, CHAR_MS);
+        } else if (lineIdx + 1 < lines.length) {
+          setTimeout(function () { type(lineIdx + 1, 0); }, LINE_PAUSE_MS);
+        }
+      }
+      function start() { if (started) return; started = true; type(0, 0); }
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          if (entries[0].isIntersecting) { start(); io.disconnect(); }
+        }, { threshold: 0.35 });
+        io.observe(document.querySelector('.manifesto'));
+      } else {
+        start();
+      }
+    })();
+
+    // ===== Works stream, experiments list, lightbox, section nav =====
+    (function () {
+      var works = window.FLUXUS_WORKS || [];
+      var experiments = window.FLUXUS_EXPERIMENTS || [];
+      var narrow = window.matchMedia('(max-width:640px)').matches;
+      var PREVIEW = narrow ? 2 : 4; // media shown inline per project; the rest open in the lightbox
+
+      function parse(entry) {
+        var isVideo = entry.indexOf('video:') === 0;
+        return { video: isVideo, src: encodeURI(isVideo ? entry.slice(6) : entry) };
+      }
+      function el(tag, cls, text) {
+        var n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text != null) n.textContent = text;
+        return n;
+      }
+
+      // --- works ---
+      var list = document.getElementById('worksList');
+      var lazyVideos = [];
+      works.forEach(function (w, wi) {
+        var art = el('article', 'work');
+        var mediaWrap = el('div', 'work-media');
+        w.media.slice(0, PREVIEW).forEach(function (entry, mi) {
+          var m = parse(entry);
+          var btn = el('button');
+          btn.type = 'button';
+          btn.setAttribute('aria-label', w.project + ' — open image ' + (mi + 1));
+          btn.addEventListener('click', function () { openLightbox(wi, mi); });
+          var node;
+          if (m.video) {
+            node = document.createElement('video');
+            node.muted = true; node.loop = true; node.playsInline = true;
+            node.setAttribute('playsinline', ''); node.setAttribute('webkit-playsinline', '');
+            node.preload = 'none';
+            node.dataset.src = m.src;
+            node.addEventListener('loadedmetadata', function () {
+              if (node.videoWidth) node.style.aspectRatio = node.videoWidth + ' / ' + node.videoHeight;
+            });
+            lazyVideos.push(node);
+          } else {
+            node = document.createElement('img');
+            node.loading = 'lazy';
+            node.decoding = 'async';
+            node.alt = w.project;
+            node.src = m.src;
+          }
+          btn.appendChild(node);
+          mediaWrap.appendChild(btn);
+        });
+        art.appendChild(mediaWrap);
+
+        var meta = el('dl', 'work-meta');
+        [['Project', w.project], ['Client', w.client], ['Type, year', w.year ? w.type + ', ' + w.year : w.type]]
+          .forEach(function (row) {
+            meta.appendChild(el('dt', null, row[0]));
+            meta.appendChild(el('dd', null, row[1]));
+          });
+        if (w.media.length > PREVIEW) {
+          meta.appendChild(el('dt', null, ''));
+          var dd = el('dd');
+          var more = el('button', 'work-more', 'View all ' + w.media.length);
+          more.type = 'button';
+          more.addEventListener('click', function () { openLightbox(wi, PREVIEW); });
+          dd.appendChild(more);
+          meta.appendChild(dd);
+        }
+        art.appendChild(meta);
+        list.appendChild(art);
+      });
+      document.getElementById('worksCount').textContent = works.length;
+
+      // Inline videos only load and play while near the viewport.
+      if ('IntersectionObserver' in window) {
+        var vio = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            var v = e.target;
+            if (e.isIntersecting) {
+              if (!v.src) v.src = v.dataset.src;
+              v.play().catch(function () {});
+            } else if (!v.paused) {
+              v.pause();
+            }
+          });
+        }, { rootMargin: '300px 0px' });
+        lazyVideos.forEach(function (v) { vio.observe(v); });
+      } else {
+        lazyVideos.forEach(function (v) { v.src = v.dataset.src; v.play().catch(function () {}); });
+      }
+
+      // --- experiments ---
+      var expList = document.getElementById('experimentsList');
+      experiments.forEach(function (x) {
+        var li = el('li');
+        var a = el('a');
+        a.href = x.href;
+        if (/^https?:/.test(x.href)) { a.target = '_blank'; a.rel = 'noopener'; }
+        a.appendChild(el('span', null, x.title));
+        a.appendChild(el('span', 'desc', x.desc));
+        a.appendChild(el('span', 'year', x.year));
+        li.appendChild(a);
+        expList.appendChild(li);
+      });
+      document.getElementById('experimentsCount').textContent = experiments.length;
+
+      // --- lightbox ---
+      var lb = document.getElementById('lightbox');
+      var stage = document.getElementById('lightboxStage');
+      var titleEl = document.getElementById('lightboxTitle');
+      var countEl = document.getElementById('lightboxCount');
+      var cur = { w: 0, m: 0 };
+      var lastFocus = null;
+      function render() {
+        var w = works[cur.w];
+        var m = parse(w.media[cur.m]);
+        stage.innerHTML = '';
+        var node;
+        if (m.video) {
+          node = document.createElement('video');
+          node.muted = true; node.loop = true; node.playsInline = true; node.autoplay = true;
+          node.setAttribute('playsinline', '');
+          node.src = m.src;
+        } else {
+          node = document.createElement('img');
+          node.alt = w.project;
+          node.src = m.src;
+        }
+        stage.appendChild(node);
+        titleEl.textContent = w.project;
+        countEl.textContent = (cur.m + 1) + ' / ' + w.media.length;
+      }
+      function openLightbox(wi, mi) {
+        lastFocus = document.activeElement;
+        cur = { w: wi, m: Math.min(mi, works[wi].media.length - 1) };
+        render();
+        lb.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+        lb.querySelector('.lightbox-close').focus();
+      }
+      function closeLightbox() {
+        lb.classList.remove('is-open');
+        stage.innerHTML = '';
+        document.body.style.overflow = '';
+        if (lastFocus) lastFocus.focus();
+      }
+      function step(d) {
+        var n = works[cur.w].media.length;
+        cur.m = (cur.m + d + n) % n;
+        render();
+      }
+      lb.addEventListener('click', function (e) {
+        var action = e.target.closest('[data-lb]');
+        if (action) {
+          var a = action.getAttribute('data-lb');
+          if (a === 'close') closeLightbox();
+          else step(a === 'next' ? 1 : -1);
+        } else if (e.target === stage) {
+          closeLightbox(); // click on the empty backdrop
+        }
+      });
+      document.addEventListener('keydown', function (e) {
+        if (!lb.classList.contains('is-open')) return;
+        if (e.key === 'Escape') closeLightbox();
+        else if (e.key === 'ArrowRight') step(1);
+        else if (e.key === 'ArrowLeft') step(-1);
+      });
+      var touchX = null;
+      stage.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; }, { passive: true });
+      stage.addEventListener('touchend', function (e) {
+        if (touchX == null) return;
+        var dx = e.changedTouches[0].clientX - touchX;
+        if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1);
+        touchX = null;
+      });
+
+      // --- section nav: highlight the section currently in view ---
+      var navLinks = Array.prototype.slice.call(document.querySelectorAll('.section-nav a'));
+      var sections = navLinks.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+      function updateNav() {
+        var probe = 80; // just below the sticky nav
+        var active = -1;
+        sections.forEach(function (s, i) { if (s && s.getBoundingClientRect().top <= probe) active = i; });
+        // CONTACT is short and never reaches the top - light it up once it's on screen
+        var last = sections[sections.length - 1];
+        if (last && last.getBoundingClientRect().top < window.innerHeight * 0.6) active = sections.length - 1;
+        navLinks.forEach(function (a, i) { a.classList.toggle('is-active', i === active); });
+      }
+      window.addEventListener('scroll', updateNav, { passive: true });
+      updateNav();
+    })();
+  </script>
   <script>
     // This clip sits well below the fold - fetching it eagerly on page
     // load competed with the hero wheel's own clips for bandwidth and
@@ -360,7 +858,9 @@
     import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
     var canvas = document.getElementById('astroboy-canvas');
-    var closingLogoEl = document.querySelector('.closing-logo');
+    // The first opaque block below the manifesto - the figure slides up and
+    // away as it arrives, so it never floats over the works archive.
+    var closingLogoEl = document.querySelector('.archive') || document.querySelector('.closing-logo');
 
     if (canvas && window.WebGLRenderingContext) {
       var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
