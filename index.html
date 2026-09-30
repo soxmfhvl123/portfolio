@@ -249,15 +249,16 @@
     align-items:flex-end;
     gap:12px;
   }
-  .work-media button{
+  .work-media > button, .work-media > a{
     all:unset;
     cursor:zoom-in;
     display:block;
     line-height:0;
     background:var(--tile);
   }
-  .work-media button.is-loaded{ background:transparent; }
-  .work-media button.is-light{ background:#e9e9e9; } /* dark-on-transparent artwork */
+  .work-media > a{ cursor:pointer; } /* tile links out to the project's site */
+  .work-media > .is-loaded{ background:transparent; }
+  .work-media > .is-light{ background:#e9e9e9; } /* dark-on-transparent artwork */
   /* Row height, but never wider than the column (very wide pieces like a
      logo banner shrink instead of being cropped) - --ar is width/height,
      set once the file's real size is known. Never cropped (no cover). */
@@ -267,7 +268,7 @@
     width:auto;
   }
   .work-media video{ aspect-ratio:var(--ar, 16 / 9); }
-  .work-media button:focus-visible{ outline:2px solid var(--ink); outline-offset:3px; }
+  .work-media > button:focus-visible, .work-media > a:focus-visible{ outline:2px solid var(--ink); outline-offset:3px; }
   .work-meta{
     display:grid;
     grid-template-columns:90px minmax(0, 520px);
@@ -439,7 +440,7 @@
     .archive-section{ padding:56px 20px 16px; }
     .work{ margin-bottom:72px; }
     .work-media img, .work-media video{ height:auto; width:100%; max-width:none; }
-    .work-media button{ width:100%; }
+    .work-media > button, .work-media > a{ width:100%; }
     .work-meta{ grid-template-columns:72px minmax(0, 1fr); }
     .index-list a, .index-list .row{ grid-template-columns:minmax(0, 1fr) auto; }
     .index-list .desc{ display:none; }
@@ -636,10 +637,20 @@
         var mediaWrap = el('div', 'work-media');
         w.media.slice(0, PREVIEW).forEach(function (entry, mi) {
           var m = parse(entry);
-          var btn = el('button', m.light ? 'is-light' : null);
-          btn.type = 'button';
-          btn.setAttribute('aria-label', w.project + ' — open image ' + (mi + 1));
-          btn.addEventListener('click', function () { openLightbox(wi, mi); });
+          var btn;
+          if (w.mediaLink && w.link) {
+            // media opens the project's site instead of the lightbox
+            btn = el('a', m.light ? 'is-light' : null);
+            btn.href = w.link;
+            btn.target = '_blank';
+            btn.rel = 'noopener';
+            btn.setAttribute('aria-label', w.project + ' — open website');
+          } else {
+            btn = el('button', m.light ? 'is-light' : null);
+            btn.type = 'button';
+            btn.setAttribute('aria-label', w.project + ' — open image ' + (mi + 1));
+            btn.addEventListener('click', function () { openLightbox(wi, mi); });
+          }
           var node;
           if (m.video) {
             node = document.createElement('video');

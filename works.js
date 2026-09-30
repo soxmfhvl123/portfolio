@@ -2,7 +2,7 @@
 // WORKS: each entry becomes one block in the archive stream. `media` paths
 // are relative to the site root; prefix a path with 'video:' for an mp4.
 // Prefix 'light:' for dark artwork on a transparent background (shown on a light tile).
-// Leave `year` empty ('') to show the type on its own. Optional `link` adds a Website row.
+// Leave `year` empty ('') to show the type on its own. Optional `link` adds a Website row; `mediaLink: true` makes the media open that link.
 // EXPERIMENTS: the interactive / web pieces listed under EXPERIMENTS.
 
 window.FLUXUS_WORKS = [
@@ -33,6 +33,17 @@ window.FLUXUS_WORKS = [
     media: [
       "video:resume/img/OTHERPROJECTS/FURNITURE/YELLOW BOX/yellow box1_opt.mp4",
       "video:resume/img/OTHERPROJECTS/FURNITURE/YELLOW BOX/yellow box2_opt.mp4"
+    ]
+  },
+  {
+    project: "FVC Records",
+    client: "FVC Records",
+    type: "Brand Identity + Website",
+    year: "",
+    link: "https://soxmfhvl123.github.io/FVC/",
+    mediaLink: true,
+    media: [
+      "video:resume/img/OTHERPROJECTS/fvc/fvc logo rotate_opt.mp4"
     ]
   },
   {
