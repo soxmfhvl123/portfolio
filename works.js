@@ -2,10 +2,54 @@
 // WORKS: each entry becomes one block in the archive stream. `media` paths
 // are relative to the site root; prefix a path with 'video:' for an mp4.
 // Prefix 'light:' for dark artwork on a transparent background (shown on a light tile).
-// Leave `year` empty ('') to show the type on its own.
+// Leave `year` empty ('') to show the type on its own. Optional `link` adds a Website row.
 // EXPERIMENTS: the interactive / web pieces listed under EXPERIMENTS.
 
 window.FLUXUS_WORKS = [
+  {
+    project: "DREAM MAKER",
+    client: "Self-initiated",
+    type: "Furniture",
+    year: "",
+    media: [
+      "resume/img/OTHERPROJECTS/FURNITURE/DREAM MAKER/KakaoTalk_20260930_131447497_web.webp",
+      "resume/img/OTHERPROJECTS/FURNITURE/DREAM MAKER/KakaoTalk_20260930_131447497_01_web.webp"
+    ]
+  },
+  {
+    project: "WARM WELCOME",
+    client: "Self-initiated",
+    type: "Furniture",
+    year: "",
+    media: [
+      "video:resume/img/OTHERPROJECTS/FURNITURE/WARM WELCOME/warm welcom_opt.mp4"
+    ]
+  },
+  {
+    project: "YELLOW BOX",
+    client: "Self-initiated",
+    type: "Furniture",
+    year: "",
+    media: [
+      "video:resume/img/OTHERPROJECTS/FURNITURE/YELLOW BOX/yellow box1_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/FURNITURE/YELLOW BOX/yellow box2_opt.mp4"
+    ]
+  },
+  {
+    project: "WHY Global Forum Website",
+    client: "CLAB",
+    type: "Web Design",
+    year: "2026",
+    link: "http://whyglobalforum.com/",
+    media: [
+      "resume/img/CLAB/CLAB_WHY_Global_Forum_Website/WHY_web_1_hero.webp",
+      "resume/img/CLAB/CLAB_WHY_Global_Forum_Website/WHY_web_2_about.webp",
+      "resume/img/CLAB/CLAB_WHY_Global_Forum_Website/WHY_web_3_speakers.webp",
+      "resume/img/CLAB/CLAB_WHY_Global_Forum_Website/WHY_web_4_program.webp",
+      "resume/img/CLAB/CLAB_WHY_Global_Forum_Website/WHY_web_5_partners.webp",
+      "resume/img/CLAB/CLAB_WHY_Global_Forum_Website/WHY_web_6_register.webp"
+    ]
+  },
   {
     project: "CLAB Brand Identity",
     client: "CLAB — Prof. Cathy Lee Lab",
@@ -23,10 +67,10 @@ window.FLUXUS_WORKS = [
     type: "Key Visual",
     year: "2025",
     media: [
-      "resume/img/CLAB/CLAB_Global_Design_Forum/CLAB_1.png",
+      "resume/img/CLAB/CLAB_Global_Design_Forum/CLAB_1_hq.webp",
       "resume/img/CLAB/CLAB_Global_Design_Forum/CLAB_2.png",
-      "resume/img/CLAB/CLAB_Global_Design_Forum/CLAB_3.png",
-      "resume/img/CLAB/CLAB_Global_Design_Forum/CLAB_4.png"
+      "resume/img/CLAB/CLAB_Global_Design_Forum/CLAB_3_hq.webp",
+      "resume/img/CLAB/CLAB_Global_Design_Forum/CLAB_4_hq.webp"
     ]
   },
   {
@@ -35,10 +79,10 @@ window.FLUXUS_WORKS = [
     type: "Brand Identity + Guidelines",
     year: "2024",
     media: [
-      "light:resume/img/CUZ/CUZ_Brand_Identity/CUZ_2.png",
+      "light:resume/img/CUZ/CUZ_Brand_Identity/CUZ_2_hq.webp",
       "resume/img/CUZ/CUZ_Brand_Identity/CUZ_9.png",
-      "resume/img/CUZ/CUZ_Brand_Identity/CUZ_10.png",
-      "resume/img/CUZ/CUZ_Brand_Identity/CUZ_11.png",
+      "resume/img/CUZ/CUZ_Brand_Identity/CUZ_10_hq.webp",
+      "resume/img/CUZ/CUZ_Brand_Identity/CUZ_11_hq.webp",
       "video:resume/img/CUZ/CUZ_Brand_Identity/CUZ_11_opt.mp4"
     ]
   },
@@ -48,14 +92,14 @@ window.FLUXUS_WORKS = [
     type: "Poster + Welcome Kit",
     year: "2024",
     media: [
-      "resume/img/CUZ/CUZ_Spirit/CUZ_1.png",
-      "resume/img/CUZ/CUZ_Spirit/CUZ_3.png",
+      "resume/img/CUZ/CUZ_Spirit/CUZ_1_hq.webp",
+      "resume/img/CUZ/CUZ_Spirit/CUZ_3_hq.webp",
       "video:resume/img/CUZ/CUZ_Spirit/CUZ_3_opt.mp4",
-      "resume/img/CUZ/CUZ_Spirit/CUZ_4.png",
-      "resume/img/CUZ/CUZ_Spirit/CUZ_5.png",
-      "resume/img/CUZ/CUZ_Spirit/CUZ_6.png",
-      "resume/img/CUZ/CUZ_Spirit/CUZ_7.png",
-      "resume/img/CUZ/CUZ_Spirit/CUZ_8.png"
+      "resume/img/CUZ/CUZ_Spirit/CUZ_4_hq.webp",
+      "resume/img/CUZ/CUZ_Spirit/CUZ_5_hq.webp",
+      "resume/img/CUZ/CUZ_Spirit/CUZ_6_hq.webp",
+      "resume/img/CUZ/CUZ_Spirit/CUZ_7_hq.webp",
+      "resume/img/CUZ/CUZ_Spirit/CUZ_8_hq.webp"
     ]
   },
   {
@@ -64,7 +108,7 @@ window.FLUXUS_WORKS = [
     type: "Brand Identity",
     year: "2023",
     media: [
-      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_1.png",
+      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_1_hq.webp",
       "video:resume/img/OSCARFUTURA/OSCAR_Brand_Identity/oforb_opt.mp4",
       "video:resume/img/OSCARFUTURA/OSCAR_Brand_Identity/Comp 4_1_opt.mp4",
       "video:resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSTIN_FLAG_opt.mp4",
@@ -73,16 +117,16 @@ window.FLUXUS_WORKS = [
       "video:resume/img/OSCARFUTURA/OSCAR_Brand_Identity/reiktune poster_3_opt.mp4",
       "video:resume/img/OSCARFUTURA/OSCAR_Brand_Identity/3d scaned lesugi at ostin.mp4 1080_opt.mp4",
       "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/Screenshot 2023-08-30 at 5.48.07 PM copy.jpg",
-      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_7.jpg",
-      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_8.jpg",
-      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_6.png",
-      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_10.png",
-      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_11.png",
-      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_9.png",
-      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_2.png",
-      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_3.png",
-      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_4.png",
-      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_5.png",
+      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_7_hq.webp",
+      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_8_hq.webp",
+      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_6_hq.webp",
+      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_10_hq.webp",
+      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_11_hq.webp",
+      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_9_hq.webp",
+      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_2_hq.webp",
+      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_3_hq.webp",
+      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_4_hq.webp",
+      "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_5_hq.webp",
       "video:resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OFOTD_REIKTUNE_web_no_logo_opt.mp4"
     ]
   },
@@ -94,7 +138,7 @@ window.FLUXUS_WORKS = [
     media: [
       "video:resume/img/OSCARFUTURA/OSCAR_Artwork/FISH_WEB_opt.mp4",
       "resume/img/OSCARFUTURA/OSCAR_Artwork/FGEGG_web.webp",
-      "resume/img/OSCARFUTURA/OSCAR_Artwork/OSCARFUTURA_14.png"
+      "resume/img/OSCARFUTURA/OSCAR_Artwork/OSCARFUTURA_14_hq.webp"
     ]
   },
   {
@@ -103,9 +147,9 @@ window.FLUXUS_WORKS = [
     type: "Poster + Promotion",
     year: "2023",
     media: [
-      "resume/img/OSCARFUTURA/OSCAR_Popup/OSCARFUTURA_0.png",
-      "resume/img/OSCARFUTURA/OSCAR_Popup/OSCARFUTURA_12.png",
-      "resume/img/OSCARFUTURA/OSCAR_Popup/OSCARFUTURA_13.jpg"
+      "resume/img/OSCARFUTURA/OSCAR_Popup/OSCARFUTURA_0_hq.webp",
+      "resume/img/OSCARFUTURA/OSCAR_Popup/OSCARFUTURA_12_hq.webp",
+      "resume/img/OSCARFUTURA/OSCAR_Popup/OSCARFUTURA_13_hq.webp"
     ]
   },
   {
@@ -114,18 +158,18 @@ window.FLUXUS_WORKS = [
     type: "Menu Design",
     year: "2022–23",
     media: [
-      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_1.png",
-      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_2.png",
-      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_3.png",
-      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_4.png",
-      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_5.png",
-      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_6.png",
-      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_7.png",
-      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_8.png",
-      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_9.png",
-      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_10.png",
-      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_11.png",
-      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_12.png",
+      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_1_hq.webp",
+      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_2_hq.webp",
+      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_3_hq.webp",
+      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_4_hq.webp",
+      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_5_hq.webp",
+      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_6_hq.webp",
+      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_7_hq.webp",
+      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_8_hq.webp",
+      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_9_hq.webp",
+      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_10_hq.webp",
+      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_11_hq.webp",
+      "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_12_hq.webp",
       "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_17.png",
       "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_18.png",
       "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_19.png",
@@ -145,10 +189,10 @@ window.FLUXUS_WORKS = [
     type: "Visual + Menu Layout",
     year: "2022–23",
     media: [
-      "resume/img/NAEUN/NAEUN_Collab/NAEUN_13.jpg",
-      "resume/img/NAEUN/NAEUN_Collab/NAEUN_14.jpg",
-      "resume/img/NAEUN/NAEUN_Collab/NAEUN_15.jpg",
-      "resume/img/NAEUN/NAEUN_Collab/NAEUN_16.jpg",
+      "resume/img/NAEUN/NAEUN_Collab/NAEUN_13_hq.webp",
+      "resume/img/NAEUN/NAEUN_Collab/NAEUN_14_hq.webp",
+      "resume/img/NAEUN/NAEUN_Collab/NAEUN_15_hq.webp",
+      "resume/img/NAEUN/NAEUN_Collab/NAEUN_16_hq.webp",
       "resume/img/NAEUN/NAEUN_Collab/NAEUN_38.png",
       "video:resume/img/NAEUN/NAEUN_Collab/NAEUN_39_opt.mp4",
       "video:resume/img/NAEUN/NAEUN_Collab/NAEUN_40_opt.mp4"
@@ -160,7 +204,7 @@ window.FLUXUS_WORKS = [
     type: "Logo + Brand Launch",
     year: "2023",
     media: [
-      "resume/img/NAEUN/NAEUN_Naro/NAEUN_28.png",
+      "resume/img/NAEUN/NAEUN_Naro/NAEUN_28_hq.webp",
       "resume/img/NAEUN/NAEUN_Naro/NAEUN_29.png",
       "video:resume/img/NAEUN/NAEUN_Naro/NAEUN_30_opt.mp4",
       "video:resume/img/NAEUN/NAEUN_Naro/NAEUN_31_opt.mp4",
@@ -188,9 +232,9 @@ window.FLUXUS_WORKS = [
     year: "2023",
     media: [
       "resume/img/NAEUN/NAEUN_WonSoju/NAEUN_31.jpeg",
-      "resume/img/NAEUN/NAEUN_WonSoju/NAEUN_32.jpeg",
-      "resume/img/NAEUN/NAEUN_WonSoju/NAEUN_33.jpeg",
-      "resume/img/NAEUN/NAEUN_WonSoju/NAEUN_34.jpeg"
+      "resume/img/NAEUN/NAEUN_WonSoju/NAEUN_32_hq.webp",
+      "resume/img/NAEUN/NAEUN_WonSoju/NAEUN_33_hq.webp",
+      "resume/img/NAEUN/NAEUN_WonSoju/NAEUN_34_hq.webp"
     ]
   },
   {
@@ -222,15 +266,15 @@ window.FLUXUS_WORKS = [
       "video:resume/img/OTHERPROJECTS/FLUXUS/컴포지션_opt.mp4",
       "video:resume/img/OTHERPROJECTS/FLUXUS/MOTION POSTER_opt.mp4",
       "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_1.png",
-      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_2.png",
-      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_3.png",
-      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_4.png",
-      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_5.png",
-      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_6.png",
-      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_7.png",
-      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_8.png",
-      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_9.png",
-      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_10.png"
+      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_2_hq.webp",
+      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_3_hq.webp",
+      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_4_hq.webp",
+      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_5_hq.webp",
+      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_6_hq.webp",
+      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_7_hq.webp",
+      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_8_hq.webp",
+      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_9_hq.webp",
+      "resume/img/OTHERPROJECTS/FLUXUS/FLUXUS_10_hq.webp"
     ]
   },
   {
@@ -319,44 +363,15 @@ window.FLUXUS_WORKS = [
     ]
   },
   {
-    project: "DREAM MAKER",
-    client: "Self-initiated",
-    type: "Furniture",
-    year: "",
-    media: [
-      "resume/img/OTHERPROJECTS/FURNITURE/DREAM MAKER/KakaoTalk_20260930_131447497_web.webp",
-      "resume/img/OTHERPROJECTS/FURNITURE/DREAM MAKER/KakaoTalk_20260930_131447497_01_web.webp"
-    ]
-  },
-  {
-    project: "WARM WELCOME",
-    client: "Self-initiated",
-    type: "Furniture",
-    year: "",
-    media: [
-      "video:resume/img/OTHERPROJECTS/FURNITURE/WARM WELCOME/warm welcom_opt.mp4"
-    ]
-  },
-  {
-    project: "YELLOW BOX",
-    client: "Self-initiated",
-    type: "Furniture",
-    year: "",
-    media: [
-      "video:resume/img/OTHERPROJECTS/FURNITURE/YELLOW BOX/yellow box1_opt.mp4",
-      "video:resume/img/OTHERPROJECTS/FURNITURE/YELLOW BOX/yellow box2_opt.mp4"
-    ]
-  },
-  {
     project: "Mastermind",
     client: "Mastermind (YouTube)",
     type: "Channel Branding + Logo",
     year: "",
     media: [
       "resume/img/OTHERPROJECTS/Mastermind/Mastermind_1.png",
-      "resume/img/OTHERPROJECTS/Mastermind/Mastermind_2.png",
-      "resume/img/OTHERPROJECTS/Mastermind/Mastermind_3.png",
-      "resume/img/OTHERPROJECTS/Mastermind/Mastermind_4.png"
+      "resume/img/OTHERPROJECTS/Mastermind/Mastermind_2_hq.webp",
+      "resume/img/OTHERPROJECTS/Mastermind/Mastermind_3_hq.webp",
+      "resume/img/OTHERPROJECTS/Mastermind/Mastermind_4_hq.webp"
     ]
   },
   {
@@ -377,7 +392,7 @@ window.FLUXUS_WORKS = [
       "resume/img/OTHERPROJECTS/V-SIDE/-Bed Chem--Sabrina Carpenter.png",
       "resume/img/OTHERPROJECTS/V-SIDE/-DTMF--Bad Bunny.png",
       "resume/img/OTHERPROJECTS/V-SIDE/-Denial Is a River--Doechii.png",
-      "resume/img/OTHERPROJECTS/V-SIDE/-Die with a Smile--Lady Gaga and Bruno Mars.png",
+      "resume/img/OTHERPROJECTS/V-SIDE/-Die with a Smile--Lady Gaga and Bruno Mars_hq.webp",
       "resume/img/OTHERPROJECTS/V-SIDE/-Eoo--Bad Bunny.png",
       "resume/img/OTHERPROJECTS/V-SIDE/-Golden--Huntrix- Ejae, Audrey Nuna and Rei Ami.png",
       "resume/img/OTHERPROJECTS/V-SIDE/-Hard Fought Hallelujah--Brandon Lake and Jelly Roll.png",
@@ -435,7 +450,7 @@ window.FLUXUS_WORKS = [
     type: "Makgeolli Label Design",
     year: "",
     media: [
-      "resume/img/OTHERPROJECTS/KVIEK/KVIEK_1.png"
+      "resume/img/OTHERPROJECTS/KVIEK/KVIEK_1_hq.webp"
     ]
   },
   {
@@ -444,13 +459,14 @@ window.FLUXUS_WORKS = [
     type: "Museum Branding",
     year: "",
     media: [
-      "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_1.png",
-      "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_2.png",
-      "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_3.png",
-      "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_4.png",
-      "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_5.png",
-      "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_6.png",
-      "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_7.png"
+      "resume/img/OTHERPROJECTS/MOIF/Group 1_hq.webp",
+      "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_1_hq.webp",
+      "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_2_hq.webp",
+      "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_3_hq.webp",
+      "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_4_hq.webp",
+      "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_5_hq.webp",
+      "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_6_hq.webp",
+      "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_7_hq.webp"
     ]
   },
   {
@@ -465,21 +481,30 @@ window.FLUXUS_WORKS = [
   {
     project: "NIKOTEA",
     client: "NIKOTEA",
-    type: "Channel Branding",
+    type: "Channel Branding + Packaging",
     year: "",
     media: [
+      "resume/img/OTHERPROJECTS/NIKOTEA/Tea Bag Mockup (5) copy_hq.webp",
+      "video:resume/img/OTHERPROJECTS/NIKOTEA/Comp 1_opt.mp4",
+      "resume/img/OTHERPROJECTS/NIKOTEA/Tea Bag Mockup (5) copydniwe_hq.webp",
+      "resume/img/OTHERPROJECTS/NIKOTEA/Tea Bag Mockup (5) copydpwef_hq.webp",
+      "resume/img/OTHERPROJECTS/NIKOTEA/Tea Bag Mockup (5) copydwdfgg_hq.webp",
+      "resume/img/OTHERPROJECTS/NIKOTEA/Tea Bag Mockup (5) copydwnow_hq.webp",
+      "resume/img/OTHERPROJECTS/NIKOTEA/Tea Bag Mockup (5) copyeweff_hq.webp",
+      "resume/img/OTHERPROJECTS/NIKOTEA/Tea Bag Mockup (5) copyfjowog_hq.webp",
+      "resume/img/OTHERPROJECTS/NIKOTEA/Tea Bag Mockup (532f) copy_hq.webp",
       "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_1.png",
-      "light:resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_2.png",
-      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_3.png",
-      "light:resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_4.png",
-      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_5.png",
-      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_6.png",
-      "light:resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_7.png",
-      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_8.png",
-      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_9.png",
-      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_10.png",
-      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_11.png",
-      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_12.png"
+      "light:resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_2_hq.webp",
+      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_3_hq.webp",
+      "light:resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_4_hq.webp",
+      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_5_hq.webp",
+      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_6_hq.webp",
+      "light:resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_7_hq.webp",
+      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_8_hq.webp",
+      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_9_hq.webp",
+      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_10_hq.webp",
+      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_11_hq.webp",
+      "resume/img/OTHERPROJECTS/NIKOTEA/NIKOTEA_12_hq.webp"
     ]
   },
   {
@@ -488,13 +513,13 @@ window.FLUXUS_WORKS = [
     type: "Channel Branding",
     year: "",
     media: [
-      "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_1.png",
-      "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_2.png",
-      "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_3.png",
-      "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_4.png",
+      "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_1_hq.webp",
+      "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_2_hq.webp",
+      "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_3_hq.webp",
+      "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_4_hq.webp",
       "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_5.png",
-      "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_6.png",
-      "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_7.png"
+      "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_6_hq.webp",
+      "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_7_hq.webp"
     ]
   },
   {
@@ -503,7 +528,7 @@ window.FLUXUS_WORKS = [
     type: "Channel Branding",
     year: "",
     media: [
-      "resume/img/OTHERPROJECTS/ILLUSIONLOOM/ILLUSIONLOOM_1.png"
+      "resume/img/OTHERPROJECTS/ILLUSIONLOOM/ILLUSIONLOOM_1_hq.webp"
     ]
   },
   {
@@ -512,7 +537,7 @@ window.FLUXUS_WORKS = [
     type: "Studio Branding",
     year: "",
     media: [
-      "resume/img/OTHERPROJECTS/VISIONAIRE/VISIONAIRE_6.png",
+      "resume/img/OTHERPROJECTS/VISIONAIRE/VISIONAIRE_6_hq.webp",
       "resume/img/OTHERPROJECTS/VISIONAIRE/VISIONAIRE_7.png",
       "resume/img/OTHERPROJECTS/VISIONAIRE/VISIONAIRE_8.png",
       "resume/img/OTHERPROJECTS/VISIONAIRE/VISIONAIRE_9.png",
@@ -535,13 +560,13 @@ window.FLUXUS_WORKS = [
     type: "Branding",
     year: "",
     media: [
-      "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_1.png",
-      "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_2.png",
-      "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_3.png",
-      "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_4.png",
-      "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_5.png",
-      "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_6.png",
-      "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_7.png"
+      "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_1_hq.webp",
+      "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_2_hq.webp",
+      "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_3_hq.webp",
+      "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_4_hq.webp",
+      "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_5_hq.webp",
+      "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_6_hq.webp",
+      "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_7_hq.webp"
     ]
   }
 ];

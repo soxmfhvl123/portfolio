@@ -672,6 +672,16 @@
             meta.appendChild(el('dt', null, row[0]));
             meta.appendChild(el('dd', null, row[1]));
           });
+        if (w.link) {
+          meta.appendChild(el('dt', null, 'Website'));
+          var linkDd = el('dd');
+          var siteLink = el('a', 'work-more', w.link.replace(/^https?:\/\//, '').replace(/\/$/, '') + ' ↗');
+          siteLink.href = w.link;
+          siteLink.target = '_blank';
+          siteLink.rel = 'noopener';
+          linkDd.appendChild(siteLink);
+          meta.appendChild(linkDd);
+        }
         if (w.media.length > PREVIEW) {
           meta.appendChild(el('dt', null, ''));
           var dd = el('dd');
