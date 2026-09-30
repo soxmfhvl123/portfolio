@@ -37,7 +37,7 @@ window.FLUXUS_WORKS = [
   },
   {
     project: "FVC Records",
-    client: "FVC Records",
+    client: "CHUGO.inc",
     type: "Brand Identity + Website",
     year: "",
     link: "https://soxmfhvl123.github.io/FVC/",
