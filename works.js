@@ -585,6 +585,15 @@ window.FLUXUS_WORKS = [
       "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_6_hq.webp",
       "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_7_hq.webp"
     ]
+  },
+  {
+    project: "VSOP CITY BOY YY Personal Branding",
+    client: "CHUGO.inc",
+    type: "Branding",
+    year: "2021",
+    media: [
+      "resume/img/OTHERPROJECTS/VSOPCITY BOY YY/VSOP CITY BOY YY.png"
+    ]
   }
 ];
 
