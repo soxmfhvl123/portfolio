@@ -203,10 +203,18 @@ window.FLUXUS_WORKS = [
       "resume/img/NAEUN/NAEUN_Collab/NAEUN_13_hq.webp",
       "resume/img/NAEUN/NAEUN_Collab/NAEUN_14_hq.webp",
       "resume/img/NAEUN/NAEUN_Collab/NAEUN_15_hq.webp",
-      "resume/img/NAEUN/NAEUN_Collab/NAEUN_16_hq.webp",
-      "resume/img/NAEUN/NAEUN_Collab/NAEUN_38.png",
-      "video:resume/img/NAEUN/NAEUN_Collab/NAEUN_39_opt.mp4",
-      "video:resume/img/NAEUN/NAEUN_Collab/NAEUN_40_opt.mp4"
+      "resume/img/NAEUN/NAEUN_Collab/NAEUN_16_hq.webp"
+    ]
+  },
+  {
+    project: "ATOMIX × ODETTE Menu Card + Website",
+    client: "ATOMIX",
+    type: "Menu Card + Website",
+    year: "2023",
+    media: [
+      "resume/img/NAEUN/NAEUN_Collab2/NAEUN_38.png",
+      "video:resume/img/NAEUN/NAEUN_Collab2/NAEUN_39_opt.mp4",
+      "video:resume/img/NAEUN/NAEUN_Collab2/NAEUN_40_opt.mp4"
     ]
   },
   {
