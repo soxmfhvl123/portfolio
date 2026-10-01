@@ -499,7 +499,10 @@
     .lightbox-bar{ padding:14px 20px 18px; }
     .lightbox .lightbox-close{ right:20px; }
     .closing-logo{ padding:10vh 20px 0.5vh; }
-    .closing-word{ font-size:13vw; }
+    /* phones: just FLUXUS, sized by script to run exactly margin to margin */
+    .closing-logo{ justify-content:flex-start; }
+    .closing-word{ font-size:24vw; }
+    .closing-word + .closing-word{ display:none; }
     .site-footer{ padding:2px 20px 10px; justify-content:center; }
     .footer-full{ display:none; }
     .footer-brief{ display:inline; }
@@ -987,6 +990,27 @@
     <span class="closing-word">FLUXUS</span>
     <span class="closing-word">STUDIO</span>
   </section>
+  <script>
+    // On phones the closing wordmark is FLUXUS alone, scaled so its ink runs
+    // exactly from the left margin to the right margin like the content above.
+    (function () {
+      var section = document.querySelector('.closing-logo');
+      var word = section && section.querySelector('.closing-word');
+      if (!word) return;
+      var phone = window.matchMedia('(max-width:640px)');
+      function fit() {
+        if (!phone.matches) { word.style.fontSize = ''; word.style.letterSpacing = ''; return; }
+        var cs = getComputedStyle(section);
+        var target = section.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        word.style.fontSize = '100px';
+        var w = word.getBoundingClientRect().width;
+        if (w > 0) word.style.fontSize = (100 * target / w).toFixed(2) + 'px';
+      }
+      fit();
+      window.addEventListener('resize', fit);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    })();
+  </script>
 
   <footer class="site-footer">
     <span class="footer-full">&copy; 2026 FLUXUS STUDIO</span>
