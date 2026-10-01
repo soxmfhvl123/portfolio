@@ -7,6 +7,18 @@
 
 window.FLUXUS_WORKS = [
   {
+    project: "Hi everyone",
+    client: "Self-initiated",
+    type: "Interactive Web",
+    year: "2026",
+    tags: ["WEB"],
+    link: "https://soxmfhvl123.github.io/hi/hello-reel.html",
+    mediaLink: true,
+    media: [
+      "video:resume/img/OTHERPROJECTS/HI EVERYONE/hi-everyone_opt.mp4"
+    ]
+  },
+  {
     project: "ASTRA JIN",
     client: "Self-initiated",
     type: "Interactive Web",
