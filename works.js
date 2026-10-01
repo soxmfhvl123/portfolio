@@ -14,7 +14,8 @@ window.FLUXUS_WORKS = [
     link: "https://soxmfhvl123.github.io/clawset/",
     mediaLink: true,
     media: [
-      "light:resume/img/OTHERPROJECTS/clawset/clawset_hq.webp",
+      "resume/img/OTHERPROJECTS/clawset/clawset_white.webp",
+      "video:resume/img/OTHERPROJECTS/clawset/clawset-scroll_opt.mp4",
       "video:resume/img/OTHERPROJECTS/clawset/bianca.mp4",
       "video:resume/img/OTHERPROJECTS/clawset/jinx.mp4",
       "video:resume/img/OTHERPROJECTS/clawset/valka.mp4"
@@ -54,7 +55,7 @@ window.FLUXUS_WORKS = [
     client: "CHUGO.inc",
     type: "Brand Identity + Website",
     year: "",
-    link: "https://soxmfhvl123.github.io/FVC/",
+    link: "https://fvc.ai.kr/",
     mediaLink: true,
     media: [
       "video:resume/img/OTHERPROJECTS/fvc/fvc logo rotate_opt.mp4"
