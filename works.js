@@ -2,8 +2,8 @@
 // WORKS: each entry becomes one block in the archive stream. `media` paths
 // are relative to the site root; prefix a path with 'video:' for an mp4.
 // Prefix 'light:' for dark artwork on a transparent background (shown on a light tile), 'bleed:' for full column width.
+// `tags`: any of WEB, BRANDING, FURNITURE, 3D, PRINTS, MOTION (drives the category filter).
 // Leave `year` empty ('') to show the type on its own. Optional `link` adds a Website row; `mediaLink: true` makes the media open that link.
-// EXPERIMENTS: the interactive / web pieces listed under EXPERIMENTS.
 
 window.FLUXUS_WORKS = [
   {
@@ -12,6 +12,7 @@ window.FLUXUS_WORKS = [
     type: "Web Design",
     year: "2026",
     link: "https://globaldesignleadership.org/",
+    tags: ["WEB"],
     mediaLink: true,
     media: [
       "video:resume/img/CLAB/CLAB_GLOBAL DESIGN LEADERSHIP/gdla-scroll-1080p_opt.mp4"
@@ -23,6 +24,7 @@ window.FLUXUS_WORKS = [
     type: "Brand Identity + Website",
     year: "2026",
     link: "https://soxmfhvl123.github.io/clawset/",
+    tags: ["WEB", "BRANDING", "MOTION"],
     mediaLink: true,
     media: [
       "bleed:resume/img/OTHERPROJECTS/clawset/clawset_logo_white.webp",
@@ -37,6 +39,7 @@ window.FLUXUS_WORKS = [
     client: "Self-initiated",
     type: "Furniture",
     year: "2026",
+    tags: ["FURNITURE"],
     media: [
       "resume/img/OTHERPROJECTS/FURNITURE/DREAM MAKER/KakaoTalk_20260930_131447497_web.webp",
       "resume/img/OTHERPROJECTS/FURNITURE/DREAM MAKER/KakaoTalk_20260930_131447497_01_web.webp"
@@ -47,6 +50,7 @@ window.FLUXUS_WORKS = [
     client: "Self-initiated",
     type: "Furniture",
     year: "2026",
+    tags: ["FURNITURE"],
     media: [
       "video:resume/img/OTHERPROJECTS/FURNITURE/WARM WELCOME/warm welcom_opt.mp4"
     ]
@@ -56,6 +60,7 @@ window.FLUXUS_WORKS = [
     client: "Self-initiated",
     type: "Furniture",
     year: "2026",
+    tags: ["FURNITURE"],
     media: [
       "video:resume/img/OTHERPROJECTS/FURNITURE/YELLOW BOX/yellow box1_opt.mp4",
       "video:resume/img/OTHERPROJECTS/FURNITURE/YELLOW BOX/yellow box2_opt.mp4"
@@ -67,6 +72,7 @@ window.FLUXUS_WORKS = [
     type: "Brand Identity + Website",
     year: "",
     link: "https://fvc.ai.kr/",
+    tags: ["BRANDING", "WEB", "3D"],
     mediaLink: true,
     media: [
       "video:resume/img/OTHERPROJECTS/fvc/fvc logo rotate_opt.mp4"
@@ -78,6 +84,7 @@ window.FLUXUS_WORKS = [
     type: "Web Design",
     year: "2026",
     link: "http://whyglobalforum.com/",
+    tags: ["WEB"],
     media: [
       "resume/img/CLAB/CLAB_WHY_Global_Forum_Website/WHY_web_1_hero.webp",
       "resume/img/CLAB/CLAB_WHY_Global_Forum_Website/WHY_web_2_about.webp",
@@ -92,6 +99,7 @@ window.FLUXUS_WORKS = [
     client: "CLAB",
     type: "Brand Identity",
     year: "2025",
+    tags: ["BRANDING", "MOTION"],
     media: [
       "video:resume/img/CLAB/CLAB_Brand_Identity/CLAB_NEW_GRADIENT_opt.mp4",
       "video:resume/img/CLAB/CLAB_Brand_Identity/CLAB_GRADIENT_1350_opt.mp4",
@@ -103,6 +111,7 @@ window.FLUXUS_WORKS = [
     client: "CLAB",
     type: "Key Visual",
     year: "2025",
+    tags: ["PRINTS"],
     media: [
       "resume/img/CLAB/CLAB_Global_Design_Forum/CLAB_1_hq.webp",
       "resume/img/CLAB/CLAB_Global_Design_Forum/CLAB_2.png",
@@ -115,6 +124,7 @@ window.FLUXUS_WORKS = [
     client: "CUZ Inc.",
     type: "Brand Identity + Guidelines",
     year: "2024",
+    tags: ["BRANDING", "MOTION"],
     media: [
       "light:resume/img/CUZ/CUZ_Brand_Identity/CUZ_2_hq.webp",
       "resume/img/CUZ/CUZ_Brand_Identity/CUZ_9.png",
@@ -128,6 +138,7 @@ window.FLUXUS_WORKS = [
     client: "CUZ Inc.",
     type: "Poster + Welcome Kit",
     year: "2024",
+    tags: ["PRINTS"],
     media: [
       "resume/img/CUZ/CUZ_Spirit/CUZ_1_hq.webp",
       "resume/img/CUZ/CUZ_Spirit/CUZ_3_hq.webp",
@@ -144,6 +155,7 @@ window.FLUXUS_WORKS = [
     client: "Oscar Futura",
     type: "Brand Identity",
     year: "2023",
+    tags: ["BRANDING", "WEB", "3D", "MOTION"],
     media: [
       "resume/img/OSCARFUTURA/OSCAR_Brand_Identity/OSCARFUTURA_1_hq.webp",
       "video:resume/img/OSCARFUTURA/OSCAR_Brand_Identity/oforb_opt.mp4",
@@ -172,6 +184,7 @@ window.FLUXUS_WORKS = [
     client: "Oscar Futura",
     type: "2D/3D Artwork",
     year: "2023",
+    tags: ["3D", "MOTION"],
     media: [
       "video:resume/img/OSCARFUTURA/OSCAR_Artwork/FISH_WEB_opt.mp4",
       "resume/img/OSCARFUTURA/OSCAR_Artwork/FGEGG_web.webp",
@@ -183,6 +196,7 @@ window.FLUXUS_WORKS = [
     client: "Oscar Futura",
     type: "Poster + Promotion",
     year: "2023",
+    tags: ["PRINTS"],
     media: [
       "resume/img/OSCARFUTURA/OSCAR_Popup/OSCARFUTURA_0_hq.webp",
       "resume/img/OSCARFUTURA/OSCAR_Popup/OSCARFUTURA_12_hq.webp",
@@ -194,6 +208,7 @@ window.FLUXUS_WORKS = [
     client: "NA:EUN Hospitality — Atomix, Atoboy",
     type: "Menu Design",
     year: "2022–23",
+    tags: ["PRINTS"],
     media: [
       "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_1_hq.webp",
       "resume/img/NAEUN/NAEUN_Seasonal/NAEUN_2_hq.webp",
@@ -225,6 +240,7 @@ window.FLUXUS_WORKS = [
     client: "NA:EUN Hospitality",
     type: "Visual + Menu Layout",
     year: "2022–23",
+    tags: ["PRINTS"],
     media: [
       "resume/img/NAEUN/NAEUN_Collab/NAEUN_13_hq.webp",
       "resume/img/NAEUN/NAEUN_Collab/NAEUN_14_hq.webp",
@@ -237,6 +253,7 @@ window.FLUXUS_WORKS = [
     client: "ATOMIX",
     type: "Menu Card + Website",
     year: "2023",
+    tags: ["PRINTS", "WEB"],
     media: [
       "resume/img/NAEUN/NAEUN_Collab2/NAEUN_38.png",
       "video:resume/img/NAEUN/NAEUN_Collab2/NAEUN_39_opt.mp4",
@@ -248,6 +265,7 @@ window.FLUXUS_WORKS = [
     client: "NA:EUN Hospitality",
     type: "Logo + Brand Launch",
     year: "2023",
+    tags: ["BRANDING", "MOTION"],
     media: [
       "resume/img/NAEUN/NAEUN_Naro/NAEUN_28_hq.webp",
       "resume/img/NAEUN/NAEUN_Naro/NAEUN_29.png",
@@ -260,6 +278,7 @@ window.FLUXUS_WORKS = [
     client: "NA:EUN Hospitality",
     type: "Brand Identity + Tableware",
     year: "2023",
+    tags: ["BRANDING"],
     media: [
       "resume/img/NAEUN/NAEUN_SEOUL SALON/seoulsalon1_web.webp",
       "resume/img/NAEUN/NAEUN_SEOUL SALON/07 copy_web.webp",
@@ -273,6 +292,7 @@ window.FLUXUS_WORKS = [
     client: "NA:EUN Hospitality",
     type: "Poster",
     year: "2023",
+    tags: ["PRINTS"],
     media: [
       "resume/img/NAEUN/NAEUN_WonSoju/NAEUN_31.jpeg",
       "resume/img/NAEUN/NAEUN_WonSoju/NAEUN_32_hq.webp",
@@ -285,6 +305,7 @@ window.FLUXUS_WORKS = [
     client: "Self-initiated",
     type: "Identity + Website",
     year: "2026",
+    tags: ["WEB", "BRANDING", "MOTION"],
     media: [
       "resume/img/OTHERPROJECTS/School of Design Intelligence/1.jpg",
       "resume/img/OTHERPROJECTS/School of Design Intelligence/2.jpg",
@@ -304,6 +325,7 @@ window.FLUXUS_WORKS = [
     client: "Self-initiated",
     type: "Studio Branding",
     year: "",
+    tags: ["BRANDING", "PRINTS", "MOTION"],
     media: [
       "video:resume/img/OTHERPROJECTS/FLUXUS/Comp_opt.mp4",
       "video:resume/img/OTHERPROJECTS/FLUXUS/컴포지션_opt.mp4",
@@ -325,6 +347,7 @@ window.FLUXUS_WORKS = [
     client: "BBBD",
     type: "Brand Identity + Merchandise",
     year: "",
+    tags: ["BRANDING"],
     media: [
       "resume/img/OTHERPROJECTS/bbbd/LOGO.png",
       "resume/img/OTHERPROJECTS/bbbd/MOCKUP_10_web.webp",
@@ -348,6 +371,7 @@ window.FLUXUS_WORKS = [
     client: "Dosan Social Club",
     type: "Brand Identity",
     year: "",
+    tags: ["BRANDING", "PRINTS"],
     media: [
       "resume/img/OTHERPROJECTS/FRIENDS/Poster copy_web.webp",
       "resume/img/OTHERPROJECTS/FRIENDS/FW_Sticker_11 copy_web.webp",
@@ -366,6 +390,7 @@ window.FLUXUS_WORKS = [
     client: "P2 GALLERY",
     type: "Brand Identity",
     year: "",
+    tags: ["BRANDING", "MOTION"],
     media: [
       "video:resume/img/OTHERPROJECTS/P2/@@@@@@@@P2ALLCOMPS_1_opt.mp4",
       "resume/img/OTHERPROJECTS/P2/Poster copy 1_web.webp",
@@ -380,6 +405,7 @@ window.FLUXUS_WORKS = [
     client: "ATOMIX",
     type: "3D Artwork + AR",
     year: "",
+    tags: ["3D", "PRINTS"],
     media: [
       "resume/img/OTHERPROJECTS/SEOUL/seoulrium1.png",
       "video:resume/img/OTHERPROJECTS/SEOUL/0bbd91d0bc8a4918a456dde656656d29_opt.mp4",
@@ -412,6 +438,7 @@ window.FLUXUS_WORKS = [
     client: "Mastermind (YouTube)",
     type: "Channel Branding + Logo",
     year: "",
+    tags: ["BRANDING"],
     media: [
       "resume/img/OTHERPROJECTS/Mastermind/Mastermind_1.png",
       "resume/img/OTHERPROJECTS/Mastermind/Mastermind_2_hq.webp",
@@ -424,6 +451,7 @@ window.FLUXUS_WORKS = [
     client: "Self-initiated",
     type: "Poster Series",
     year: "2026",
+    tags: ["PRINTS"],
     media: [
       "resume/img/OTHERPROJECTS/V-SIDE/-APT.--Rosé and Bruno Mars.png",
       "resume/img/OTHERPROJECTS/V-SIDE/-Birds of a Feather--Billie Eilish.png",
@@ -465,6 +493,7 @@ window.FLUXUS_WORKS = [
     client: "VOID",
     type: "Product Advertisement",
     year: "",
+    tags: ["3D", "MOTION"],
     media: [
       "video:resume/img/OTHERPROJECTS/VOID/void_opt.mp4"
     ]
@@ -474,6 +503,7 @@ window.FLUXUS_WORKS = [
     client: "Seongsuyul Orchestra Room",
     type: "Installation",
     year: "2026",
+    tags: ["3D"],
     media: [
       "resume/img/OTHERPROJECTS/seongsuyul/seongsuyul1.png",
       "resume/img/OTHERPROJECTS/seongsuyul/seongsuyul2.png",
@@ -485,6 +515,7 @@ window.FLUXUS_WORKS = [
     client: "Juun.J",
     type: "Fashion Advertisement",
     year: "",
+    tags: ["MOTION"],
     media: [
       "video:resume/img/OTHERPROJECTS/juunj/juunj_opt.mp4"
     ]
@@ -494,6 +525,7 @@ window.FLUXUS_WORKS = [
     client: "KVIEK",
     type: "Makgeolli Label Design",
     year: "",
+    tags: ["PRINTS"],
     media: [
       "resume/img/OTHERPROJECTS/KVIEK/KVIEK_1_hq.webp"
     ]
@@ -503,6 +535,7 @@ window.FLUXUS_WORKS = [
     client: "Self-initiated",
     type: "Museum Branding",
     year: "",
+    tags: ["BRANDING", "WEB"],
     media: [
       "resume/img/OTHERPROJECTS/MOIF/Group 1_hq.webp",
       "resume/img/OTHERPROJECTS/MOIF/MOIFNEW_1_hq.webp",
@@ -519,6 +552,7 @@ window.FLUXUS_WORKS = [
     client: "Choon",
     type: "Fashion Advertisement",
     year: "",
+    tags: ["MOTION"],
     media: [
       "video:resume/img/OTHERPROJECTS/CHOON/choon_opt.mp4"
     ]
@@ -528,6 +562,7 @@ window.FLUXUS_WORKS = [
     client: "NIKOTEA",
     type: "Channel Branding + Packaging",
     year: "",
+    tags: ["BRANDING", "PRINTS"],
     media: [
       "resume/img/OTHERPROJECTS/NIKOTEA/Tea Bag Mockup (5) copy_hq.webp",
       "video:resume/img/OTHERPROJECTS/NIKOTEA/Comp 1_opt.mp4",
@@ -557,6 +592,7 @@ window.FLUXUS_WORKS = [
     client: "SEOUL2WHERE",
     type: "Channel Branding",
     year: "",
+    tags: ["BRANDING", "PRINTS"],
     media: [
       "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_1_hq.webp",
       "resume/img/OTHERPROJECTS/SEOUL2WHERE/SEOUL2WHERE_2_hq.webp",
@@ -572,6 +608,7 @@ window.FLUXUS_WORKS = [
     client: "ILLUSIONLOOM",
     type: "Channel Branding",
     year: "",
+    tags: ["BRANDING"],
     media: [
       "resume/img/OTHERPROJECTS/ILLUSIONLOOM/ILLUSIONLOOM_1_hq.webp"
     ]
@@ -581,6 +618,7 @@ window.FLUXUS_WORKS = [
     client: "VISIONAIRE",
     type: "Studio Branding",
     year: "",
+    tags: ["BRANDING"],
     media: [
       "resume/img/OTHERPROJECTS/VISIONAIRE/VISIONAIRE_6_hq.webp",
       "resume/img/OTHERPROJECTS/VISIONAIRE/VISIONAIRE_7.png",
@@ -595,6 +633,7 @@ window.FLUXUS_WORKS = [
     client: "Self-initiated",
     type: "3D Artwork",
     year: "",
+    tags: ["3D", "MOTION"],
     media: [
       "video:resume/img/OTHERPROJECTS/WALK,REPEAT,FORGET/wrf_opt.mp4"
     ]
@@ -604,6 +643,7 @@ window.FLUXUS_WORKS = [
     client: "LOST BALLS LOST BALLS",
     type: "Branding",
     year: "",
+    tags: ["BRANDING"],
     media: [
       "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_1_hq.webp",
       "resume/img/OTHERPROJECTS/LOST BALLS LOST BALLS/LOSTBALLS_2_hq.webp",
@@ -619,24 +659,33 @@ window.FLUXUS_WORKS = [
     client: "CHUGO.inc",
     type: "Branding",
     year: "2021",
+    tags: ["BRANDING"],
     media: [
       "resume/img/OTHERPROJECTS/VSOPCITY BOY YY/VSOP CITY BOY YY.png"
     ]
+  },
+  {
+    project: "Cosmophony",
+    client: "Self-initiated",
+    type: "Interactive Web",
+    year: "2026",
+    tags: ["WEB", "3D"],
+    link: "https://soxmfhvl123.github.io/monosymphony/",
+    mediaLink: true,
+    media: [
+      "video:resume/img/OTHERPROJECTS/COSMOPHONY/cosmophony-walkthrough_opt.mp4"
+    ]
+  },
+  {
+    project: "Digital Debris",
+    client: "Self-initiated",
+    type: "Interactive Web",
+    year: "2026",
+    tags: ["WEB", "3D"],
+    link: "https://soxmfhvl123.github.io/digitaldebris/",
+    mediaLink: true,
+    media: [
+      "video:resume/img/OTHERPROJECTS/DIGITAL DEBRIS/digital-debris-walkthrough_opt.mp4"
+    ]
   }
-];
-
-window.FLUXUS_EXPERIMENTS = [
-  { title: "What is Korean Luxury", desc: "Korean Luxury Photo Archive", year: "2026", href: "https://soxmfhvl123.github.io/koreanluxury/" },
-  { title: "School of Design Intelligence", desc: "Design Education for the Age of Intelligence", year: "2026", href: "https://soxmfhvl123.github.io/schoolofdesignintelligence/index.html" },
-  { title: "V-SIDE®", desc: "Visualizing the sonic landscape", year: "2026", href: "https://soxmfhvl123.github.io/v-side/" },
-  { title: "Seoul Dust Collector", desc: "Interactive 3D Weather Visualization", year: "2026", href: "https://soxmfhvl123.github.io/seoulmisaedustcollector/" },
-  { title: "FLUX-GEN Kinetic Lab", desc: "Kinetic Typography Engine v3.0", year: "2026", href: "resume/fluxus_gen_kinetic_lab/" },
-  { title: "Digital Debris", desc: "Open-World 3D Poster Galaxy", year: "2026", href: "https://soxmfhvl123.github.io/digitaldebris/" },
-  { title: "DATASWIFT", desc: "Organic Pixel Datascape", year: "2026", href: "https://soxmfhvl123.github.io/datastream/" },
-  { title: "Cosmophony", desc: "Generative Audio-Reactive Particle Symphony", year: "2026", href: "https://soxmfhvl123.github.io/monosymphony/" },
-  { title: "The Digital Mycelium", desc: "Bio-Luminescent Ecosystem", year: "2026", href: "https://soxmfhvl123.github.io/The-Digital-Mycelium/" },
-  { title: "DO to Refine", desc: "A kind of manifesto", year: "2026", href: "https://soxmfhvl123.github.io/do/" },
-  { title: "Finding Organic Warmth in an Inorganic Universe", desc: "Essay", year: "2026", href: "https://soxmfhvl123.github.io/findingorganicwarmth/" },
-  { title: "Does reliance on seamless AI interaction reduce human connection?", desc: "Essay", year: "2026", href: "https://soxmfhvl123.github.io/relianceonaidriveninteraction/" },
-  { title: "Why Do We Even Need Human Designers in the Age of AI?", desc: "Essay", year: "2026", href: "https://soxmfhvl123.github.io/Why-Do-We-Even-Need-Human-Designers-in-the-Age-of-AI/" }
 ];

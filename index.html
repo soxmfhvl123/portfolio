@@ -211,8 +211,9 @@
     top:0;
     z-index:20;
     display:flex;
-    gap:28px;
-    padding:16px 32px;
+    flex-direction:column;
+    gap:10px;
+    padding:16px 32px 12px;
     background:var(--paper);
     border-bottom:1px solid var(--hairline);
     font-size:0.8rem;
@@ -221,6 +222,19 @@
     scrollbar-width:none;
   }
   .section-nav::-webkit-scrollbar{ display:none; }
+  .nav-links, .nav-filters{ display:flex; gap:28px; }
+  .nav-filters{ gap:18px; font-size:0.68rem; letter-spacing:0.1em; }
+  .nav-filters button{
+    all:unset;
+    cursor:pointer;
+    color:var(--dim);
+    white-space:nowrap;
+    transition:color 0.2s ease;
+  }
+  .nav-filters button:hover, .nav-filters button.is-active{ color:var(--ink); }
+  .nav-filters button.is-active{ text-decoration:underline; text-underline-offset:4px; }
+  .nav-filters button:focus-visible{ outline:1px solid var(--ink); outline-offset:3px; }
+  .nav-filters sup{ font-size:0.75em; margin-left:2px; }
   .section-nav a{
     color:var(--dim);
     text-decoration:none;
@@ -231,7 +245,7 @@
   .section-nav sup{ font-size:0.6em; margin-left:2px; }
   .archive-section{
     padding:72px 32px 24px;
-    scroll-margin-top:52px;
+    scroll-margin-top:var(--nav-h, 80px);
   }
   .section-label{
     margin:0 0 40px;
@@ -294,7 +308,34 @@
   }
   .work-more:hover{ color:var(--ink); }
 
-  /* experiments / contact lists */
+  .work{ scroll-margin-top:calc(var(--nav-h, 80px) + 16px); }
+  .work[hidden], .index-table li[hidden]{ display:none; }
+
+  /* index: every work in one table */
+  .index-table{ list-style:none; margin:0; padding:0; border-top:1px solid var(--hairline); }
+  .index-table li{ border-bottom:1px solid var(--hairline); }
+  .index-table a, .index-head{
+    display:grid;
+    grid-template-columns:44px minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.7fr) 64px;
+    gap:16px;
+    align-items:baseline;
+  }
+  .index-table a{
+    padding:12px 0;
+    color:var(--ink);
+    text-decoration:none;
+    font-size:clamp(0.9rem, 1.2vw, 1.05rem);
+    transition:opacity 0.2s ease;
+  }
+  .index-table a:hover{ opacity:0.45; }
+  .index-table .no, .index-table .client, .index-table .type, .index-table .tags, .index-table .year{
+    font-size:0.72rem; letter-spacing:0.04em; color:var(--dim);
+  }
+  .index-table .no, .index-table .year{ font-variant-numeric:tabular-nums; }
+  .index-table .year, .index-head span:last-child{ text-align:right; }
+  .index-head{ padding:0 0 10px; font-size:0.66rem; letter-spacing:0.1em; color:var(--dim); }
+
+  /* contact list */
   .index-list{ list-style:none; margin:0; padding:0; border-top:1px solid var(--hairline); }
   .index-list li{ border-bottom:1px solid var(--hairline); }
   .index-list a, .index-list .row{
@@ -441,7 +482,12 @@
     .brand, .clock, .resume-link{ justify-self:center; }
     .manifesto{ padding:12vh 20px 22px; }
     .edge-mark{ right:6px; font-size:0.58rem; }
-    .section-nav{ padding:14px 20px; gap:16px; font-size:0.7rem; letter-spacing:0.06em; }
+    .section-nav{ padding:14px 20px 10px; gap:9px; font-size:0.7rem; letter-spacing:0.06em; }
+    .nav-links{ gap:16px; }
+    .nav-filters{ flex-wrap:wrap; gap:6px 12px; font-size:0.62rem; }
+    .index-table a, .index-head{ grid-template-columns:30px minmax(0, 1fr) 44px; gap:10px; }
+    .index-table .client, .index-table .type, .index-table .tags,
+    .index-head .client, .index-head .type, .index-head .tags{ display:none; }
     .archive-section{ padding:56px 20px 16px; }
     .work{ margin-bottom:72px; }
     .work-media img, .work-media video{ height:auto; width:100%; max-width:none; }
@@ -511,10 +557,13 @@
 
   <div class="archive">
     <nav class="section-nav" aria-label="Sections">
-      <a href="#works">WORKS<sup id="worksCount"></sup></a>
-      <a href="#experiments">EXPERIMENTS<sup id="experimentsCount"></sup></a>
-      <a href="#about">ABOUT</a>
-      <a href="#contact">CONTACT</a>
+      <div class="nav-links">
+        <a href="#works">WORKS<sup id="worksCount"></sup></a>
+        <a href="#index">INDEX</a>
+        <a href="#about">ABOUT</a>
+        <a href="#contact">CONTACT</a>
+      </div>
+      <div class="nav-filters" id="navFilters" role="group" aria-label="Filter works by category"></div>
     </nav>
 
     <main>
@@ -523,9 +572,12 @@
         <div id="worksList"></div>
       </section>
 
-      <section class="archive-section" id="experiments">
-        <h2 class="section-label">EXPERIMENTS &mdash; WEB, CODE, ESSAYS</h2>
-        <ul class="index-list" id="experimentsList"></ul>
+      <section class="archive-section" id="index">
+        <h2 class="section-label">INDEX</h2>
+        <div class="index-head" aria-hidden="true">
+          <span>NO.</span><span>PROJECT</span><span class="client">CLIENT</span><span class="type">TYPE</span><span class="tags">CATEGORY</span><span>YEAR</span>
+        </div>
+        <ul class="index-table" id="indexList"></ul>
       </section>
 
       <section class="archive-section" id="about">
@@ -608,10 +660,9 @@
       }
     })();
 
-    // ===== Works stream, experiments list, lightbox, section nav =====
+    // ===== Works stream, index, category filter, lightbox, section nav =====
     (function () {
       var works = window.FLUXUS_WORKS || [];
-      var experiments = window.FLUXUS_EXPERIMENTS || [];
       var narrow = window.matchMedia('(max-width:640px)').matches;
       var PREVIEW = narrow ? 2 : 4; // media shown inline per project; the rest open in the lightbox
 
@@ -660,6 +711,8 @@
       var lazyVideos = [];
       works.forEach(function (w, wi) {
         var art = el('article', 'work');
+        art.id = 'work-' + (wi + 1);
+        art.dataset.tags = (w.tags || []).join(' ');
         var mediaWrap = el('div', 'work-media');
         w.media.slice(0, PREVIEW).forEach(function (entry, mi) {
           var m = parse(entry);
@@ -758,20 +811,60 @@
         lazyVideos.forEach(function (v) { v.src = v.dataset.src; v.play().catch(function () {}); });
       }
 
-      // --- experiments ---
-      var expList = document.getElementById('experimentsList');
-      experiments.forEach(function (x) {
+      // --- index: every work as one row, linking to its block above ---
+      var indexList = document.getElementById('indexList');
+      works.forEach(function (w, wi) {
         var li = el('li');
+        li.dataset.tags = (w.tags || []).join(' ');
         var a = el('a');
-        a.href = x.href;
-        if (/^https?:/.test(x.href)) { a.target = '_blank'; a.rel = 'noopener'; }
-        a.appendChild(el('span', null, x.title));
-        a.appendChild(el('span', 'desc', x.desc));
-        a.appendChild(el('span', 'year', x.year));
+        a.href = '#work-' + (wi + 1);
+        a.appendChild(el('span', 'no', String(wi + 1).padStart(2, '0')));
+        a.appendChild(el('span', 'project', w.project));
+        a.appendChild(el('span', 'client', w.client));
+        a.appendChild(el('span', 'type', w.type));
+        a.appendChild(el('span', 'tags', (w.tags || []).join(', ')));
+        a.appendChild(el('span', 'year', w.year || '\u2014'));
         li.appendChild(a);
-        expList.appendChild(li);
+        indexList.appendChild(li);
       });
-      document.getElementById('experimentsCount').textContent = experiments.length;
+
+      // --- category filter (shows only matching works + index rows) ---
+      var CATEGORIES = ['ALL', 'WEB', 'BRANDING', 'FURNITURE', '3D', 'PRINTS', 'MOTION'];
+      var filterBar = document.getElementById('navFilters');
+      var articles = Array.prototype.slice.call(list.children);
+      var rows = Array.prototype.slice.call(indexList.children);
+      function hasTag(node, tag) { return tag === 'ALL' || (' ' + node.dataset.tags + ' ').indexOf(' ' + tag + ' ') !== -1; }
+      function applyFilter(tag) {
+        var shown = 0;
+        articles.forEach(function (a) { var on = hasTag(a, tag); a.hidden = !on; if (on) shown++; });
+        rows.forEach(function (r) { r.hidden = !hasTag(r, tag); });
+        document.getElementById('worksCount').textContent = shown;
+        Array.prototype.forEach.call(filterBar.children, function (b) {
+          var on = b.dataset.tag === tag;
+          b.classList.toggle('is-active', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+      }
+      CATEGORIES.forEach(function (tag) {
+        var n = tag === 'ALL' ? works.length : works.filter(function (w) { return (w.tags || []).indexOf(tag) !== -1; }).length;
+        var b = el('button', null, tag);
+        b.type = 'button';
+        b.dataset.tag = tag;
+        b.appendChild(el('sup', null, String(n)));
+        b.addEventListener('click', function () {
+          applyFilter(tag);
+          var worksTop = document.getElementById('works').getBoundingClientRect().top;
+          if (worksTop < 0) document.getElementById('works').scrollIntoView({ behavior: 'smooth' });
+        });
+        filterBar.appendChild(b);
+      });
+      applyFilter('ALL');
+
+      // keep scroll offsets matched to the (two-row) sticky nav's real height
+      var navEl = document.querySelector('.section-nav');
+      function syncNavHeight() { document.documentElement.style.setProperty('--nav-h', navEl.offsetHeight + 'px'); }
+      syncNavHeight();
+      window.addEventListener('resize', syncNavHeight);
 
       // --- lightbox ---
       var lb = document.getElementById('lightbox');
@@ -846,10 +939,10 @@
       });
 
       // --- section nav: highlight the section currently in view ---
-      var navLinks = Array.prototype.slice.call(document.querySelectorAll('.section-nav a'));
+      var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-links a'));
       var sections = navLinks.map(function (a) { return document.querySelector(a.getAttribute('href')); });
       function updateNav() {
-        var probe = 80; // just below the sticky nav
+        var probe = navEl.offsetHeight + 12; // just below the sticky nav
         var active = -1;
         sections.forEach(function (s, i) { if (s && s.getBoundingClientRect().top <= probe) active = i; });
         // CONTACT is short and never reaches the top - light it up once it's on screen
