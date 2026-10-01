@@ -188,6 +188,7 @@ window.FLUXUS_WORKS = [
     year: "2024",
     tags: ["PRINTS"],
     media: [
+      "resume/img/CUZ/CUZ_Spirit/Group 2_web.webp",
       "resume/img/CUZ/CUZ_Spirit/CUZ_1_hq.webp",
       "resume/img/CUZ/CUZ_Spirit/CUZ_3_hq.webp",
       "video:resume/img/CUZ/CUZ_Spirit/CUZ_3_opt.mp4",
@@ -284,6 +285,32 @@ window.FLUXUS_WORKS = [
     ]
   },
   {
+    project: "ATOMIX Seasonal Menu Card",
+    client: "ATOMIX",
+    type: "Menu Card + 3D Motion",
+    year: "2022–23",
+    tags: ["PRINTS", "3D", "MOTION"],
+    media: [
+      "video:resume/img/NAEUN/ATOMIX_Seasonal_menu card/butert_opt.mp4",
+      "video:resume/img/NAEUN/ATOMIX_Seasonal_menu card/namul-culture_opt.mp4",
+      "resume/img/NAEUN/ATOMIX_Seasonal_menu card/tradit_web.webp"
+    ]
+  },
+  {
+    project: "ATOBOY",
+    client: "ATOBOY",
+    type: "Poster + Social Graphics",
+    year: "2022–23",
+    tags: ["PRINTS"],
+    media: [
+      "resume/img/NAEUN/NAEUN_ATOBOY/4 copy 3_web.webp",
+      "resume/img/NAEUN/NAEUN_ATOBOY/11_web.webp",
+      "resume/img/NAEUN/NAEUN_ATOBOY/Artboard 35 (1)_web.webp",
+      "resume/img/NAEUN/NAEUN_ATOBOY/Untitled-6_web.webp",
+      "resume/img/NAEUN/NAEUN_ATOBOY/now hiring_web.webp"
+    ]
+  },
+  {
     project: "ATOBOY × KASAMA Collab Event",
     client: "NA:EUN Hospitality",
     type: "Visual + Menu Layout",
@@ -292,6 +319,7 @@ window.FLUXUS_WORKS = [
     media: [
       "resume/img/NAEUN/NAEUN_Collab/1p_web.webp",
       "resume/img/NAEUN/NAEUN_Collab/2p_web.webp",
+      "resume/img/NAEUN/NAEUN_Collab/KakaoTalk_20221008_222724636_01_web.webp",
       "resume/img/NAEUN/NAEUN_Collab/NAEUN_13_hq.webp",
       "resume/img/NAEUN/NAEUN_Collab/NAEUN_14_hq.webp",
       "resume/img/NAEUN/NAEUN_Collab/NAEUN_15_hq.webp",
@@ -320,7 +348,9 @@ window.FLUXUS_WORKS = [
       "resume/img/NAEUN/NAEUN_Naro/NAEUN_28_hq.webp",
       "resume/img/NAEUN/NAEUN_Naro/NAEUN_29.png",
       "video:resume/img/NAEUN/NAEUN_Naro/NAEUN_30_opt.mp4",
-      "video:resume/img/NAEUN/NAEUN_Naro/NAEUN_31_opt.mp4"
+      "video:resume/img/NAEUN/NAEUN_Naro/NAEUN_31_opt.mp4",
+      "light:resume/img/NAEUN/NAEUN_Naro/IMG_1581_web.webp",
+      "resume/img/NAEUN/NAEUN_Naro/Untitled-2_web.webp"
     ]
   },
   {
@@ -414,6 +444,18 @@ window.FLUXUS_WORKS = [
       "resume/img/OTHERPROJECTS/bbbd/GRAPHICPACK_5_web.webp",
       "resume/img/OTHERPROJECTS/bbbd/GRAPHICPACK_9.png",
       "resume/img/OTHERPROJECTS/bbbd/GRAPHICPACK_10.png"
+    ]
+  },
+  {
+    project: "NAEBANGSA",
+    client: "NAEBANGSA",
+    type: "Brand Identity + Packaging",
+    year: "",
+    tags: ["BRANDING", "PRINTS"],
+    media: [
+      "resume/img/OTHERPROJECTS/NAEBANGSA/Frame 3_web.webp",
+      "resume/img/OTHERPROJECTS/NAEBANGSA/4 copy_web.webp",
+      "resume/img/OTHERPROJECTS/NAEBANGSA/FREE-015-October-November 2 copy_web.webp"
     ]
   },
   {
