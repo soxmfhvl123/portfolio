@@ -2,10 +2,22 @@
 // WORKS: each entry becomes one block in the archive stream. `media` paths
 // are relative to the site root; prefix a path with 'video:' for an mp4.
 // Prefix 'light:' for dark artwork on a transparent background (shown on a light tile), 'bleed:' for full column width.
-// `tags`: any of WEB, BRANDING, FURNITURE, 3D, PRINTS, MOTION (drives the category filter).
+// `tags`: any of WEB, BRANDING, FURNITURE, 3D, PRINTS, MOTION, INTERACTION (drives the category filter).
 // Leave `year` empty ('') to show the type on its own. Optional `link` adds a Website row; `mediaLink: true` makes the media open that link.
 
 window.FLUXUS_WORKS = [
+  {
+    project: "ASTRA JIN",
+    client: "Self-initiated",
+    type: "Interactive Web",
+    year: "2026",
+    tags: ["INTERACTION", "WEB"],
+    link: "https://soxmfhvl123.github.io/astrajin/",
+    mediaLink: true,
+    media: [
+      "video:resume/img/OTHERPROJECTS/astrajin/astrajin-10s_opt.mp4"
+    ]
+  },
   {
     project: "Global Design Leadership Association",
     client: "CLAB",
@@ -669,7 +681,7 @@ window.FLUXUS_WORKS = [
     client: "Self-initiated",
     type: "Interactive Web",
     year: "2026",
-    tags: ["WEB", "3D"],
+    tags: ["INTERACTION", "WEB", "3D"],
     link: "https://soxmfhvl123.github.io/monosymphony/",
     mediaLink: true,
     media: [
@@ -681,7 +693,7 @@ window.FLUXUS_WORKS = [
     client: "Self-initiated",
     type: "Interactive Web",
     year: "2026",
-    tags: ["WEB", "3D"],
+    tags: ["INTERACTION", "WEB", "3D"],
     link: "https://soxmfhvl123.github.io/digitaldebris/",
     mediaLink: true,
     media: [
