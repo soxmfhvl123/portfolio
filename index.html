@@ -257,8 +257,8 @@
     background:var(--tile);
   }
   .work-media > a{ cursor:pointer; }
-  /* 'bleed:' media - spans the full page width, past the side gutters */
-  .work-media > .is-bleed{ flex:0 0 calc(100% + 64px); margin:0 -32px; background:transparent; }
+  /* 'bleed:' media - spans the full column width (inside the page margins) */
+  .work-media > .is-bleed{ flex:0 0 100%; background:transparent; }
   .work-media > .is-bleed img, .work-media > .is-bleed video{
     width:100%; height:auto; max-width:none !important; max-height:none !important;
   } /* tile links out to the project's site */
@@ -452,7 +452,6 @@
     .lightbox-stage{ padding:56px 12px 0; }
     .lightbox-bar{ padding:14px 20px 18px; }
     .lightbox .lightbox-close{ right:20px; }
-    .work-media > .is-bleed{ flex-basis:calc(100% + 40px); margin:0 -20px; }
     .closing-logo{ padding:10vh 20px 0.5vh; }
     .closing-word{ font-size:13vw; }
     .site-footer{ padding:2px 20px 10px; justify-content:center; }

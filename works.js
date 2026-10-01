@@ -1,11 +1,22 @@
 // FLUXUS home — archive data.
 // WORKS: each entry becomes one block in the archive stream. `media` paths
 // are relative to the site root; prefix a path with 'video:' for an mp4.
-// Prefix 'light:' for dark artwork on a transparent background (shown on a light tile), 'bleed:' for full-width.
+// Prefix 'light:' for dark artwork on a transparent background (shown on a light tile), 'bleed:' for full column width.
 // Leave `year` empty ('') to show the type on its own. Optional `link` adds a Website row; `mediaLink: true` makes the media open that link.
 // EXPERIMENTS: the interactive / web pieces listed under EXPERIMENTS.
 
 window.FLUXUS_WORKS = [
+  {
+    project: "Global Design Leadership Association",
+    client: "CLAB",
+    type: "Web Design",
+    year: "2026",
+    link: "https://globaldesignleadership.org/",
+    mediaLink: true,
+    media: [
+      "video:resume/img/CLAB/CLAB_GLOBAL DESIGN LEADERSHIP/gdla-scroll-1080p_opt.mp4"
+    ]
+  },
   {
     project: "CLAWSET",
     client: "Self-initiated",
