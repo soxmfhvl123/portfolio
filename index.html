@@ -798,20 +798,31 @@
       });
       document.getElementById('worksCount').textContent = works.length;
 
-      // Inline videos only load and play while near the viewport.
+      // Inline videos: one observer starts buffering a clip well before it
+      // scrolls in, a second one plays it only while it is actually on screen
+      // (so off-screen clips never decode alongside the visible ones and steal
+      // frames from them).
       if ('IntersectionObserver' in window) {
-        var vio = new IntersectionObserver(function (entries) {
+        var loader = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (!e.isIntersecting) return;
+            var v = e.target;
+            if (!v.src) { v.preload = 'auto'; v.src = v.dataset.src; }
+            loader.unobserve(v);
+          });
+        }, { rootMargin: lightVideo ? '900px 0px' : '700px 0px' });
+        var player = new IntersectionObserver(function (entries) {
           entries.forEach(function (e) {
             var v = e.target;
             if (e.isIntersecting) {
-              if (!v.src) v.src = v.dataset.src;
+              if (!v.src) { v.preload = 'auto'; v.src = v.dataset.src; }
               v.play().catch(function () {});
             } else if (!v.paused) {
               v.pause();
             }
           });
-        }, { rootMargin: lightVideo ? '700px 0px' : '400px 0px' }); // start a bit before it scrolls in
-        lazyVideos.forEach(function (v) { vio.observe(v); });
+        }, { threshold: 0.01 });
+        lazyVideos.forEach(function (v) { loader.observe(v); player.observe(v); });
       } else {
         lazyVideos.forEach(function (v) { v.src = v.dataset.src; v.play().catch(function () {}); });
       }
