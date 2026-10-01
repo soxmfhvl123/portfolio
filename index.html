@@ -256,7 +256,12 @@
     line-height:0;
     background:var(--tile);
   }
-  .work-media > a{ cursor:pointer; } /* tile links out to the project's site */
+  .work-media > a{ cursor:pointer; }
+  /* 'bleed:' media - spans the full page width, past the side gutters */
+  .work-media > .is-bleed{ flex:0 0 calc(100% + 64px); margin:0 -32px; background:transparent; }
+  .work-media > .is-bleed img, .work-media > .is-bleed video{
+    width:100%; height:auto; max-width:none !important; max-height:none !important;
+  } /* tile links out to the project's site */
   .work-media > .is-loaded{ background:transparent; }
   .work-media > .is-light{ background:#e9e9e9; } /* dark-on-transparent artwork */
   /* Row height, but never wider than the column (very wide pieces like a
@@ -447,6 +452,7 @@
     .lightbox-stage{ padding:56px 12px 0; }
     .lightbox-bar{ padding:14px 20px 18px; }
     .lightbox .lightbox-close{ right:20px; }
+    .work-media > .is-bleed{ flex-basis:calc(100% + 40px); margin:0 -20px; }
     .closing-logo{ padding:10vh 20px 0.5vh; }
     .closing-word{ font-size:13vw; }
     .site-footer{ padding:2px 20px 10px; justify-content:center; }
@@ -610,13 +616,14 @@
       var narrow = window.matchMedia('(max-width:640px)').matches;
       var PREVIEW = narrow ? 2 : 4; // media shown inline per project; the rest open in the lightbox
 
-      // Media entries: a path, optionally prefixed with 'video:' (mp4) and/or
+      // Media entries: a path, optionally prefixed with 'video:' (mp4),
       // 'light:' (dark artwork on a transparent background - shown on a
-      // light tile so it doesn't vanish on the dark page).
+      // light tile so it doesn't vanish on the dark page) and/or 'bleed:'
+      // (spans the full page width).
       function parse(entry) {
-        var m = { video: false, light: false };
+        var m = { video: false, light: false, bleed: false };
         var prefix;
-        while ((prefix = /^(video|light):/.exec(entry))) {
+        while ((prefix = /^(video|light|bleed):/.exec(entry))) {
           m[prefix[1]] = true;
           entry = entry.slice(prefix[0].length);
         }
@@ -632,6 +639,9 @@
       var lightVideo = document.documentElement.classList.contains('no-wheel');
       function videoSrc(src) { return lightVideo ? src.replace(/\.mp4$/i, '_m.mp4') : src; }
       function posterOf(src) { return src.replace(/\.mp4$/i, '_poster.jpg'); }
+      function tileClass(m) {
+        return [m.light ? 'is-light' : '', m.bleed ? 'is-bleed' : ''].join(' ').trim() || null;
+      }
       function fitTo(node, btn, w, h) {
         if (!w || !h) return;
         node.style.setProperty('--ar', (w / h).toFixed(4));
@@ -657,13 +667,13 @@
           var btn;
           if (w.mediaLink && w.link) {
             // media opens the project's site instead of the lightbox
-            btn = el('a', m.light ? 'is-light' : null);
+            btn = el('a', tileClass(m));
             btn.href = w.link;
             btn.target = '_blank';
             btn.rel = 'noopener';
             btn.setAttribute('aria-label', w.project + ' — open website');
           } else {
-            btn = el('button', m.light ? 'is-light' : null);
+            btn = el('button', tileClass(m));
             btn.type = 'button';
             btn.setAttribute('aria-label', w.project + ' — open image ' + (mi + 1));
             btn.addEventListener('click', function () { openLightbox(wi, mi); });

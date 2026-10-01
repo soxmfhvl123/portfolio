@@ -1,7 +1,7 @@
 // FLUXUS home — archive data.
 // WORKS: each entry becomes one block in the archive stream. `media` paths
 // are relative to the site root; prefix a path with 'video:' for an mp4.
-// Prefix 'light:' for dark artwork on a transparent background (shown on a light tile).
+// Prefix 'light:' for dark artwork on a transparent background (shown on a light tile), 'bleed:' for full-width.
 // Leave `year` empty ('') to show the type on its own. Optional `link` adds a Website row; `mediaLink: true` makes the media open that link.
 // EXPERIMENTS: the interactive / web pieces listed under EXPERIMENTS.
 
@@ -14,7 +14,7 @@ window.FLUXUS_WORKS = [
     link: "https://soxmfhvl123.github.io/clawset/",
     mediaLink: true,
     media: [
-      "resume/img/OTHERPROJECTS/clawset/clawset_white.webp",
+      "bleed:resume/img/OTHERPROJECTS/clawset/clawset_logo_white.webp",
       "video:resume/img/OTHERPROJECTS/clawset/clawset-scroll_opt.mp4",
       "video:resume/img/OTHERPROJECTS/clawset/bianca.mp4",
       "video:resume/img/OTHERPROJECTS/clawset/jinx.mp4",
