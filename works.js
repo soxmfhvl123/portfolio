@@ -290,6 +290,8 @@ window.FLUXUS_WORKS = [
     year: "2022–23",
     tags: ["PRINTS"],
     media: [
+      "resume/img/NAEUN/NAEUN_Collab/1p_web.webp",
+      "resume/img/NAEUN/NAEUN_Collab/2p_web.webp",
       "resume/img/NAEUN/NAEUN_Collab/NAEUN_13_hq.webp",
       "resume/img/NAEUN/NAEUN_Collab/NAEUN_14_hq.webp",
       "resume/img/NAEUN/NAEUN_Collab/NAEUN_15_hq.webp",
