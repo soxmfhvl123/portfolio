@@ -7,6 +7,39 @@
 
 window.FLUXUS_WORKS = [
   {
+    project: "GRIT",
+    client: "Self-initiated",
+    type: "AI Motion Campaign",
+    year: "2026",
+    tags: ["MOTION"],
+    media: [
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_a_nike_athlete_throwing_a_punch_red_boxing_gloves_illum_8d3feeb2-6f2a-4579-bf27-1fb514a44311_3_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/81087d55-7406-4f95-9ead-fa077a629f88_3_720_N_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_a_nike_athlete_mid-air_performing_BMX_trick_vivid_neon__337eb86b-7150-426f-9428-bf045b8ff235_3_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_a_nike_athlete_drawing_a_bow_vivid_red_arrow_tip_glowin_13ac2f5e-a914-489f-be46-7ef59dde406f_1_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/2590dc71-eeb2-4664-8f27-191c7676fc7a_4_720_N_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_a_nike_athlete_performing_a_trick_on_a_deep_red_skatebo_40b497ea-d89c-44b3-bc5e-c9404f13559d_3_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_a_nike_athlete_snowboarding_mid-air_trick_colorful_wint_e6fe0126-d752-4481-ab17-ab3231c206f5_3_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_a_nike_athlete_riding_horse_in_motion_wearing_bright_pu_73fa07c6-002c-434b-ad8b-a26059a623a6_0_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_a_nike_athlete_lifting_weights_in_a_dark_gym_muscles_de_ca43b474-7564-41f8-bed4-db5673ee6f9a_3_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_a_nike_athlete_ice_skating_on_a_frozen_lake_vivid_winte_530e81e1-dac6-451a-a2ec-742d67f8314d_1_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/db8c1b64-9418-4f2f-a22b-2a1980cad2bb_3_720_N_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_a_nike_athlete_skiing_downhill_in_heavy_snow_vibrant_wi_e405dab1-2c4e-4f8f-8bfe-ca3006e1f5c4_1_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_a_nike_athlete_snowboarding_mid-air_trick_colorful_wint_b99df0c2-16c9-4970-af32-669d51d98b04_1_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/011aa395-800d-40f7-b318-2d76034cd697_2_720_N_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/120ff8b3-845a-429b-93ce-3aed9d9aae1a_2_720_N_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/6cbea873-c726-4aa3-a92d-6b995d796d0b_4_720_N_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/a900b1cd-64db-4990-964f-9ad5dd30c1ce_3_720_N_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/e7c8d40a-5f46-4f09-926b-f26933fc421a_3_720_N_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/fe653d7b-1b50-4375-b2f8-e069da76eaa0_2_720_N_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_a_nike_athlete_mid-leap_over_bright_yellow_hurdle_bar_c_42dfab46-1f72-4fb5-9a49-e5d969f76b98_3_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_a_nike_athlete_performing_a_high_kick_wearing_vivid_red_ff9707ab-a2f4-47ef-a20f-348ab1bda6c2_0_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_a_nike_athlete_sprinting_up_a_wall_wearing_vivid_red_cl_f6863277-dec7-4f1c-8fc6-228e0fea0c52_0_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_a_nike_athlete_stretching_in_studio_wearing_vivid_pink__ef803155-f143-45c4-bf21-e7604f8f92ad_0_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/GRIT/social_djinc_vibrant_color_a_nike_athlete_holding_a_throphy_dramatic_f6782a10-1f2a-407b-9725-001cc2877ef1_0_opt.mp4"
+    ]
+  },
+  {
     project: "DATAISM",
     client: "Self-initiated",
     type: "Interactive Web",
