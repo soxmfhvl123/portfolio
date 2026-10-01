@@ -7,6 +7,20 @@
 
 window.FLUXUS_WORKS = [
   {
+    project: "CLAWSET",
+    client: "Self-initiated",
+    type: "Brand Identity + Website",
+    year: "2026",
+    link: "https://soxmfhvl123.github.io/clawset/",
+    mediaLink: true,
+    media: [
+      "light:resume/img/OTHERPROJECTS/clawset/clawset_hq.webp",
+      "video:resume/img/OTHERPROJECTS/clawset/bianca.mp4",
+      "video:resume/img/OTHERPROJECTS/clawset/jinx.mp4",
+      "video:resume/img/OTHERPROJECTS/clawset/valka.mp4"
+    ]
+  },
+  {
     project: "DREAM MAKER",
     client: "Self-initiated",
     type: "Furniture",
@@ -69,7 +83,7 @@ window.FLUXUS_WORKS = [
     media: [
       "video:resume/img/CLAB/CLAB_Brand_Identity/CLAB_NEW_GRADIENT_opt.mp4",
       "video:resume/img/CLAB/CLAB_Brand_Identity/CLAB_GRADIENT_1350_opt.mp4",
-      "video:resume/img/CLAB/CLAB_Brand_Identity/CLAB_5.mp4"
+      "video:resume/img/CLAB/CLAB_Brand_Identity/CLAB_5_opt.mp4"
     ]
   },
   {
@@ -266,11 +280,11 @@ window.FLUXUS_WORKS = [
       "resume/img/OTHERPROJECTS/School of Design Intelligence/4.jpg",
       "resume/img/OTHERPROJECTS/School of Design Intelligence/5.jpg",
       "resume/img/OTHERPROJECTS/School of Design Intelligence/6.jpg",
-      "video:resume/img/OTHERPROJECTS/School of Design Intelligence/7.mp4",
-      "video:resume/img/OTHERPROJECTS/School of Design Intelligence/8.mp4",
-      "video:resume/img/OTHERPROJECTS/School of Design Intelligence/9.mp4",
-      "video:resume/img/OTHERPROJECTS/School of Design Intelligence/10.mp4",
-      "video:resume/img/OTHERPROJECTS/School of Design Intelligence/11.mp4"
+      "video:resume/img/OTHERPROJECTS/School of Design Intelligence/7_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/School of Design Intelligence/8_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/School of Design Intelligence/9_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/School of Design Intelligence/10_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/School of Design Intelligence/11_opt.mp4"
     ]
   },
   {

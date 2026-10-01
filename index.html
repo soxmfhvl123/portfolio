@@ -533,7 +533,7 @@
     </main>
 
     <section class="feature-video">
-      <video muted loop playsinline webkit-playsinline preload="none" data-src="assets/feature-video.mp4"></video>
+      <video muted loop playsinline webkit-playsinline preload="none" poster="assets/feature-video_poster.jpg" data-src="assets/feature-video.mp4"></video>
     </section>
 
     <section class="archive-section" id="contact">
@@ -626,6 +626,12 @@
       // Size a tile from the file's real dimensions: --ar drives the row
       // layout, and the max sizes stop low-res files being blown up past
       // their own pixels (which is what made them look blurry).
+      // Phones / touch devices (same test as the hero wheel) get the 720px
+      // "_m" encode of every clip; every clip has a "_poster.jpg" first frame
+      // so something shows (at the right size) before any video data arrives.
+      var lightVideo = document.documentElement.classList.contains('no-wheel');
+      function videoSrc(src) { return lightVideo ? src.replace(/\.mp4$/i, '_m.mp4') : src; }
+      function posterOf(src) { return src.replace(/\.mp4$/i, '_poster.jpg'); }
       function fitTo(node, btn, w, h) {
         if (!w || !h) return;
         node.style.setProperty('--ar', (w / h).toFixed(4));
@@ -668,10 +674,17 @@
             node.muted = true; node.loop = true; node.playsInline = true;
             node.setAttribute('playsinline', ''); node.setAttribute('webkit-playsinline', '');
             node.preload = 'none';
-            node.dataset.src = m.src;
-            node.addEventListener('loadedmetadata', function () {
-              fitTo(node, btn, node.videoWidth, node.videoHeight);
-            });
+            node.dataset.src = videoSrc(m.src);
+            node.poster = posterOf(m.src);
+            // size the tile from the poster right away, then from the clip itself
+            (function (vid, tile) {
+              var probe = new Image();
+              probe.onload = function () { if (!vid.videoWidth) fitTo(vid, tile, probe.naturalWidth, probe.naturalHeight); };
+              probe.src = vid.poster;
+              vid.addEventListener('loadedmetadata', function () {
+                fitTo(vid, tile, vid.videoWidth, vid.videoHeight);
+              });
+            })(node, btn);
             lazyVideos.push(node);
           } else {
             node = document.createElement('img');
@@ -730,7 +743,7 @@
               v.pause();
             }
           });
-        }, { rootMargin: '300px 0px' });
+        }, { rootMargin: lightVideo ? '700px 0px' : '400px 0px' }); // start a bit before it scrolls in
         lazyVideos.forEach(function (v) { vio.observe(v); });
       } else {
         lazyVideos.forEach(function (v) { v.src = v.dataset.src; v.play().catch(function () {}); });
@@ -767,7 +780,8 @@
           node = document.createElement('video');
           node.muted = true; node.loop = true; node.playsInline = true; node.autoplay = true;
           node.setAttribute('playsinline', '');
-          node.src = m.src;
+          node.poster = posterOf(m.src);
+          node.src = videoSrc(m.src);
         } else {
           node = document.createElement('img');
           node.alt = w.project;
@@ -848,6 +862,7 @@
       var video = section ? section.querySelector('video') : null;
       if (!video) return;
       var src = video.getAttribute('data-src');
+      if (document.documentElement.classList.contains('no-wheel')) src = src.replace(/\.mp4$/i, '_m.mp4'); // phones: 720px encode
       var started = false;
       function activate() {
         if (started || !src) return;
