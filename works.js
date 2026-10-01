@@ -7,6 +7,18 @@
 
 window.FLUXUS_WORKS = [
   {
+    project: "DATAISM",
+    client: "Self-initiated",
+    type: "Interactive Web",
+    year: "2026",
+    tags: ["WEB", "INTERACTION"],
+    link: "https://soxmfhvl123.github.io/dataism/",
+    mediaLink: true,
+    media: [
+      "video:resume/img/OTHERPROJECTS/DATAISM/dataism_opt.mp4"
+    ]
+  },
+  {
     project: "Hi everyone",
     client: "Self-initiated",
     type: "Interactive Web",
