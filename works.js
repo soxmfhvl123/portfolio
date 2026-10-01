@@ -31,6 +31,18 @@ window.FLUXUS_WORKS = [
     ]
   },
   {
+    project: "DATASTREAM",
+    client: "Self-initiated",
+    type: "Interactive Web",
+    year: "2026",
+    tags: ["INTERACTION", "WEB", "3D"],
+    link: "https://soxmfhvl123.github.io/datastream/",
+    mediaLink: true,
+    media: [
+      "video:resume/img/OTHERPROJECTS/DATASTREAM/datastream_opt.mp4"
+    ]
+  },
+  {
     project: "Global Design Leadership Association",
     client: "CLAB",
     type: "Web Design",
