@@ -350,7 +350,9 @@ window.FLUXUS_WORKS = [
     year: "",
     media: [
       "resume/img/OTHERPROJECTS/FRIENDS/Poster copy_web.webp",
+      "resume/img/OTHERPROJECTS/FRIENDS/FW_Sticker_11 copy_web.webp",
       "resume/img/OTHERPROJECTS/FRIENDS/Group 79_web.webp",
+      "resume/img/OTHERPROJECTS/FRIENDS/cherry sweat_web.webp",
       "resume/img/OTHERPROJECTS/FRIENDS/01 copy_web.webp",
       "resume/img/OTHERPROJECTS/FRIENDS/osfke.png",
       "resume/img/OTHERPROJECTS/FRIENDS/Artboard 14.png",
