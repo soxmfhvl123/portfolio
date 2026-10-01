@@ -293,6 +293,7 @@ window.FLUXUS_WORKS = [
     media: [
       "video:resume/img/NAEUN/ATOMIX_Seasonal_menu card/butert_opt.mp4",
       "video:resume/img/NAEUN/ATOMIX_Seasonal_menu card/namul-culture_opt.mp4",
+      "video:resume/img/NAEUN/ATOMIX_Seasonal_menu card/KakaoTalk_20261002_004436245_opt.mp4",
       "resume/img/NAEUN/ATOMIX_Seasonal_menu card/tradit_web.webp"
     ]
   },
