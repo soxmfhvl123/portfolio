@@ -131,8 +131,10 @@
     position:fixed;
     top:50%;
     left:50%;
-    width:min(88vw, 88vh);
-    height:min(88vw, 88vh);
+    /* fixed at its largest size; scroll only changes transform (GPU), never
+       width/height, so the WebGL buffer isn't reallocated while scrolling */
+    width:min(104vw, 104vh);
+    height:min(104vw, 104vh);
     transform:translate(-50%, -50%);
     transform-origin:center center;
     z-index:3;
@@ -308,7 +310,13 @@
   }
   .work-more:hover{ color:var(--ink); }
 
-  .work{ scroll-margin-top:calc(var(--nav-h, 80px) + 16px); }
+  .work{
+    scroll-margin-top:calc(var(--nav-h, 80px) + 16px);
+    /* off-screen works skip layout + paint entirely until they scroll near;
+       'auto' remembers each block's real height once it has been rendered */
+    content-visibility:auto;
+    contain-intrinsic-size:auto 680px;
+  }
   .work[hidden], .index-table li[hidden]{ display:none; }
 
   /* index: every work in one table */
@@ -520,6 +528,15 @@
   if (window.matchMedia && window.matchMedia('(max-width:768px), (hover:none) and (pointer:coarse)').matches) {
     document.documentElement.classList.add('no-wheel');
   }
+  // One scroll listener for the whole page: every scroll-driven update runs
+  // together in a single animation frame instead of once per raw scroll event
+  // (which can fire several times a frame and force repeated layouts).
+  window.__onScrollFrame = [];
+  (function () {
+    var pending = false;
+    function run() { pending = false; for (var i = 0; i < window.__onScrollFrame.length; i++) window.__onScrollFrame[i](); }
+    window.addEventListener('scroll', function () { if (!pending) { pending = true; requestAnimationFrame(run); } }, { passive: true });
+  })();
 </script>
 </head>
 <body>
@@ -802,26 +819,81 @@
       // scrolls in, a second one plays it only while it is actually on screen
       // (so off-screen clips never decode alongside the visible ones and steal
       // frames from them).
+      // Starting a clip (demux + decoder setup) is what caused the scroll
+      // hitches, so clips start through a small queue: at most two at a time,
+      // and only once scrolling has paused for a moment. The poster frame
+      // stands in until then; on-screen clips jump the queue.
+      var MAX_STARTING = 2, SCROLL_QUIET_MS = 150;
+      var startQueue = [], starting = 0, lastScrollAt = 0, pumpTimer = null;
+      // Decoding clips while the page itself is scrolling costs frames, so
+      // visible clips hold still during a scroll and resume the moment it
+      // settles (the page is moving anyway, so the brief hold isn't noticed).
+      var scrolling = false, resumeTimer = null;
+      function resumeVisible() {
+        scrolling = false;
+        lazyVideos.forEach(function (v) { if (v.__wantPlay && v.paused && v.getAttribute('src')) v.play().catch(function () {}); });
+      }
+      window.addEventListener('scroll', function () {
+        lastScrollAt = performance.now();
+        if (!scrolling) {
+          scrolling = true;
+          lazyVideos.forEach(function (v) { if (!v.paused) v.pause(); });
+        }
+        clearTimeout(resumeTimer);
+        resumeTimer = setTimeout(resumeVisible, SCROLL_QUIET_MS);
+      }, { passive: true });
+      function startClip(v) {
+        starting++;
+        var done = false;
+        function finish() {
+          if (done) return; done = true; starting--;
+          v.removeEventListener('loadeddata', finish); v.removeEventListener('error', finish);
+          if (v.__wantPlay && !scrolling) v.play().catch(function () {});
+          pumpStarts();
+        }
+        v.addEventListener('loadeddata', finish);
+        v.addEventListener('error', finish);
+        setTimeout(finish, 2500); // never let one slow clip block the queue
+        v.preload = 'auto';
+        v.src = v.dataset.src;
+      }
+      function pumpStarts() {
+        clearTimeout(pumpTimer);
+        var quietFor = performance.now() - lastScrollAt;
+        if (quietFor < SCROLL_QUIET_MS) { pumpTimer = setTimeout(pumpStarts, SCROLL_QUIET_MS - quietFor + 10); return; }
+        while (starting < MAX_STARTING && startQueue.length) {
+          var v = startQueue.shift();
+          if (!v.getAttribute('src')) startClip(v);
+        }
+      }
+      function queueClip(v, urgent) {
+        if (v.getAttribute('src')) return;
+        var i = startQueue.indexOf(v);
+        if (i !== -1) { if (!urgent) return; startQueue.splice(i, 1); }
+        if (urgent) startQueue.unshift(v); else startQueue.push(v);
+        pumpStarts();
+      }
+
       if ('IntersectionObserver' in window) {
         var loader = new IntersectionObserver(function (entries) {
           entries.forEach(function (e) {
             if (!e.isIntersecting) return;
-            var v = e.target;
-            if (!v.src) { v.preload = 'auto'; v.src = v.dataset.src; }
-            loader.unobserve(v);
+            queueClip(e.target, false);
+            loader.unobserve(e.target);
           });
         }, { rootMargin: lightVideo ? '900px 0px' : '700px 0px' });
         var player = new IntersectionObserver(function (entries) {
           entries.forEach(function (e) {
             var v = e.target;
+            v.__wantPlay = e.isIntersecting;
             if (e.isIntersecting) {
-              if (!v.src) { v.preload = 'auto'; v.src = v.dataset.src; }
-              v.play().catch(function () {});
+              if (v.getAttribute('src')) { if (!scrolling) v.play().catch(function () {}); }
+              else queueClip(v, true);
             } else if (!v.paused) {
               v.pause();
             }
           });
-        }, { threshold: 0.01 });
+        }, { threshold: 0.25 });
         lazyVideos.forEach(function (v) { loader.observe(v); player.observe(v); });
       } else {
         lazyVideos.forEach(function (v) { v.src = v.dataset.src; v.play().catch(function () {}); });
@@ -966,7 +1038,7 @@
         if (last && last.getBoundingClientRect().top < window.innerHeight * 0.6) active = sections.length - 1;
         navLinks.forEach(function (a, i) { a.classList.toggle('is-active', i === active); });
       }
-      window.addEventListener('scroll', updateNav, { passive: true });
+      window.__onScrollFrame.unshift(updateNav); // reads only - runs before the transform writes
       updateNav();
     })();
   </script>
@@ -1159,14 +1231,15 @@
       window.addEventListener('resize', resize);
       resize();
 
+      var figureOnScreen = true, archiveTop = Infinity;
       var ANGULAR_SPEED = 0.35; // radians per second, constant (linear) rotation
       var last = performance.now();
       function animate(now) {
         var dt = (now - last) / 1000;
         last = now;
         if (model) model.rotation.y += ANGULAR_SPEED * dt;
-        resize(); // keep the render resolution in sync with the current CSS size every frame
-        renderer.render(scene, camera);
+        // (2) skip drawing while the figure is off screen or fully covered by the archive
+        if (figureOnScreen) renderer.render(scene, camera);
         requestAnimationFrame(animate);
       }
       requestAnimationFrame(animate);
@@ -1191,7 +1264,8 @@
         var vw = window.innerWidth || 1;
         var vmin = Math.min(vh, vw);
         var margin = 28; // px gap always kept between the figure and the closing section
-        var limit = closingLogoEl.getBoundingClientRect().top - margin;
+        archiveTop = closingLogoEl.getBoundingClientRect().top;
+        var limit = archiveTop - margin;
         if (limit >= vh) return { top: topPercent, size: sizeVal }; // closing section still far below
 
         var halfPx = (sizeVal / 100 * vmin) / 2;
@@ -1215,11 +1289,16 @@
         var top = TOP_LOAD + (TOP_SCROLL - TOP_LOAD) * ease;
         var size = SIZE_LOAD + (SIZE_SCROLL - SIZE_LOAD) * ease;
         var clamped = keepClearOfFooter(top, size);
-        canvas.style.top = clamped.top + '%';
-        canvas.style.width = 'min(' + clamped.size + 'vw, ' + clamped.size + 'vh)';
-        canvas.style.height = 'min(' + clamped.size + 'vw, ' + clamped.size + 'vh)';
+        // same placement as before, expressed as a transform on the fixed-size canvas
+        var vmin = Math.min(vh, window.innerWidth || 1);
+        var dy = (clamped.top - 50) / 100 * vh;
+        canvas.style.transform = 'translate(-50%, -50%) translate3d(0,' + dy.toFixed(1) + 'px,0) scale(' + (clamped.size / SIZE_LOAD).toFixed(4) + ')';
+        var half = clamped.size / 100 * vmin / 2;
+        var centerY = clamped.top / 100 * vh;
+        figureOnScreen = centerY + half > 0 && archiveTop > 0;
       }
-      window.addEventListener('scroll', updateFrame, { passive: true });
+      window.__onScrollFrame.push(updateFrame);
+      window.addEventListener('resize', updateFrame);
       updateFrame();
     }
   </script>
@@ -1240,8 +1319,8 @@
 
     var skipWheel = document.documentElement.classList.contains('no-wheel');
     if (wheelCanvasFront && wheelCanvasBack && heroStage && window.WebGLRenderingContext && !skipWheel) {
-      var rendererFront = new THREE.WebGLRenderer({ canvas: wheelCanvasFront, antialias: true, alpha: true, preserveDrawingBuffer: true });
-      var rendererBack = new THREE.WebGLRenderer({ canvas: wheelCanvasBack, antialias: true, alpha: true, preserveDrawingBuffer: true });
+      var rendererFront = new THREE.WebGLRenderer({ canvas: wheelCanvasFront, antialias: true, alpha: true, powerPreference: 'high-performance' });
+      var rendererBack = new THREE.WebGLRenderer({ canvas: wheelCanvasBack, antialias: true, alpha: true, powerPreference: 'high-performance' });
       [rendererFront, rendererBack].forEach(function (r) {
         r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
         r.outputColorSpace = THREE.SRGBColorSpace;
@@ -1545,7 +1624,6 @@
       function updateRotation() {
         lastScrollAt = Date.now();
         idleSpin = 0; // scroll always takes over immediately, no jump
-        var heroHeight = heroStage.offsetHeight || window.innerHeight;
         var progress = Math.min(Math.max((window.scrollY || 0) / heroHeight, 0), 1);
         var rotateProgress = Math.min(progress / ROTATE_END, 1);
         var exitProgress = Math.min(Math.max((progress - ROTATE_END) / (EXIT_END - ROTATE_END), 0), 1);
@@ -1556,10 +1634,13 @@
         // exactly in step with scroll - never left trailing behind - well
         // before the intro text underneath can be seen.
         var offset = (-exitProgress * 105).toFixed(2) + 'vh';
-        wheelCanvasFront.style.transform = 'translateY(' + offset + ')';
-        wheelCanvasBack.style.transform = 'translateY(' + offset + ')';
+        wheelCanvasFront.style.transform = 'translate3d(0,' + offset + ',0)';
+        wheelCanvasBack.style.transform = 'translate3d(0,' + offset + ',0)';
+        wheelGone = exitProgress >= 1;
       }
-      window.addEventListener('scroll', updateRotation, { passive: true });
+      var heroHeight = heroStage.offsetHeight || window.innerHeight, wheelGone = false;
+      window.addEventListener('resize', function () { heroHeight = heroStage.offsetHeight || window.innerHeight; updateRotation(); });
+      window.__onScrollFrame.push(updateRotation);
       updateRotation();
 
       var _scratchVec = new THREE.Vector3();
@@ -1591,8 +1672,7 @@
         }
         currentRotation += ((targetRotation + idleSpin) - currentRotation) * 0.08;
         group.rotation.y = currentRotation;
-        resize();
-        if (heroVisible) renderSplit();
+        if (heroVisible && !wheelGone) renderSplit();
         // re-check the active playback window every ~200ms rather than
         // every frame - the ring doesn't move fast enough for that to be
         // noticeable, and it keeps this from adding its own overhead
