@@ -48,7 +48,7 @@ window.FLUXUS_WORKS = [
     link: "https://soxmfhvl123.github.io/dataism/",
     mediaLink: true,
     media: [
-      "video:resume/img/OTHERPROJECTS/DATAISM/dataism_opt.mp4"
+      "video:resume/img/OTHERPROJECTS/DATAISM/dataism-v2_opt.mp4"
     ]
   },
   {
