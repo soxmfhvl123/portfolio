@@ -7,6 +7,27 @@
 
 window.FLUXUS_WORKS = [
   {
+    project: "FAKE CHURCH",
+    client: "FAKE CHURCH",
+    type: "Brand Identity + Lookbook",
+    year: "2026",
+    tags: ["BRANDING"],
+    link: "https://fakechurch.xyz/",
+    mediaLink: true,
+    media: [
+      "resume/img/OTHERPROJECTS/fakechurch/hero_web.webp",
+      "resume/img/OTHERPROJECTS/fakechurch/hf_20261003_070106_02b32a60-9299-4029-ae9b-f42fca68de4d_web.webp",
+      "resume/img/OTHERPROJECTS/fakechurch/hf_20261003_070206_5908831a-4355-4de6-bacc-cd88e215f857_web.webp",
+      "resume/img/OTHERPROJECTS/fakechurch/hf_20261003_071025_64844dff-18cf-4686-8612-625d6caf9034_web.webp",
+      "resume/img/OTHERPROJECTS/fakechurch/hf_20261003_070518_698ed521-dbd5-45d4-a74b-3dd92a125df1_web.webp",
+      "resume/img/OTHERPROJECTS/fakechurch/hf_20261003_070604_ec97016d-9651-453f-8c0f-a4bc0f45f164_web.webp",
+      "resume/img/OTHERPROJECTS/fakechurch/hf_20261003_071007_a7234e53-fcf0-4d43-b5f4-6421741ff2df_web.webp",
+      "resume/img/OTHERPROJECTS/fakechurch/hf_20261003_071425_3bc8d1a6-ca7d-45c3-aab9-51d3f95bc012_web.webp",
+      "resume/img/OTHERPROJECTS/fakechurch/hf_20261003_072321_ec2da588-280b-4fd5-aa93-be42f81f8aab_web.webp",
+      "resume/img/OTHERPROJECTS/fakechurch/hf_20261003_152621_37e4d742-256e-4409-8a68-7ecc7434a762_web.webp"
+    ]
+  },
+  {
     project: "GRIT",
     client: "Self-initiated",
     type: "AI Motion Campaign",
