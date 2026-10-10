@@ -188,6 +188,34 @@
     color:var(--dim);
   }
 
+  /* ===== BACK TO TOP (bottom-right, left of the vertical copyright) ===== */
+  .to-top{
+    position:fixed;
+    right:48px;
+    bottom:28px;
+    z-index:40;
+    width:44px;
+    height:44px;
+    display:grid;
+    place-items:center;
+    padding:0;
+    border:1px solid var(--hairline);
+    border-radius:50%;
+    background:rgba(11,11,11,0.72);
+    color:var(--ink);
+    cursor:pointer;
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(8px);
+    transition:opacity 0.25s ease, transform 0.25s ease, visibility 0.25s, border-color 0.2s ease;
+    -webkit-backdrop-filter:blur(6px);
+    backdrop-filter:blur(6px);
+  }
+  .to-top.is-shown{ opacity:1; visibility:visible; transform:none; }
+  .to-top:hover{ border-color:var(--ink); }
+  .to-top:focus-visible{ outline:2px solid var(--ink); outline-offset:3px; }
+  .to-top svg{ width:16px; height:16px; }
+
   /* ===== VERTICAL COPYRIGHT (fixed on the right edge) ===== */
   .edge-mark{
     position:fixed;
@@ -492,6 +520,7 @@
     .brand, .clock, .resume-link, .header-links{ justify-self:center; }
     .manifesto{ padding:12vh 20px 22px; }
     .edge-mark{ right:6px; font-size:0.58rem; }
+    .to-top{ right:30px; bottom:20px; width:40px; height:40px; }
     .section-nav{ padding:12px 20px 8px; gap:4px; font-size:0.9rem; letter-spacing:0.05em; }
     .nav-links{ gap:20px; }
     .nav-links a{ padding:6px 0; } /* bigger tap targets */
@@ -514,7 +543,7 @@
     /* phones: just FLUXUS, sized by script to run exactly margin to margin */
     .closing-logo{ justify-content:flex-start; }
     .closing-word{ font-size:24vw; }
-    .closing-word + .closing-word{ display:none; }
+    .closing-word:first-child{ display:none; }
     .site-footer{ padding:2px 20px 10px; justify-content:center; }
     .footer-full{ display:none; }
     .footer-brief{ display:inline; }
@@ -546,7 +575,7 @@
   <header class="site-header">
     <div class="brand">
       <canvas id="brand-logo-canvas" aria-hidden="true"></canvas>
-      <a class="wordmark" href="index.html">FLUXUS</a>
+      <a class="wordmark" href="index.html">STUDIO FLUXUS</a>
     </div>
     <div class="clock">
       <span id="clockCity">SEOUL</span>
@@ -560,7 +589,25 @@
   </header>
 
 
-  <div class="edge-mark" aria-hidden="true">&copy; FLUXUS STUDIO &mdash; 2026</div>
+  <button class="to-top" type="button" aria-label="Back to top">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5"/></svg>
+  </button>
+  <script>
+    // Back-to-top: appears after one screen of scrolling, glides to the top.
+    (function () {
+      var btn = document.querySelector('.to-top');
+      if (!btn) return;
+      function update() { btn.classList.toggle('is-shown', (window.scrollY || 0) > window.innerHeight); }
+      if (window.__onScrollFrame) window.__onScrollFrame.push(update);
+      else window.addEventListener('scroll', update, { passive: true });
+      update();
+      btn.addEventListener('click', function () {
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+  </script>
+  <div class="edge-mark" aria-hidden="true">&copy; STUDIO FLUXUS &mdash; 2026</div>
 
 
   <div class="archive">
@@ -1004,15 +1051,15 @@
   </script>
 
   <section class="closing-logo">
-    <span class="closing-word">FLUXUS</span>
     <span class="closing-word">STUDIO</span>
+    <span class="closing-word">FLUXUS</span>
   </section>
   <script>
     // On phones the closing wordmark is FLUXUS alone, scaled so its ink runs
     // exactly from the left margin to the right margin like the content above.
     (function () {
       var section = document.querySelector('.closing-logo');
-      var word = section && section.querySelector('.closing-word');
+      var word = section && section.querySelector('.closing-word:last-child');
       if (!word) return;
       var phone = window.matchMedia('(max-width:640px)');
       function fit() {
@@ -1030,9 +1077,9 @@
   </script>
 
   <footer class="site-footer">
-    <span class="footer-full">&copy; 2026 FLUXUS STUDIO</span>
+    <span class="footer-full">&copy; 2026 STUDIO FLUXUS</span>
     <a class="footer-full" href="mailto:soxmfhvl123@gmail.com">soxmfhvl123@gmail.com</a>
-    <span class="footer-brief">FLUXUS</span>
+    <span class="footer-brief">STUDIO FLUXUS</span>
   </footer>
 
   <script type="importmap">
