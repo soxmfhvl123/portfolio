@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLUXUS™ — Wheel</title>
+<meta name="description" content="FLUXUS™ is an independent creative platform founded by Dongjin Choi, documenting experiments across graphic design, objects, digital media, and visual culture.">
+<meta property="og:title" content="FLUXUS™">
+<meta property="og:description" content="Art Archive & Design Studio — an independent creative platform founded by Dongjin Choi.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
+<style>
+  :root{
+    --ink:#ededed;
+    --paper:#0b0b0b;
+    --dim:#7a7a7a;
+    --hairline:#242424;
+    --tile:#161616;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+    min-height:100vh;
+    min-height:100dvh;
+    display:flex;
+    flex-direction:column;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* ===== HEADER ===== */
+  .site-header{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    align-items:center;
+    gap:16px;
+    padding:28px 32px;
+    position:relative;
+    z-index:10;
+    background:var(--paper);
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    justify-self:start;
+  }
+  #brand-logo-canvas{
+    filter:invert(1); /* the logo texture is black - flip it for the dark page */
+    width:30px;
+    height:30px;
+    display:block;
+    flex-shrink:0;
+  }
+  .wordmark{
+    font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight:700;
+    font-size:clamp(1.05rem, 1.6vw, 1.35rem);
+    letter-spacing:-0.01em;
+    color:var(--ink);
+    text-decoration:none;
+    white-space:nowrap;
+  }
+  .clock{
+    display:flex;
+    align-items:baseline;
+    justify-content:center;
+    justify-self:center;
+    gap:6px;
+    font-size:0.8rem;
+    letter-spacing:0.08em;
+    color:var(--ink);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .clock .dot{ opacity:0.5; }
+  .resume-link{
+    font-size:0.8rem;
+    letter-spacing:0.08em;
+    color:var(--ink);
+    text-decoration:none;
+    transition:opacity 0.2s ease;
+    white-space:nowrap;
+    justify-self:end;
+  }
+  .resume-link:hover{ opacity:0.5; }
+  .header-links{ display:flex; gap:24px; justify-self:end; }
+  .resume-link[aria-current="page"]{ opacity:0.45; }
+
+  /* ===== HERO (3D golden astroboy stage + background image wheel) ===== */
+  .hero-stage{
+    position:relative;
+    height:380vh;
+    width:100%;
+  }
+  #wheel-canvas-back{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100vh;
+    display:block;
+    z-index:2;
+    opacity:0;
+    transition:opacity 0.5s ease;
+    will-change:transform;
+  }
+  #wheel-canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100vh;
+    display:block;
+    z-index:4;
+    opacity:0;
+    transition:opacity 0.5s ease;
+    will-change:transform;
+  }
+  #wheel-video-pool{
+    position:fixed;
+    top:0; left:0;
+    width:1px; height:1px;
+    overflow:hidden;
+    opacity:0;
+    pointer-events:none;
+  }
+  #astroboy-canvas{
+    position:fixed;
+    top:50%;
+    left:50%;
+    /* fixed at its largest size; scroll only changes transform (GPU), never
+       width/height, so the WebGL buffer isn't reallocated while scrolling */
+    width:min(104vw, 104vh);
+    height:min(104vw, 104vh);
+    transform:translate(-50%, -50%);
+    transform-origin:center center;
+    z-index:3;
+    pointer-events:none;
+    opacity:0;
+    transition:opacity 1s ease;
+    will-change:top;
+  }
+
+  /* ===== MANIFESTO (typed statement stack under the golden figure) ===== */
+  .manifesto{
+    position:relative;
+    z-index:5; /* type sits in front of the golden figure (z 3) */
+    pointer-events:none;
+    min-height:100vh;
+    min-height:100dvh;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:14vh 32px 28px;
+  }
+  .manifesto-lines{
+    margin:0;
+    padding:0;
+    list-style:none;
+    font-size:clamp(1.9rem, 5.2vw, 4.6rem);
+    line-height:1.04;
+    font-weight:400;
+    letter-spacing:-0.025em;
+    color:var(--ink);
+  }
+  .manifesto-lines li{ min-height:1.04em; }
+  .manifesto-lines .caret{
+    display:inline-block;
+    width:0.06em;
+    height:0.82em;
+    margin-left:0.04em;
+    background:var(--ink);
+    vertical-align:-0.06em;
+    animation:caret-blink 1s steps(1) infinite;
+  }
+  @keyframes caret-blink{ 50%{ opacity:0; } }
+  .manifesto-caption{
+    max-width:520px;
+    margin:0;
+    font-size:0.7rem;
+    line-height:1.5;
+    letter-spacing:0.04em;
+    color:var(--dim);
+  }
+
+  /* ===== VERTICAL COPYRIGHT (fixed on the right edge) ===== */
+  .edge-mark{
+    position:fixed;
+    right:14px;
+    bottom:32px;
+    z-index:30;
+    writing-mode:vertical-rl;
+    font-size:0.66rem;
+    letter-spacing:0.12em;
+    color:#fff;
+    mix-blend-mode:difference; /* stays legible over both paper and images */
+    pointer-events:none;
+    white-space:nowrap;
+  }
+
+  /* ===== ARCHIVE (everything below the manifesto; opaque, so the fixed
+     golden figure slides away instead of floating over the works) ===== */
+  .archive{
+    position:relative;
+    z-index:6;
+    background:var(--paper);
+  }
+  .section-nav{
+    position:sticky;
+    top:0;
+    z-index:20;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding:16px 32px 12px;
+    background:var(--paper);
+    border-bottom:1px solid var(--hairline);
+    font-size:0.8rem;
+    letter-spacing:0.08em;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .section-nav::-webkit-scrollbar{ display:none; }
+  .nav-links, .nav-filters{ display:flex; gap:28px; }
+  .nav-filters{ gap:18px; font-size:0.68rem; letter-spacing:0.1em; }
+  .nav-filters button{
+    all:unset;
+    cursor:pointer;
+    color:var(--dim);
+    white-space:nowrap;
+    transition:color 0.2s ease;
+  }
+  .nav-filters button:hover, .nav-filters button.is-active{ color:var(--ink); }
+  .nav-filters button.is-active{ text-decoration:underline; text-underline-offset:4px; }
+  .nav-filters button:focus-visible{ outline:1px solid var(--ink); outline-offset:3px; }
+  .nav-filters sup{ font-size:0.75em; margin-left:2px; }
+  .section-nav a{
+    color:var(--dim);
+    text-decoration:none;
+    white-space:nowrap;
+    transition:color 0.2s ease;
+  }
+  .section-nav a:hover, .section-nav a.is-active{ color:var(--ink); }
+  .section-nav sup{ font-size:0.6em; margin-left:2px; }
+  .archive-section{
+    padding:72px 32px 24px;
+    scroll-margin-top:var(--nav-h, 80px);
+  }
+  .section-label{
+    margin:0 0 40px;
+    font-size:0.7rem;
+    font-weight:400;
+    letter-spacing:0.08em;
+    color:var(--dim);
+  }
+
+  /* works stream */
+  .work{ margin:0 0 96px; }
+  .work-media{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    gap:12px;
+  }
+  .work-media > button, .work-media > a{
+    all:unset;
+    cursor:zoom-in;
+    display:block;
+    line-height:0;
+    background:var(--tile);
+  }
+  .work-media > a{ cursor:pointer; }
+  /* 'bleed:' media - spans the full column width (inside the page margins) */
+  .work-media > .is-bleed{ flex:0 0 100%; background:transparent; }
+  .work-media > .is-bleed img, .work-media > .is-bleed video{
+    width:100%; height:auto; max-width:none !important; max-height:none !important;
+  } /* tile links out to the project's site */
+  .work-media > .is-loaded{ background:transparent; }
+  .work-media > .is-light{ background:#e9e9e9; } /* dark-on-transparent artwork */
+  /* Row height, but never wider than the column (very wide pieces like a
+     logo banner shrink instead of being cropped) - --ar is width/height,
+     set once the file's real size is known. Never cropped (no cover). */
+  .work-media img, .work-media video{
+    display:block;
+    height:min(clamp(220px, 30vw, 500px), calc((100vw - 64px) / var(--ar, 1.7778)));
+    width:auto;
+  }
+  .work-media video{ aspect-ratio:var(--ar, 16 / 9); }
+  .work-media > button:focus-visible, .work-media > a:focus-visible{ outline:2px solid var(--ink); outline-offset:3px; }
+  .work-meta{
+    display:grid;
+    grid-template-columns:90px minmax(0, 520px);
+    column-gap:12px;
+    margin-top:14px;
+    font-size:0.72rem;
+    line-height:1.55;
+    letter-spacing:0.02em;
+  }
+  .work-meta dt{ color:var(--dim); }
+  .work-meta dd{ margin:0; color:var(--ink); }
+  .work-more{
+    all:unset;
+    cursor:pointer;
+    color:var(--dim);
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .work-more:hover{ color:var(--ink); }
+
+  .work{
+    scroll-margin-top:calc(var(--nav-h, 80px) + 16px);
+    /* off-screen works skip layout + paint entirely until they scroll near;
+       'auto' remembers each block's real height once it has been rendered */
+    content-visibility:auto;
+    contain-intrinsic-size:auto 680px;
+  }
+  .work[hidden], .index-table li[hidden]{ display:none; }
+
+  /* index: every work in one table */
+  .index-table{ list-style:none; margin:0; padding:0; border-top:1px solid var(--hairline); }
+  .index-table li{ border-bottom:1px solid var(--hairline); }
+  .index-table a, .index-head{
+    display:grid;
+    grid-template-columns:44px minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.7fr) 64px;
+    gap:16px;
+    align-items:baseline;
+  }
+  .index-table a{
+    padding:12px 0;
+    color:var(--ink);
+    text-decoration:none;
+    font-size:clamp(0.9rem, 1.2vw, 1.05rem);
+    transition:opacity 0.2s ease;
+  }
+  .index-table a:hover{ opacity:0.45; }
+  .index-table .no, .index-table .client, .index-table .type, .index-table .tags, .index-table .year{
+    font-size:0.72rem; letter-spacing:0.04em; color:var(--dim);
+  }
+  .index-table .no, .index-table .year{ font-variant-numeric:tabular-nums; }
+  .index-table .year, .index-head span:last-child{ text-align:right; }
+  .index-head{ padding:0 0 10px; font-size:0.66rem; letter-spacing:0.1em; color:var(--dim); }
+
+  /* contact list */
+  .index-list{ list-style:none; margin:0; padding:0; border-top:1px solid var(--hairline); }
+  .index-list li{ border-bottom:1px solid var(--hairline); }
+  .index-list a, .index-list .row{
+    display:grid;
+    grid-template-columns:minmax(0, 1.2fr) minmax(0, 1fr) auto;
+    gap:16px;
+    align-items:baseline;
+    padding:14px 0;
+    color:var(--ink);
+    text-decoration:none;
+    font-size:clamp(1rem, 1.5vw, 1.25rem);
+    transition:opacity 0.2s ease;
+  }
+  .index-list a:hover{ opacity:0.45; }
+  .index-list .desc, .index-list .year{ font-size:0.75rem; letter-spacing:0.04em; color:var(--dim); }
+  .index-list .year{ font-variant-numeric:tabular-nums; }
+
+  /* about */
+  .about-text{
+    max-width:920px;
+    font-size:clamp(1.35rem, 2.7vw, 2.3rem);
+    line-height:1.38;
+    font-weight:400;
+    letter-spacing:-0.005em;
+    color:var(--ink);
+    margin:0 0 0.6em 0;
+  }
+  .about-text:last-child{ margin-bottom:0; }
+  #about{ padding-bottom:12vh; }
+
+  /* lightbox */
+  .lightbox{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:none;
+    flex-direction:column;
+    background:rgba(11,11,11,0.97);
+  }
+  .lightbox.is-open{ display:flex; }
+  .lightbox-stage{
+    flex:1;
+    min-height:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:56px 32px 0;
+  }
+  .lightbox-stage img, .lightbox-stage video{
+    display:block;
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+  }
+  .lightbox-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    padding:16px 32px 20px;
+    font-size:0.75rem;
+    letter-spacing:0.06em;
+  }
+  .lightbox-bar .count{ color:var(--dim); font-variant-numeric:tabular-nums; }
+  .lightbox button{
+    all:unset;
+    cursor:pointer;
+    font-size:0.75rem;
+    letter-spacing:0.08em;
+    color:var(--ink);
+  }
+  .lightbox button:hover{ opacity:0.5; }
+  .lightbox .lightbox-close{ position:absolute; top:20px; right:32px; }
+  .lightbox-nav{ display:flex; gap:24px; }
+
+  /* ===== FEATURE VIDEO (full bleed, between description and footer) ===== */
+  .feature-video{
+    width:100%;
+    line-height:0;
+    position:relative;
+    z-index:1;
+    background:var(--paper);
+  }
+  .feature-video video{
+    display:block;
+    width:100%;
+    height:auto;
+    aspect-ratio:16/9; /* reserves the right height immediately, before
+                           the video's metadata has actually loaded, so
+                           the page doesn't jump once it does */
+  }
+
+  /* ===== CLOSING LOGO (full bleed) ===== */
+  .closing-logo{
+    position:relative;
+    z-index:6;
+    background:var(--paper);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:100%;
+    padding:12vh 32px 0.5vh;
+    overflow:hidden;
+  }
+  .closing-word{
+    font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight:700;
+    font-size:11vw;
+    line-height:1;
+    letter-spacing:-0.02em;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+
+  /* ===== FOOTER ===== */
+  .site-footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:2px 32px 10px;
+    font-size:0.7rem;
+    letter-spacing:0.08em;
+    color:var(--dim);
+    position:relative;
+    z-index:6;
+    background:var(--paper);
+  }
+  .site-footer a{
+    color:var(--dim);
+    text-decoration:none;
+  }
+  .site-footer a:hover{ color:var(--ink); }
+  .footer-brief{ display:none; }
+
+  @media (max-width:640px){
+    .site-header{
+      grid-template-columns:1fr;
+      justify-items:center;
+      gap:10px;
+      padding:22px 20px;
+      text-align:center;
+    }
+    .brand, .clock, .resume-link, .header-links{ justify-self:center; }
+    .manifesto{ padding:12vh 20px 22px; }
+    .edge-mark{ right:6px; font-size:0.58rem; }
+    .section-nav{ padding:12px 20px 8px; gap:4px; font-size:0.9rem; letter-spacing:0.05em; }
+    .nav-links{ gap:20px; }
+    .nav-links a{ padding:6px 0; } /* bigger tap targets */
+    .nav-filters{ flex-wrap:wrap; gap:0 16px; font-size:0.78rem; letter-spacing:0.06em; }
+    .nav-filters button{ padding:7px 0; }
+    .index-table a, .index-head{ grid-template-columns:30px minmax(0, 1fr) 44px; gap:10px; }
+    .index-table .client, .index-table .type, .index-table .tags,
+    .index-head .client, .index-head .type, .index-head .tags{ display:none; }
+    .archive-section{ padding:56px 20px 16px; }
+    .work{ margin-bottom:72px; }
+    .work-media img, .work-media video{ height:auto; width:100%; max-width:none; }
+    .work-media > button, .work-media > a{ width:100%; }
+    .work-meta{ grid-template-columns:72px minmax(0, 1fr); }
+    .index-list a, .index-list .row{ grid-template-columns:minmax(0, 1fr) auto; }
+    .index-list .desc{ display:none; }
+    .lightbox-stage{ padding:56px 12px 0; }
+    .lightbox-bar{ padding:14px 20px 18px; }
+    .lightbox .lightbox-close{ right:20px; }
+    .closing-logo{ padding:10vh 20px 0.5vh; }
+    /* phones: just FLUXUS, sized by script to run exactly margin to margin */
+    .closing-logo{ justify-content:flex-start; }
+    .closing-word{ font-size:24vw; }
+    .closing-word + .closing-word{ display:none; }
+    .site-footer{ padding:2px 20px 10px; justify-content:center; }
+    .footer-full{ display:none; }
+    .footer-brief{ display:inline; }
+  }
+
+  /* ===== Phones / touch tablets: no image wheel (too heavy there) ===== */
+  .no-wheel .hero-stage{ height:100vh; height:100dvh; }
+  .no-wheel #wheel-canvas, .no-wheel #wheel-canvas-back, .no-wheel #wheel-video-pool{ display:none; }
+</style>
+<script>
+  // Decided once, before anything renders: small screens and touch-only
+  // devices skip the 3D video wheel entirely (it was lagging on phones).
+  if (window.matchMedia && window.matchMedia('(max-width:768px), (hover:none) and (pointer:coarse)').matches) {
+    document.documentElement.classList.add('no-wheel');
+  }
+  // One scroll listener for the whole page: every scroll-driven update runs
+  // together in a single animation frame instead of once per raw scroll event
+  // (which can fire several times a frame and force repeated layouts).
+  window.__onScrollFrame = [];
+  (function () {
+    var pending = false;
+    function run() { pending = false; for (var i = 0; i < window.__onScrollFrame.length; i++) window.__onScrollFrame[i](); }
+    window.addEventListener('scroll', function () { if (!pending) { pending = true; requestAnimationFrame(run); } }, { passive: true });
+  })();
+</script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="brand">
+      <canvas id="brand-logo-canvas" aria-hidden="true"></canvas>
+      <a class="wordmark" href="index.html">FLUXUS</a>
+    </div>
+    <div class="clock">
+      <span id="clockCity">SEOUL</span>
+      <span class="dot">&middot;</span>
+      <span id="clockTime">00:00</span>
+    </div>
+    <nav class="header-links" aria-label="Pages">
+      <a class="resume-link" href="wheel.html" aria-current="page">WHEEL</a>
+      <a class="resume-link" href="resume/index.html">RESUME</a>
+    </nav>
+  </header>
+
+  <canvas id="astroboy-canvas"></canvas>
+  <section class="hero-stage" aria-hidden="true">
+    <canvas id="wheel-canvas-back"></canvas>
+    <canvas id="wheel-canvas"></canvas>
+    <div id="wheel-video-pool" aria-hidden="true"></div>
+  </section>
+
+  <div class="edge-mark" aria-hidden="true">&copy; FLUXUS STUDIO &mdash; 2026</div>
+
+  <section class="manifesto" aria-label="Manifesto">
+    <!-- Each line is typed out in turn once the section scrolls into view.
+         Edit / add / remove lines here freely. -->
+    <ul class="manifesto-lines">
+      <li>Objects as systems</li>
+      <li>Light as material</li>
+      <li>Images in slow motion</li>
+      <li>The archive as a practice</li>
+      <li>Between the physical and the digital</li>
+      <li>Collected, developed, released, revisited</li>
+    </ul>
+    <p class="manifesto-caption">FLUXUS [Art Archive &amp; Design Studio] is an independent creative platform founded by Dongjin Choi, documenting experiments across graphic design, objects, digital media, and visual culture.</p>
+  </section>
+
+  <script>
+    // ===== Manifesto: type each line out once the section is on screen =====
+    (function () {
+      var lines = Array.prototype.slice.call(document.querySelectorAll('.manifesto-lines li'));
+      if (!lines.length) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var texts = lines.map(function (li) { return li.textContent; });
+      var caret = document.createElement('span');
+      caret.className = 'caret';
+      if (reduce) { lines[lines.length - 1].appendChild(caret); return; }
+      lines.forEach(function (li) { li.textContent = ''; });
+      lines[0].appendChild(caret);
+
+      var CHAR_MS = 38, LINE_PAUSE_MS = 320;
+      var HOLD_MS = 5000; // full text stays up this long, then it clears and types again
+      var started = false;
+      function type(lineIdx, charIdx) {
+        var li = lines[lineIdx];
+        if (charIdx <= texts[lineIdx].length) {
+          li.textContent = texts[lineIdx].slice(0, charIdx);
+          li.appendChild(caret);
+          setTimeout(function () { type(lineIdx, charIdx + 1); }, CHAR_MS);
+        } else if (lineIdx + 1 < lines.length) {
+          setTimeout(function () { type(lineIdx + 1, 0); }, LINE_PAUSE_MS);
+        } else {
+          // all lines written - hold, then wipe and start over from the top
+          setTimeout(function () {
+            lines.forEach(function (l) { l.textContent = ''; });
+            lines[0].appendChild(caret);
+            setTimeout(function () { type(0, 0); }, LINE_PAUSE_MS);
+          }, HOLD_MS);
+        }
+      }
+      function start() { if (started) return; started = true; type(0, 0); }
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          if (entries[0].isIntersecting) { start(); io.disconnect(); }
+        }, { threshold: 0.35 });
+        io.observe(document.querySelector('.manifesto'));
+      } else {
+        start();
+      }
+    })();
+
+  </script>
+
+  <section class="closing-logo">
+    <span class="closing-word">FLUXUS</span>
+    <span class="closing-word">STUDIO</span>
+  </section>
+  <script>
+    // On phones the closing wordmark is FLUXUS alone, scaled so its ink runs
+    // exactly from the left margin to the right margin like the content above.
+    (function () {
+      var section = document.querySelector('.closing-logo');
+      var word = section && section.querySelector('.closing-word');
+      if (!word) return;
+      var phone = window.matchMedia('(max-width:640px)');
+      function fit() {
+        if (!phone.matches) { word.style.fontSize = ''; word.style.letterSpacing = ''; return; }
+        var cs = getComputedStyle(section);
+        var target = section.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        word.style.fontSize = '100px';
+        var w = word.getBoundingClientRect().width;
+        if (w > 0) word.style.fontSize = (100 * target / w).toFixed(2) + 'px';
+      }
+      fit();
+      window.addEventListener('resize', fit);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    })();
+  </script>
+
+  <footer class="site-footer">
+    <span class="footer-full">&copy; 2026 FLUXUS STUDIO</span>
+    <a class="footer-full" href="mailto:soxmfhvl123@gmail.com">soxmfhvl123@gmail.com</a>
+    <span class="footer-brief">FLUXUS</span>
+  </footer>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script>
+    (function(){
+      var cityEl = document.getElementById('clockCity');
+      var timeEl = document.getElementById('clockTime');
+      var tz;
+      try{
+        tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+      }catch(e){
+        tz = 'UTC';
+      }
+      var rawCity = tz.split('/').pop() || tz;
+      var city = rawCity.replace(/_/g, ' ').toUpperCase();
+      cityEl.textContent = city;
+
+      function tick(){
+        try{
+          var time = new Date().toLocaleTimeString('en-GB', {
+            hour:'2-digit', minute:'2-digit', timeZone: tz
+          });
+          timeEl.textContent = time;
+        }catch(e){
+          var now = new Date();
+          var hh = String(now.getHours()).padStart(2,'0');
+          var mm = String(now.getMinutes()).padStart(2,'0');
+          timeEl.textContent = hh + ':' + mm;
+        }
+      }
+      tick();
+      setInterval(tick, 15000);
+    })();
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+    var canvas = document.getElementById('astroboy-canvas');
+    // The first opaque block below the manifesto - the figure slides up and
+    // away as it arrives, so it never floats over the works archive.
+    var closingLogoEl = document.querySelector('.archive') || document.querySelector('.closing-logo');
+
+    if (canvas && window.WebGLRenderingContext) {
+      var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
+
+      var scene = new THREE.Scene();
+
+      var pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+      var camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+      camera.position.set(0, 0, 6);
+
+      var keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      keyLight.position.set(3, 5, 4);
+      scene.add(keyLight);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+
+      var model = null;
+      var fov = camera.fov * Math.PI / 180;
+
+      // Two framing states, computed once the model's real size is known:
+      //  FRAME_LOAD  - tight close-up on the head/face, huge on first paint
+      //  FRAME_SCROLL - pulled back a bit (upper body), sits higher on screen
+      var FRAME_LOAD = null;
+      var FRAME_SCROLL = null;
+
+      function frameFor(heightFraction, centerFromTop, padding) {
+        // heightFraction: portion of the model's total height to frame in view
+        // centerFromTop: 0 = very top of model, 1 = very bottom
+        var regionHeight = modelSize.y * heightFraction;
+        var regionCenterY = (modelSize.y / 2) - (modelSize.y * centerFromTop);
+        var dist = (regionHeight / 2) / Math.tan(fov / 2) * padding;
+        return { dist: dist, y: regionCenterY };
+      }
+
+      var modelSize = null;
+
+      var loader = new GLTFLoader();
+      loader.setMeshoptDecoder(MeshoptDecoder);
+      loader.load('assets/golden-astroboy.glb', function (gltf) {
+        model = gltf.scene;
+
+        var box = new THREE.Box3().setFromObject(model);
+        modelSize = box.getSize(new THREE.Vector3());
+        var center = box.getCenter(new THREE.Vector3());
+        model.position.sub(center);
+
+        FRAME_LOAD = frameFor(0.30, 0.12, 1.4);    // face/head fills the screen with more shoulder/collar margin, clear of edge clipping while it rotates
+        FRAME_SCROLL = frameFor(0.90, 0.5, 1.25);  // pulled all the way back, full figure head-to-toe with real margin
+
+        camera.position.set(0, FRAME_LOAD.y, FRAME_LOAD.dist);
+        camera.lookAt(0, FRAME_LOAD.y, 0);
+
+        scene.add(model);
+        canvas.style.opacity = '1';
+        updateFrame();
+      }, undefined, function (err) {
+        console.warn('golden astroboy failed to load', err);
+      });
+
+      var lastResizeW = 0, lastResizeH = 0;
+      function resize() {
+        var w = canvas.clientWidth || 1;
+        var h = canvas.clientHeight || 1;
+        if (w === lastResizeW && h === lastResizeH) return;
+        lastResizeW = w; lastResizeH = h;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      var figureOnScreen = true, archiveTop = Infinity;
+      var ANGULAR_SPEED = 0.35; // radians per second, constant (linear) rotation
+      var last = performance.now();
+      function animate(now) {
+        var dt = (now - last) / 1000;
+        last = now;
+        if (model) model.rotation.y += ANGULAR_SPEED * dt;
+        // (2) skip drawing while the figure is off screen or fully covered by the archive
+        if (figureOnScreen) renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+
+      // Scroll progress (0 at top -> 1 after one viewport height) drives the
+      // camera zoom (face close-up -> upper-body), how high on screen the
+      // figure sits (centered -> tucked up near the top), and its on-screen
+      // size (huge on load -> a compact badge once scrolled).
+      var TOP_LOAD = 50;    // vertical center, % of viewport, while still fixed
+      var TOP_SCROLL = 46;  // stays close to true screen center while scrolling
+      var SIZE_LOAD = 104;   // vh/vw at load - huge, face fills the screen
+      var SIZE_SCROLL = 92;  // vh/vw once scrolled - big, full figure, centered on screen
+
+      // Keeps the rotating figure from ever being covered by the opaque
+      // closing-logo/footer block, without ever shrinking it below its
+      // normal docked size: as that section's top edge approaches, this
+      // slides the figure upward (off the top of the screen if it has to)
+      // so its bottom edge never dips into the closing section.
+      function keepClearOfFooter(topPercent, sizeVal) {
+        if (!closingLogoEl) return { top: topPercent, size: sizeVal };
+        var vh = window.innerHeight || 1;
+        var vw = window.innerWidth || 1;
+        var vmin = Math.min(vh, vw);
+        var margin = 28; // px gap always kept between the figure and the closing section
+        archiveTop = closingLogoEl.getBoundingClientRect().top;
+        var limit = archiveTop - margin;
+        if (limit >= vh) return { top: topPercent, size: sizeVal }; // closing section still far below
+
+        var halfPx = (sizeVal / 100 * vmin) / 2;
+        var centerY = Math.min((topPercent / 100) * vh, limit - halfPx);
+
+        return { top: (centerY / vh) * 100, size: sizeVal };
+      }
+
+      function updateFrame() {
+        if (!FRAME_LOAD || !FRAME_SCROLL) return;
+        var vh = window.innerHeight || 1;
+        var scrollY = window.scrollY || 0;
+        var t = Math.min(Math.max(scrollY / vh, 0), 1);
+        var ease = t * t * (3 - 2 * t); // smoothstep
+
+        var dist = FRAME_LOAD.dist + (FRAME_SCROLL.dist - FRAME_LOAD.dist) * ease;
+        var y = FRAME_LOAD.y + (FRAME_SCROLL.y - FRAME_LOAD.y) * ease;
+        camera.position.set(0, y, dist);
+        camera.lookAt(0, y, 0);
+
+        var top = TOP_LOAD + (TOP_SCROLL - TOP_LOAD) * ease;
+        var size = SIZE_LOAD + (SIZE_SCROLL - SIZE_LOAD) * ease;
+        var clamped = keepClearOfFooter(top, size);
+        // same placement as before, expressed as a transform on the fixed-size canvas
+        var vmin = Math.min(vh, window.innerWidth || 1);
+        var dy = (clamped.top - 50) / 100 * vh;
+        canvas.style.transform = 'translate(-50%, -50%) translate3d(0,' + dy.toFixed(1) + 'px,0) scale(' + (clamped.size / SIZE_LOAD).toFixed(4) + ')';
+        var half = clamped.size / 100 * vmin / 2;
+        var centerY = clamped.top / 100 * vh;
+        figureOnScreen = centerY + half > 0 && archiveTop > 0;
+      }
+      window.__onScrollFrame.push(updateFrame);
+      window.addEventListener('resize', updateFrame);
+      updateFrame();
+    }
+  </script>
+
+  <script type="module">
+    // ===== Background 3D image wheel (hero section only) =====
+    // Rendered to TWO stacked canvases sharing the same scene/camera: cards
+    // currently on the near side of the ring draw on the canvas in FRONT of
+    // the golden figure, cards on the far side draw on the canvas BEHIND it -
+    // so the figure genuinely sits in the middle of the ring, not just on
+    // top of it.
+    import * as THREE from 'three';
+
+    var wheelCanvasFront = document.getElementById('wheel-canvas');
+    var wheelCanvasBack = document.getElementById('wheel-canvas-back');
+    var heroStage = document.querySelector('.hero-stage');
+    var videoPool = document.getElementById('wheel-video-pool');
+
+    var skipWheel = document.documentElement.classList.contains('no-wheel');
+    if (wheelCanvasFront && wheelCanvasBack && heroStage && window.WebGLRenderingContext && !skipWheel) {
+      var rendererFront = new THREE.WebGLRenderer({ canvas: wheelCanvasFront, antialias: true, alpha: true, powerPreference: 'high-performance' });
+      var rendererBack = new THREE.WebGLRenderer({ canvas: wheelCanvasBack, antialias: true, alpha: true, powerPreference: 'high-performance' });
+      [rendererFront, rendererBack].forEach(function (r) {
+        r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        r.outputColorSpace = THREE.SRGBColorSpace;
+      });
+
+      var scene = new THREE.Scene();
+      var CAMERA_FOV = 45;
+      var camera = new THREE.PerspectiveCamera(CAMERA_FOV, 1, 0.1, 100);
+      camera.position.set(0, 0, 8.2);
+      camera.lookAt(0, 0, 0);
+      var cameraFovRad = CAMERA_FOV * Math.PI / 180;
+
+      // ---- the ring of cards ----
+      var COUNT = 13;
+      var CARD_W = 2.7, CARD_H = 1.52; // 16:9
+      var RADIUS = (COUNT * CARD_W * 1.18) / (Math.PI * 2);
+
+      var group = new THREE.Group();
+      scene.add(group);
+      var cardMeshes = [];
+      var wheelVideos = []; // real <video> clips, so they can be paused when off-screen
+
+      // The canvases start invisible so the colored number placeholders never
+      // flash on screen - revealed as soon as the front-most card (slot 1 at
+      // load) actually has a video frame ready, or after a short timeout if
+      // that clip is slow/missing, so the hero is never stuck hidden.
+      var wheelRevealed = false;
+      function revealWheel() {
+        if (wheelRevealed) return;
+        wheelRevealed = true;
+        wheelCanvasFront.style.opacity = '1';
+        wheelCanvasBack.style.opacity = '1';
+      }
+      setTimeout(revealWheel, 1500);
+
+      var geometry = new THREE.PlaneGeometry(CARD_W, CARD_H);
+
+      function placeholderTexture(index, hue) {
+        // plain flat gray while the real clip is still loading - no
+        // color-per-slot, no number
+        var c = document.createElement('canvas');
+        c.width = 512;
+        c.height = Math.round(512 * (CARD_H / CARD_W));
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = '#1c1c1c';
+        ctx.fillRect(0, 0, c.width, c.height);
+        var tex = new THREE.CanvasTexture(c);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        return tex;
+      }
+
+      // Crops a loaded texture to fill the card fully (like CSS background-size:cover)
+      // instead of stretching it to the card's aspect ratio.
+      function coverFit(tex, imgW, imgH) {
+        var imgAspect = imgW / imgH;
+        var cardAspect = CARD_W / CARD_H;
+        if (imgAspect > cardAspect) {
+          tex.repeat.set(cardAspect / imgAspect, 1);
+          tex.offset.set((1 - tex.repeat.x) / 2, 0);
+        } else {
+          tex.repeat.set(1, imgAspect / cardAspect);
+          tex.offset.set(0, (1 - tex.repeat.y) / 2);
+        }
+        tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+        tex.needsUpdate = true;
+      }
+
+      // A clip whose aspect ratio is close to the 16:9 card crops to fill it
+      // completely (cover, above) - fine, it loses almost nothing. But a clip
+      // shot at a very different aspect (e.g. a wide desktop screen recording)
+      // would lose a real chunk of its sides/top to that same crop. Past this
+      // fraction lost, show the whole clip uncropped instead, letterboxed
+      // against a plain backing card in the same color as its placeholder so
+      // there's no gap - never appearance over losing real content.
+      var MAX_COVER_CROP = 0.08;
+
+      function applyVideoFit(mesh, video, hue) {
+        var imgW = video.videoWidth, imgH = video.videoHeight;
+        if (!imgW || !imgH) return;
+        var imgAspect = imgW / imgH;
+        var cardAspect = CARD_W / CARD_H;
+        var cropLoss = imgAspect > cardAspect
+          ? 1 - (cardAspect / imgAspect)
+          : 1 - (imgAspect / cardAspect);
+
+        var tex = new THREE.VideoTexture(video);
+        tex.colorSpace = THREE.SRGBColorSpace;
+
+        if (cropLoss <= MAX_COVER_CROP) {
+          coverFit(tex, imgW, imgH);
+          mesh.material.map = tex;
+          mesh.material.needsUpdate = true;
+          return;
+        }
+
+        if (!mesh.userData.backing) {
+          var backingMat = new THREE.MeshBasicMaterial({ color: 'hsl(' + hue + ', 60%, 55%)', toneMapped: false, side: THREE.DoubleSide });
+          var backing = new THREE.Mesh(geometry, backingMat);
+          backing.position.copy(mesh.position);
+          backing.rotation.copy(mesh.rotation);
+          backing.translateZ(-0.01); // a hair behind the content plane, no z-fighting
+          group.add(backing);
+          cardMeshes.push(backing);
+          mesh.userData.backing = backing;
+        }
+
+        var containW, containH;
+        if (imgAspect > cardAspect) { containW = CARD_W; containH = CARD_W / imgAspect; }
+        else { containH = CARD_H; containW = CARD_H * imgAspect; }
+        mesh.geometry = new THREE.PlaneGeometry(containW, containH);
+        mesh.material.map = tex;
+        mesh.material.needsUpdate = true;
+      }
+
+      for (var i = 0; i < COUNT; i++) {
+        var theta = (i / COUNT) * Math.PI * 2;
+        var hue = Math.round((i / COUNT) * 360);
+        var material = new THREE.MeshBasicMaterial({ map: placeholderTexture(i, hue), toneMapped: false, side: THREE.DoubleSide });
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(Math.sin(theta) * RADIUS, 0, Math.cos(theta) * RADIUS);
+        mesh.rotation.y = theta;
+        group.add(mesh);
+        cardMeshes.push(mesh);
+
+        // Real clips live at assets/wheel/wheel-01.mp4 ... wheel-13.mp4 - muted,
+        // autoplaying, looping video. If a slot's file doesn't exist yet, silently
+        // keep the gray placeholder.
+        //
+        // The src is NOT set here - with 13 clips, having every single one
+        // start downloading at once on page load is exactly what was
+        // making the initial load feel slow. Instead each video just sits
+        // ready (via __lazySrc) until syncVideoPlayback() actually brings
+        // its slot into the active window, at which point it's given its
+        // src for the first time and starts fetching - so page load only
+        // ever pays for the handful of clips actually about to be shown.
+        (function (mesh, slot, hue) {
+          var url = 'assets/wheel/wheel-' + String(slot).padStart(2, '0') + '.mp4';
+          var video = document.createElement('video');
+          video.muted = true;
+          video.defaultMuted = true;
+          video.loop = true;
+          video.playsInline = true;
+          // Setting these as real HTML attributes (not just JS properties)
+          // matters on mobile Safari/Chrome - some versions gate autoplay
+          // on the attribute being present at play() time.
+          video.setAttribute('muted', '');
+          video.setAttribute('playsinline', '');
+          video.setAttribute('webkit-playsinline', '');
+          video.setAttribute('autoplay', '');
+          video.preload = 'auto';
+          video.__lazySrc = url;
+          video.__started = false;
+          video.addEventListener('loadedmetadata', function () {
+            applyVideoFit(mesh, video, hue);
+          });
+          if (slot === 1) {
+            // this is the front-most card at load - wait for an actual
+            // decoded frame (not just metadata) before revealing the wheel
+            video.addEventListener('loadeddata', revealWheel);
+            video.addEventListener('error', revealWheel);
+          }
+          video.addEventListener('error', function () {
+            // no clip at this slot yet - keep the gray placeholder
+          });
+          // Mobile browsers (iOS Safari in particular) are unreliable
+          // about decoding a <video> that was only ever created in JS and
+          // never attached to the document, even when used purely as a
+          // WebGL texture source - so it lives in the off-screen pool,
+          // not display:none, which can itself pause decoding.
+          if (videoPool) videoPool.appendChild(video);
+          wheelVideos.push(video);
+        })(mesh, i + 1, hue);
+      }
+
+      // ---- resize (both canvases always share the same size) ----
+      // The near card's distance from the camera is recomputed on every
+      // resize so it always fully covers the viewport - like CSS
+      // background-size:cover, but for the card itself - instead of a
+      // fixed distance that can leave a sliver of the next card peeking
+      // through at the edges (top/bottom on a tall window, left/right on
+      // an extra-wide one).
+      var lastW = 0, lastH = 0;
+      function resize() {
+        var w = wheelCanvasFront.clientWidth || 1;
+        var h = wheelCanvasFront.clientHeight || 1;
+        if (w === lastW && h === lastH) return;
+        lastW = w; lastH = h;
+        rendererFront.setSize(w, h, false);
+        rendererBack.setSize(w, h, false);
+        var aspect = w / h;
+        camera.aspect = aspect;
+        camera.updateProjectionMatrix();
+
+        var maxDistForHeight = CARD_H / (2 * Math.tan(cameraFovRad / 2));
+        var maxDistForWidth = CARD_W / (2 * Math.tan(cameraFovRad / 2) * aspect);
+        var coverDist = Math.min(maxDistForHeight, maxDistForWidth) * 0.98; // distance at which the card exactly fills the viewport
+        // Pull back beyond that "full cover" distance so the card reads at
+        // roughly half its previous on-screen size, with the ring and the
+        // figure visible around it, instead of edge-to-edge.
+        var CARD_DISPLAY_SCALE = 0.5;
+        var dist = coverDist / CARD_DISPLAY_SCALE;
+        camera.position.z = RADIUS + dist;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      // ---- only decode the handful of cards actually near the front ----
+      // All 12 clips used to autoplay simultaneously all the time, even
+      // though only the front-facing card (and maybe a sliver of its
+      // neighbors) is ever actually visible - the rest sit edge-on or
+      // behind the astroboy figure. Decoding 12 concurrent H.264 streams
+      // is exactly the kind of thing that stutters on real hardware
+      // (most devices only have a handful of hardware decoder slots
+      // before falling back to slow software decode), especially on
+      // mobile - so only an active window of cards around the current
+      // front position actually plays; everything else is paused
+      // (decoding stops, GPU upload stops) and resumes right where it
+      // left off once it's back in the window.
+      var ACTIVE_HALF_WINDOW = 2; // 2*this+1 clips playing at once
+      function syncVideoPlayback() {
+        if (!heroVisible) {
+          wheelVideos.forEach(function (v) { if (!v.paused) v.pause(); });
+          return;
+        }
+        var twoPi = Math.PI * 2;
+        var best = 0, bestDist = Infinity;
+        for (var i = 0; i < COUNT; i++) {
+          var theta = (i / COUNT) * twoPi;
+          var angle = (theta + currentRotation) % twoPi;
+          if (angle < 0) angle += twoPi;
+          var dist = Math.min(angle, twoPi - angle);
+          if (dist < bestDist) { bestDist = dist; best = i; }
+        }
+        for (var i = 0; i < COUNT; i++) {
+          var d = Math.min(Math.abs(i - best), COUNT - Math.abs(i - best));
+          var v = wheelVideos[i];
+          if (!v) continue;
+          if (d <= ACTIVE_HALF_WINDOW) {
+            if (!v.__started) {
+              // first time this slot has ever been in the active window -
+              // this is the point it actually starts downloading
+              v.__started = true;
+              v.src = v.__lazySrc;
+            }
+            if (v.paused) v.play().catch(function () {});
+          } else if (!v.paused) {
+            v.pause();
+          }
+        }
+      }
+
+      // ---- only rendering (and playing) while the hero section is on screen ----
+      var heroVisible = true;
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          heroVisible = entries[0].isIntersecting;
+          syncVideoPlayback();
+        }, { threshold: 0 });
+        io.observe(heroStage);
+      }
+
+      // ---- mobile autoplay fallback ----
+      // Even with muted+playsinline, some mobile browsers only actually
+      // start playback after the very first user gesture on the page.
+      // Re-run the same active-window sync (not a blanket "play
+      // everything") in case the front clips are still paused once that
+      // happens; this listener removes itself after the first gesture.
+      function retryVideoPlayback() {
+        syncVideoPlayback();
+        window.removeEventListener('touchstart', retryVideoPlayback);
+        window.removeEventListener('click', retryVideoPlayback);
+        window.removeEventListener('scroll', retryVideoPlayback);
+      }
+      window.addEventListener('touchstart', retryVideoPlayback, { passive: true, once: true });
+      window.addEventListener('click', retryVideoPlayback, { once: true });
+      window.addEventListener('scroll', retryVideoPlayback, { passive: true, once: true });
+
+      // ---- scroll drives the spin, then releases the wheel to slide away ----
+      // Tied to scroll progress through the hero section itself. The first
+      // part of that scroll spins the ring through almost a full turn; once
+      // the spin is done, the rest of the scroll slides the whole wheel
+      // straight up and off the screen (instead of fading out) - and both
+      // finish with room to spare before the intro text underneath can be
+      // seen, so the wheel is always fully done spinning and gone before the
+      // copy shows.
+      var HERO_TURNS = 0.92;  // fraction of a full 360 degree spin
+      var ROTATE_END = 0.48;  // fraction of the hero's scroll spent spinning (bigger = slower spin per scroll)
+      var EXIT_END = 0.60;    // fraction of the hero's scroll by which the wheel is fully off-screen
+      var targetRotation = 0, currentRotation = 0;
+
+      // While the user is actively scrolling, scroll position is the only
+      // thing driving the spin (as before). Once they stop for a moment,
+      // a slow idle spin takes over from wherever scroll left it - and the
+      // instant scrolling resumes, the idle spin drops out with no jump,
+      // handing control straight back to scroll.
+      var IDLE_DELAY_MS = 1200;   // how long to wait after the last scroll before idle-spinning
+      var IDLE_SPIN_SPEED = 0.12; // radians/second - slow
+      var lastScrollAt = Date.now();
+      var idleSpin = 0;
+
+      function updateRotation() {
+        lastScrollAt = Date.now();
+        idleSpin = 0; // scroll always takes over immediately, no jump
+        var progress = Math.min(Math.max((window.scrollY || 0) / heroHeight, 0), 1);
+        var rotateProgress = Math.min(progress / ROTATE_END, 1);
+        var exitProgress = Math.min(Math.max((progress - ROTATE_END) / (EXIT_END - ROTATE_END), 0), 1);
+        targetRotation = rotateProgress * HERO_TURNS * Math.PI * 2;
+
+        // Slide the wheel straight up and off the screen once it's done
+        // spinning. Applied directly (no easing lag) so it always finishes
+        // exactly in step with scroll - never left trailing behind - well
+        // before the intro text underneath can be seen.
+        var offset = (-exitProgress * 105).toFixed(2) + 'vh';
+        wheelCanvasFront.style.transform = 'translate3d(0,' + offset + ',0)';
+        wheelCanvasBack.style.transform = 'translate3d(0,' + offset + ',0)';
+        wheelGone = exitProgress >= 1;
+      }
+      var heroHeight = heroStage.offsetHeight || window.innerHeight, wheelGone = false;
+      window.addEventListener('resize', function () { heroHeight = heroStage.offsetHeight || window.innerHeight; updateRotation(); });
+      window.__onScrollFrame.push(updateRotation);
+      updateRotation();
+
+      var _scratchVec = new THREE.Vector3();
+
+      // Splits the ring into a "near" half (in front of the character) and a
+      // "far" half (behind it), using each card's current world Z after the
+      // ring's rotation - then renders each half to its own canvas so the
+      // fixed astroboy layer sandwiched between them shows real depth.
+      function renderSplit() {
+        group.updateMatrixWorld(true);
+        for (var i = 0; i < cardMeshes.length; i++) {
+          cardMeshes[i].getWorldPosition(_scratchVec);
+          cardMeshes[i].userData.front = _scratchVec.z >= 0;
+        }
+        for (var i = 0; i < cardMeshes.length; i++) cardMeshes[i].visible = cardMeshes[i].userData.front;
+        rendererFront.render(scene, camera);
+        for (var i = 0; i < cardMeshes.length; i++) cardMeshes[i].visible = !cardMeshes[i].userData.front;
+        rendererBack.render(scene, camera);
+        for (var i = 0; i < cardMeshes.length; i++) cardMeshes[i].visible = true;
+      }
+
+      var syncFrameCount = 0;
+      var lastWheelFrameT = performance.now();
+      function animate(t) {
+        var dt = Math.min((t - lastWheelFrameT) / 1000, 0.1);
+        lastWheelFrameT = t;
+        if (Date.now() - lastScrollAt > IDLE_DELAY_MS) {
+          idleSpin += IDLE_SPIN_SPEED * dt;
+        }
+        currentRotation += ((targetRotation + idleSpin) - currentRotation) * 0.08;
+        group.rotation.y = currentRotation;
+        if (heroVisible && !wheelGone) renderSplit();
+        // re-check the active playback window every ~200ms rather than
+        // every frame - the ring doesn't move fast enough for that to be
+        // noticeable, and it keeps this from adding its own overhead
+        syncFrameCount++;
+        if (syncFrameCount >= 12) { syncFrameCount = 0; syncVideoPlayback(); }
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+      syncVideoPlayback();
+    }
+  </script>
+
+  <script type="module">
+    // ===== Small spinning 3D FLUXUS logo mark, top-left of the header =====
+    // A thin extruded "card" (not just a flat spinning image) so it reads as
+    // a real object as it turns - constant-speed ("linear") rotation, always
+    // spinning regardless of scroll, independent of every other animation
+    // on the page.
+    import * as THREE from 'three';
+
+    var logoCanvas = document.getElementById('brand-logo-canvas');
+    if (logoCanvas && window.WebGLRenderingContext) {
+      var logoRenderer = new THREE.WebGLRenderer({ canvas: logoCanvas, antialias: true, alpha: true });
+      logoRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      logoRenderer.outputColorSpace = THREE.SRGBColorSpace;
+
+      var logoScene = new THREE.Scene();
+      var logoCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 10);
+      logoCamera.position.set(0, 0, 3.2);
+      logoCamera.lookAt(0, 0, 0);
+
+      // logo mark is 964x1927 (about 1:2) - give it a bit of real depth
+      var LOGO_ASPECT = 964 / 1927;
+      var LOGO_H = 1.6, LOGO_W = LOGO_H * LOGO_ASPECT, LOGO_DEPTH = 0.06;
+
+      var edgeMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
+      // Both +z and -z faces show the logo mark so the card never goes
+      // blank as it spins. Each gets its OWN single-sided (FrontSide)
+      // material - earlier this was one shared DoubleSide material, which
+      // let the back face's copy show through the front face's alpha
+      // cutouts (looked like two overlapping logos). Single-sided means
+      // only whichever face currently points at the camera ever renders.
+      var faceMat = new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.5, side: THREE.FrontSide });
+      var backFaceMat = new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.5, side: THREE.FrontSide });
+      var logoGeo = new THREE.BoxGeometry(LOGO_W, LOGO_H, LOGO_DEPTH);
+      // BoxGeometry face order: +x, -x, +y, -y, +z, -z
+      var logoMesh = new THREE.Mesh(logoGeo, [edgeMat, edgeMat, edgeMat, edgeMat, faceMat, backFaceMat]);
+      logoScene.add(logoMesh);
+
+      new THREE.TextureLoader().load('assets/fluxus-logo.png', function (tex) {
+        tex.colorSpace = THREE.SRGBColorSpace;
+        faceMat.map = tex;
+        faceMat.needsUpdate = true;
+        backFaceMat.map = tex;
+        backFaceMat.needsUpdate = true;
+      });
+
+      function resizeLogo() {
+        var w = logoCanvas.clientWidth || 1;
+        var h = logoCanvas.clientHeight || 1;
+        logoRenderer.setSize(w, h, false);
+        logoCamera.aspect = w / h;
+        logoCamera.updateProjectionMatrix();
+      }
+      window.addEventListener('resize', resizeLogo);
+      resizeLogo();
+
+      var LOGO_SPIN_SPEED = 0.9; // radians / second - constant, not eased
+      var lastLogoT = performance.now();
+      function animateLogo(t) {
+        var dt = Math.min((t - lastLogoT) / 1000, 0.1);
+        lastLogoT = t;
+        logoMesh.rotation.y += LOGO_SPIN_SPEED * dt;
+        logoRenderer.render(logoScene, logoCamera);
+        requestAnimationFrame(animateLogo);
+      }
+      requestAnimationFrame(animateLogo);
+    }
+  </script>
+
+</body>
+</html>
