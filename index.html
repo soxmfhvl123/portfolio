@@ -759,40 +759,23 @@
       });
       document.getElementById('worksCount').textContent = works.length;
 
-      // Inline videos: one observer starts buffering a clip well before it
-      // scrolls in, a second one plays it only while it is actually on screen
-      // (so off-screen clips never decode alongside the visible ones and steal
-      // frames from them).
-      // Starting a clip (demux + decoder setup) is what caused the scroll
-      // hitches, so clips start through a small queue: at most two at a time,
-      // and only once scrolling has paused for a moment. The poster frame
-      // stands in until then; on-screen clips jump the queue.
+      // Inline videos: every clip that is on screen plays (also while
+      // scrolling); clips off screen are paused so they don't decode.
+      // Starting a clip (demux + decoder setup) is the expensive step, so
+      // clips start through a small queue - at most two at a time. Clips that
+      // are visible start right away; clips that are only coming up soon are
+      // pre-buffered once scrolling settles for a moment. The poster frame
+      // stands in until a clip's first frame is ready.
       var MAX_STARTING = 2, SCROLL_QUIET_MS = 150;
       var startQueue = [], starting = 0, lastScrollAt = 0, pumpTimer = null;
-      // Decoding clips while the page itself is scrolling costs frames, so
-      // visible clips hold still during a scroll and resume the moment it
-      // settles (the page is moving anyway, so the brief hold isn't noticed).
-      var scrolling = false, resumeTimer = null;
-      function resumeVisible() {
-        scrolling = false;
-        lazyVideos.forEach(function (v) { if (v.__wantPlay && v.paused && v.getAttribute('src')) v.play().catch(function () {}); });
-      }
-      window.addEventListener('scroll', function () {
-        lastScrollAt = performance.now();
-        if (!scrolling) {
-          scrolling = true;
-          lazyVideos.forEach(function (v) { if (!v.paused) v.pause(); });
-        }
-        clearTimeout(resumeTimer);
-        resumeTimer = setTimeout(resumeVisible, SCROLL_QUIET_MS);
-      }, { passive: true });
+      window.addEventListener('scroll', function () { lastScrollAt = performance.now(); }, { passive: true });
       function startClip(v) {
         starting++;
         var done = false;
         function finish() {
           if (done) return; done = true; starting--;
           v.removeEventListener('loadeddata', finish); v.removeEventListener('error', finish);
-          if (v.__wantPlay && !scrolling) v.play().catch(function () {});
+          if (v.__wantPlay) v.play().catch(function () {});
           pumpStarts();
         }
         v.addEventListener('loadeddata', finish);
@@ -803,11 +786,16 @@
       }
       function pumpStarts() {
         clearTimeout(pumpTimer);
-        var quietFor = performance.now() - lastScrollAt;
-        if (quietFor < SCROLL_QUIET_MS) { pumpTimer = setTimeout(pumpStarts, SCROLL_QUIET_MS - quietFor + 10); return; }
         while (starting < MAX_STARTING && startQueue.length) {
-          var v = startQueue.shift();
-          if (!v.getAttribute('src')) startClip(v);
+          var v = startQueue[0];
+          if (v.getAttribute('src')) { startQueue.shift(); continue; }
+          // visible clips start immediately; pre-buffering waits for a scroll pause
+          var quietFor = performance.now() - lastScrollAt;
+          if (!v.__wantPlay && quietFor < SCROLL_QUIET_MS) {
+            pumpTimer = setTimeout(pumpStarts, SCROLL_QUIET_MS - quietFor + 10);
+            return;
+          }
+          startClip(startQueue.shift());
         }
       }
       function queueClip(v, urgent) {
@@ -831,13 +819,13 @@
             var v = e.target;
             v.__wantPlay = e.isIntersecting;
             if (e.isIntersecting) {
-              if (v.getAttribute('src')) { if (!scrolling) v.play().catch(function () {}); }
+              if (v.getAttribute('src')) v.play().catch(function () {});
               else queueClip(v, true);
             } else if (!v.paused) {
               v.pause();
             }
           });
-        }, { threshold: 0.25 });
+        }, { threshold: 0 });
         lazyVideos.forEach(function (v) { loader.observe(v); player.observe(v); });
       } else {
         lazyVideos.forEach(function (v) { v.src = v.dataset.src; v.play().catch(function () {}); });
