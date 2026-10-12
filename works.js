@@ -7,6 +7,18 @@
 
 window.FLUXUS_WORKS = [
   {
+    project: "REF-ARCHIVE",
+    client: "Self-initiated",
+    type: "Reference Archive Website",
+    year: "2026",
+    tags: ["WEB"],
+    link: "https://ref-archive.site/",
+    mediaLink: true,
+    media: [
+      "video:resume/img/OTHERPROJECTS/REF-ARCHIVE/ref-archive_opt.mp4"
+    ]
+  },
+  {
     project: "FAKE CHURCH",
     client: "FAKE CHURCH",
     type: "Brand Identity + Lookbook",
