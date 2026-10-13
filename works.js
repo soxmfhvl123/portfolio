@@ -106,7 +106,7 @@ window.FLUXUS_WORKS = [
     mediaLink: true,
     media: [
       "bleed:resume/img/OTHERPROJECTS/clawset/clawset_logo_white.webp",
-      "video:resume/img/OTHERPROJECTS/clawset/clawset-scroll_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/clawset/clawset-scroll-v2_opt.mp4",
       "video:resume/img/OTHERPROJECTS/clawset/bianca.mp4",
       "video:resume/img/OTHERPROJECTS/clawset/jinx.mp4",
       "video:resume/img/OTHERPROJECTS/clawset/valka.mp4"
