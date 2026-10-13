@@ -15,7 +15,8 @@ window.FLUXUS_WORKS = [
     link: "https://ref-archive.site/",
     mediaLink: true,
     media: [
-      "video:resume/img/OTHERPROJECTS/REF-ARCHIVE/ref-archive_opt.mp4"
+      "video:resume/img/OTHERPROJECTS/REF-ARCHIVE/ref-web-v2_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/REF-ARCHIVE/ref-posters_opt.mp4"
     ]
   },
   {
@@ -93,7 +94,7 @@ window.FLUXUS_WORKS = [
     tags: ["WEB"],
     mediaLink: true,
     media: [
-      "video:resume/img/CLAB/CLAB_GLOBAL DESIGN LEADERSHIP/gdla-scroll-1080p_opt.mp4"
+      "video:resume/img/CLAB/CLAB_GLOBAL DESIGN LEADERSHIP/gdla-site-v2_opt.mp4"
     ]
   },
   {
