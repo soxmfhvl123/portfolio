@@ -88,7 +88,7 @@
     justify-self:end;
   }
   .resume-link:hover{ opacity:0.5; }
-  .header-links{ display:flex; gap:24px; justify-self:end; }
+  .header-links{ display:flex; gap:24px; justify-self:end; grid-column:3; }
   .resume-link[aria-current="page"]{ opacity:0.45; }
 
   /* ===== HERO (3D golden astroboy stage + background image wheel) ===== */
@@ -517,7 +517,7 @@
       padding:22px 20px;
       text-align:center;
     }
-    .brand, .clock, .resume-link, .header-links{ justify-self:center; }
+    .brand, .clock, .resume-link, .header-links{ justify-self:center; grid-column:auto; }
     .manifesto{ padding:12vh 20px 22px; }
     .edge-mark{ right:6px; font-size:0.58rem; }
     .to-top{ right:30px; bottom:20px; width:40px; height:40px; }
@@ -577,11 +577,9 @@
       <canvas id="brand-logo-canvas" aria-hidden="true"></canvas>
       <a class="wordmark" href="index.html">STUDIO FLUXUS</a>
     </div>
-    <div class="clock">
-      <span id="clockCity">SEOUL</span>
-      <span class="dot">&middot;</span>
-      <span id="clockTime">00:00</span>
-    </div>
+    <nav class="header-links" aria-label="Elsewhere">
+      <a class="resume-link" href="https://ref-archive.site/" target="_blank" rel="noopener">ref-archive &nearr;</a>
+    </nav>
   </header>
 
 
@@ -1088,37 +1086,6 @@
   }
   </script>
 
-  <script>
-    (function(){
-      var cityEl = document.getElementById('clockCity');
-      var timeEl = document.getElementById('clockTime');
-      var tz;
-      try{
-        tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
-      }catch(e){
-        tz = 'UTC';
-      }
-      var rawCity = tz.split('/').pop() || tz;
-      var city = rawCity.replace(/_/g, ' ').toUpperCase();
-      cityEl.textContent = city;
-
-      function tick(){
-        try{
-          var time = new Date().toLocaleTimeString('en-GB', {
-            hour:'2-digit', minute:'2-digit', timeZone: tz
-          });
-          timeEl.textContent = time;
-        }catch(e){
-          var now = new Date();
-          var hh = String(now.getHours()).padStart(2,'0');
-          var mm = String(now.getMinutes()).padStart(2,'0');
-          timeEl.textContent = hh + ':' + mm;
-        }
-      }
-      tick();
-      setInterval(tick, 15000);
-    })();
-  </script>
 
 
 
