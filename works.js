@@ -94,7 +94,7 @@ window.FLUXUS_WORKS = [
     tags: ["WEB"],
     mediaLink: true,
     media: [
-      "video:resume/img/CLAB/CLAB_GLOBAL DESIGN LEADERSHIP/gdla-site-v2_opt.mp4"
+      "video:resume/img/CLAB/CLAB_GLOBAL DESIGN LEADERSHIP/gdla-site-v3_opt.mp4"
     ]
   },
   {

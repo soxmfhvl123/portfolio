@@ -24,6 +24,7 @@ exclude:
   - "generate_media_json.py"
   - "test_parse.js"
   - "line.txt"
+  - "tools"
   # unreferenced media in resume/img
   - "resume/img/FUTUREOFGD/djinc_a_photograph_of_a_compact_disc_sculpture_crafted_from_mat_0f6cbb60-fefd-4f6e-b715-51479e57ff14.png"
   - "resume/img/FUTUREOFGD/djinc_a_woman_in_a_sculptural_black_couture_gown_lying_on_sun-b_d644647d-2ec5-44b8-83b4-c7f6f1d97a71.png"

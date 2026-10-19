@@ -7,6 +7,16 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // Images load as smaller webp copies made by tools/build_resume_thumbs.py
+    // (<name>.w320.webp for the hero grid, <name>.w960.webp everywhere else);
+    // if a copy is missing the original file loads instead.
+    const sized = (src, w) => (/\.(png|jpe?g|webp)$/i.test(src) && !/\.w\d+\.webp$/i.test(src))
+        ? src.replace(/\.[^./]+$/, '.w' + w + '.webp') : src;
+    const setSized = (img, src, w) => {
+        img.onerror = () => { img.onerror = null; img.src = src; };
+        img.src = sized(src, w);
+    };
+
     // ===== Rainbow Trail Canvas only (particles removed) =====
     const rCanvas = document.getElementById('rainbowTrailCanvas');
     const rCtx = rCanvas.getContext('2d');
@@ -45,9 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const cell = document.createElement('div');
             cell.className = 'hero-grid-cell';
             const imgEl = document.createElement('img');
-            imgEl.src = shuffled[i % shuffled.length];
             imgEl.alt = '';
+            imgEl.decoding = 'async';
             imgEl.loading = i < 32 ? 'eager' : 'lazy';
+            setSized(imgEl, shuffled[i % shuffled.length], 320);
             cell.appendChild(imgEl);
             heroImageGrid.appendChild(cell);
             gridCells.push({ el: cell, src: shuffled[i % shuffled.length] });
@@ -64,8 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             // Only update src if it's different to avoid redundant loads
-            if (heroPopupImg.getAttribute('src') !== src) {
-                heroPopupImg.src = src;
+            if (heroPopupImg.dataset.src !== src) {
+                heroPopupImg.dataset.src = src;
+                setSized(heroPopupImg, src, 960);
             }
             
             heroPopup.classList.add('active');
@@ -296,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Preload future images
     futureImages.forEach((src, i) => {
-        setTimeout(() => { const img = new Image(); img.src = src; }, i * 50);
+        setTimeout(() => { setSized(new Image(), src, 960); }, i * 50);
     });
 
     let futureTrailIndex = 0;
@@ -316,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const x = e.clientX - rect.left, y = e.clientY - rect.top;
                 const img = document.createElement('img');
                 img.className = 'futureofgd-trail-img';
-                img.src = futureImages[futureTrailIndex % futureImages.length];
+                setSized(img, futureImages[futureTrailIndex % futureImages.length], 960);
                 futureTrailIndex++;
                 img.style.left = (x - 100 + (Math.random() - 0.5) * 50) + 'px';
                 img.style.top = (y - 130 + (Math.random() - 0.5) * 50) + 'px';
@@ -592,7 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
             expPreviewVideo.style.display = 'none';
             expPreviewVideo.pause();
             expPreviewImg.style.display = 'block';
-            expPreviewImg.src = src;
+            setSized(expPreviewImg, src, 960);
         }
     }
 
@@ -625,7 +637,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     const img = new Image();
                     img.onload = () => loadedImages.set(src, img);
-                    img.src = src;
+                    setSized(img, src, 960);
                 }, i * 150);
             });
         }

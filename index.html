@@ -49,12 +49,33 @@
     gap:10px;
     justify-self:start;
   }
-  #brand-logo-canvas{
-    filter:invert(1); /* the logo texture is black - flip it for the dark page */
+  /* Small spinning FLUXUS logo mark: a thin card (logo on both faces, light
+     edges) turning at a constant speed - plain CSS 3D, no WebGL. */
+  .brand-mark{
     width:30px;
     height:30px;
-    display:block;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     flex-shrink:0;
+  }
+  .brand-card{
+    position:relative;
+    width:12px;
+    height:24px;
+    transform-style:preserve-3d;
+    animation:brand-spin 6.98s linear infinite; /* 0.9 rad/s */
+  }
+  .brand-card > *{ position:absolute; inset:0; backface-visibility:hidden; }
+  .brand-card img{ width:100%; height:100%; filter:invert(1); } /* the logo art is black */
+  .brand-card .f{ transform:translateZ(0.5px); }
+  .brand-card .b{ transform:rotateY(180deg) translateZ(0.5px); }
+  .brand-card i{ left:50%; width:1px; margin-left:-0.5px; background:#eee; }
+  .brand-card .l{ transform:rotateY(-90deg) translateZ(6px); }
+  .brand-card .r{ transform:rotateY(90deg) translateZ(6px); }
+  @keyframes brand-spin{
+    from{ transform:perspective(48px) rotateY(0deg); }
+    to{ transform:perspective(48px) rotateY(360deg); }
   }
   .wordmark{
     font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -65,19 +86,6 @@
     text-decoration:none;
     white-space:nowrap;
   }
-  .clock{
-    display:flex;
-    align-items:baseline;
-    justify-content:center;
-    justify-self:center;
-    gap:6px;
-    font-size:0.8rem;
-    letter-spacing:0.08em;
-    color:var(--ink);
-    font-variant-numeric:tabular-nums;
-    white-space:nowrap;
-  }
-  .clock .dot{ opacity:0.5; }
   .resume-link{
     font-size:0.8rem;
     letter-spacing:0.08em;
@@ -90,103 +98,6 @@
   .resume-link:hover{ opacity:0.5; }
   .header-links{ display:flex; gap:24px; justify-self:end; grid-column:3; }
   .resume-link[aria-current="page"]{ opacity:0.45; }
-
-  /* ===== HERO (3D golden astroboy stage + background image wheel) ===== */
-  .hero-stage{
-    position:relative;
-    height:380vh;
-    width:100%;
-  }
-  #wheel-canvas-back{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100vh;
-    display:block;
-    z-index:2;
-    opacity:0;
-    transition:opacity 0.5s ease;
-    will-change:transform;
-  }
-  #wheel-canvas{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100vh;
-    display:block;
-    z-index:4;
-    opacity:0;
-    transition:opacity 0.5s ease;
-    will-change:transform;
-  }
-  #wheel-video-pool{
-    position:fixed;
-    top:0; left:0;
-    width:1px; height:1px;
-    overflow:hidden;
-    opacity:0;
-    pointer-events:none;
-  }
-  #astroboy-canvas{
-    position:fixed;
-    top:50%;
-    left:50%;
-    /* fixed at its largest size; scroll only changes transform (GPU), never
-       width/height, so the WebGL buffer isn't reallocated while scrolling */
-    width:min(104vw, 104vh);
-    height:min(104vw, 104vh);
-    transform:translate(-50%, -50%);
-    transform-origin:center center;
-    z-index:3;
-    pointer-events:none;
-    opacity:0;
-    transition:opacity 1s ease;
-    will-change:top;
-  }
-
-  /* ===== MANIFESTO (typed statement stack under the golden figure) ===== */
-  .manifesto{
-    position:relative;
-    z-index:5; /* type sits in front of the golden figure (z 3) */
-    pointer-events:none;
-    min-height:100vh;
-    min-height:100dvh;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    padding:14vh 32px 28px;
-  }
-  .manifesto-lines{
-    margin:0;
-    padding:0;
-    list-style:none;
-    font-size:clamp(1.9rem, 5.2vw, 4.6rem);
-    line-height:1.04;
-    font-weight:400;
-    letter-spacing:-0.025em;
-    color:var(--ink);
-  }
-  .manifesto-lines li{ min-height:1.04em; }
-  .manifesto-lines .caret{
-    display:inline-block;
-    width:0.06em;
-    height:0.82em;
-    margin-left:0.04em;
-    background:var(--ink);
-    vertical-align:-0.06em;
-    animation:caret-blink 1s steps(1) infinite;
-  }
-  @keyframes caret-blink{ 50%{ opacity:0; } }
-  .manifesto-caption{
-    max-width:520px;
-    margin:0;
-    font-size:0.7rem;
-    line-height:1.5;
-    letter-spacing:0.04em;
-    color:var(--dim);
-  }
 
   /* ===== BACK TO TOP (bottom-right, left of the vertical copyright) ===== */
   .to-top{
@@ -517,8 +428,7 @@
       padding:22px 20px;
       text-align:center;
     }
-    .brand, .clock, .resume-link, .header-links{ justify-self:center; grid-column:auto; }
-    .manifesto{ padding:12vh 20px 22px; }
+    .brand, .resume-link, .header-links{ justify-self:center; grid-column:auto; }
     .edge-mark{ right:6px; font-size:0.58rem; }
     .to-top{ right:30px; bottom:20px; width:40px; height:40px; }
     .section-nav{ padding:12px 20px 8px; gap:4px; font-size:0.9rem; letter-spacing:0.05em; }
@@ -549,9 +459,6 @@
     .footer-brief{ display:inline; }
   }
 
-  /* ===== Phones / touch tablets: no image wheel (too heavy there) ===== */
-  .no-wheel .hero-stage{ height:100vh; height:100dvh; }
-  .no-wheel #wheel-canvas, .no-wheel #wheel-canvas-back, .no-wheel #wheel-video-pool{ display:none; }
 </style>
 <script>
   // Decided once, before anything renders: small screens and touch-only
@@ -574,7 +481,7 @@
 
   <header class="site-header">
     <div class="brand">
-      <canvas id="brand-logo-canvas" aria-hidden="true"></canvas>
+      <span class="brand-mark" aria-hidden="true"><span class="brand-card"><img class="f" src="assets/fluxus-logo.png" alt="" decoding="async"><img class="b" src="assets/fluxus-logo.png" alt="" decoding="async"><i class="l"></i><i class="r"></i></span></span>
       <a class="wordmark" href="index.html">STUDIO FLUXUS</a>
     </div>
     <nav class="header-links" aria-label="Elsewhere">
@@ -666,7 +573,8 @@
     </div>
   </div>
 
-  <script src="works.js"></script>
+  <script src="works.js?v=6611dc08"></script>
+  <script src="media-meta.js?v=3e2445b8"></script>
   <script>
     // (the typed manifesto lives on wheel.html with the hero)
     // ===== Works stream, index, category filter, lightbox, section nav =====
@@ -686,6 +594,7 @@
           m[prefix[1]] = true;
           entry = entry.slice(prefix[0].length);
         }
+        m.path = entry;
         m.src = encodeURI(entry);
         return m;
       }
@@ -701,12 +610,35 @@
       function tileClass(m) {
         return [m.light ? 'is-light' : '', m.bleed ? 'is-bleed' : ''].join(' ').trim() || null;
       }
-      function fitTo(node, btn, w, h) {
+      function sizeTo(node, w, h) {
         if (!w || !h) return;
         node.style.setProperty('--ar', (w / h).toFixed(4));
         node.style.maxWidth = w + 'px';
         node.style.maxHeight = h + 'px';
+      }
+      function fitTo(node, btn, w, h) {
+        if (!w || !h) return;
+        sizeTo(node, w, h);
         btn.classList.add('is-loaded');
+      }
+      // media-meta.js (tools/build_media_meta.py): [width, height, smaller
+      // copies] per file, so tiles take their final size before anything
+      // downloads, and images load a copy close to the size they're shown at.
+      var MEDIA = window.FLUXUS_MEDIA || {};
+      var vw = document.documentElement.clientWidth || window.innerWidth;
+      function shownWidth(info, bleed) {
+        if (narrow) return vw - 40;
+        if (bleed) return vw - 64;
+        var rowH = Math.min(Math.max(220, vw * 0.3), 500);
+        return Math.min(rowH * info[0] / info[1], vw - 64, info[0]);
+      }
+      function setSources(img, m, info) {
+        var tiers = info[2];
+        if (!tiers || !tiers.length) return;
+        var base = m.src.replace(/\.[^./]+$/, '');
+        img.srcset = tiers.map(function (t) { return base + '.w' + t + '.webp ' + t + 'w'; })
+          .concat(m.src + ' ' + info[0] + 'w').join(', ');
+        img.sizes = Math.round(shownWidth(info, m.bleed)) + 'px';
       }
       function el(tag, cls, text) {
         var n = document.createElement(tag);
@@ -747,24 +679,35 @@
             node.preload = 'none';
             node.dataset.src = videoSrc(m.src);
             node.poster = posterOf(m.src);
-            // size the tile from the poster right away, then from the clip itself
-            (function (vid, tile) {
-              var probe = new Image();
-              probe.onload = function () { if (!vid.videoWidth) fitTo(vid, tile, probe.naturalWidth, probe.naturalHeight); };
-              probe.src = vid.poster;
+            // size the tile from the table right away (or the poster), then from the clip itself
+            (function (vid, tile, info) {
+              if (info) fitTo(vid, tile, info[0], info[1]);
+              else {
+                var probe = new Image();
+                probe.onload = function () { if (!vid.videoWidth) fitTo(vid, tile, probe.naturalWidth, probe.naturalHeight); };
+                probe.src = vid.poster;
+              }
               vid.addEventListener('loadedmetadata', function () {
                 fitTo(vid, tile, vid.videoWidth, vid.videoHeight);
               });
-            })(node, btn);
+            })(node, btn, MEDIA[m.path]);
             lazyVideos.push(node);
           } else {
             node = document.createElement('img');
             node.loading = 'lazy';
             node.decoding = 'async';
             node.alt = w.project;
-            node.addEventListener('load', function () {
-              fitTo(node, btn, node.naturalWidth, node.naturalHeight);
-            });
+            var info = MEDIA[m.path];
+            if (info) {
+              node.width = info[0]; node.height = info[1];
+              sizeTo(node, info[0], info[1]);
+              setSources(node, m, info);
+              node.addEventListener('load', function () { btn.classList.add('is-loaded'); });
+            } else {
+              node.addEventListener('load', function () {
+                fitTo(node, btn, node.naturalWidth, node.naturalHeight);
+              });
+            }
             node.src = m.src;
           }
           btn.appendChild(node);
@@ -1077,86 +1020,6 @@
     <a class="footer-full" href="mailto:soxmfhvl123@gmail.com">soxmfhvl123@gmail.com</a>
     <span class="footer-brief">STUDIO FLUXUS</span>
   </footer>
-
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-    }
-  }
-  </script>
-
-
-
-
-  <script type="module">
-    // ===== Small spinning 3D FLUXUS logo mark, top-left of the header =====
-    // A thin extruded "card" (not just a flat spinning image) so it reads as
-    // a real object as it turns - constant-speed ("linear") rotation, always
-    // spinning regardless of scroll, independent of every other animation
-    // on the page.
-    import * as THREE from 'three';
-
-    var logoCanvas = document.getElementById('brand-logo-canvas');
-    if (logoCanvas && window.WebGLRenderingContext) {
-      var logoRenderer = new THREE.WebGLRenderer({ canvas: logoCanvas, antialias: true, alpha: true });
-      logoRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      logoRenderer.outputColorSpace = THREE.SRGBColorSpace;
-
-      var logoScene = new THREE.Scene();
-      var logoCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 10);
-      logoCamera.position.set(0, 0, 3.2);
-      logoCamera.lookAt(0, 0, 0);
-
-      // logo mark is 964x1927 (about 1:2) - give it a bit of real depth
-      var LOGO_ASPECT = 964 / 1927;
-      var LOGO_H = 1.6, LOGO_W = LOGO_H * LOGO_ASPECT, LOGO_DEPTH = 0.06;
-
-      var edgeMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
-      // Both +z and -z faces show the logo mark so the card never goes
-      // blank as it spins. Each gets its OWN single-sided (FrontSide)
-      // material - earlier this was one shared DoubleSide material, which
-      // let the back face's copy show through the front face's alpha
-      // cutouts (looked like two overlapping logos). Single-sided means
-      // only whichever face currently points at the camera ever renders.
-      var faceMat = new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.5, side: THREE.FrontSide });
-      var backFaceMat = new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.5, side: THREE.FrontSide });
-      var logoGeo = new THREE.BoxGeometry(LOGO_W, LOGO_H, LOGO_DEPTH);
-      // BoxGeometry face order: +x, -x, +y, -y, +z, -z
-      var logoMesh = new THREE.Mesh(logoGeo, [edgeMat, edgeMat, edgeMat, edgeMat, faceMat, backFaceMat]);
-      logoScene.add(logoMesh);
-
-      new THREE.TextureLoader().load('assets/fluxus-logo.png', function (tex) {
-        tex.colorSpace = THREE.SRGBColorSpace;
-        faceMat.map = tex;
-        faceMat.needsUpdate = true;
-        backFaceMat.map = tex;
-        backFaceMat.needsUpdate = true;
-      });
-
-      function resizeLogo() {
-        var w = logoCanvas.clientWidth || 1;
-        var h = logoCanvas.clientHeight || 1;
-        logoRenderer.setSize(w, h, false);
-        logoCamera.aspect = w / h;
-        logoCamera.updateProjectionMatrix();
-      }
-      window.addEventListener('resize', resizeLogo);
-      resizeLogo();
-
-      var LOGO_SPIN_SPEED = 0.9; // radians / second - constant, not eased
-      var lastLogoT = performance.now();
-      function animateLogo(t) {
-        var dt = Math.min((t - lastLogoT) / 1000, 0.1);
-        lastLogoT = t;
-        logoMesh.rotation.y += LOGO_SPIN_SPEED * dt;
-        logoRenderer.render(logoScene, logoCamera);
-        requestAnimationFrame(animateLogo);
-      }
-      requestAnimationFrame(animateLogo);
-    }
-  </script>
 
 </body>
 </html>

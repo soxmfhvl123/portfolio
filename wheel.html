@@ -49,12 +49,33 @@
     gap:10px;
     justify-self:start;
   }
-  #brand-logo-canvas{
-    filter:invert(1); /* the logo texture is black - flip it for the dark page */
+  /* Small spinning FLUXUS logo mark: a thin card (logo on both faces, light
+     edges) turning at a constant speed - plain CSS 3D, no WebGL. */
+  .brand-mark{
     width:30px;
     height:30px;
-    display:block;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     flex-shrink:0;
+  }
+  .brand-card{
+    position:relative;
+    width:12px;
+    height:24px;
+    transform-style:preserve-3d;
+    animation:brand-spin 6.98s linear infinite; /* 0.9 rad/s */
+  }
+  .brand-card > *{ position:absolute; inset:0; backface-visibility:hidden; }
+  .brand-card img{ width:100%; height:100%; filter:invert(1); } /* the logo art is black */
+  .brand-card .f{ transform:translateZ(0.5px); }
+  .brand-card .b{ transform:rotateY(180deg) translateZ(0.5px); }
+  .brand-card i{ left:50%; width:1px; margin-left:-0.5px; background:#eee; }
+  .brand-card .l{ transform:rotateY(-90deg) translateZ(6px); }
+  .brand-card .r{ transform:rotateY(90deg) translateZ(6px); }
+  @keyframes brand-spin{
+    from{ transform:perspective(48px) rotateY(0deg); }
+    to{ transform:perspective(48px) rotateY(360deg); }
   }
   .wordmark{
     font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -574,7 +595,7 @@
 
   <header class="site-header">
     <div class="brand">
-      <canvas id="brand-logo-canvas" aria-hidden="true"></canvas>
+      <span class="brand-mark" aria-hidden="true"><span class="brand-card"><img class="f" src="assets/fluxus-logo.png" alt="" decoding="async"><img class="b" src="assets/fluxus-logo.png" alt="" decoding="async"><i class="l"></i><i class="r"></i></span></span>
       <a class="wordmark" href="index.html">STUDIO FLUXUS</a>
     </div>
     <nav class="header-links" aria-label="Elsewhere">
@@ -1253,73 +1274,6 @@
     }
   </script>
 
-  <script type="module">
-    // ===== Small spinning 3D FLUXUS logo mark, top-left of the header =====
-    // A thin extruded "card" (not just a flat spinning image) so it reads as
-    // a real object as it turns - constant-speed ("linear") rotation, always
-    // spinning regardless of scroll, independent of every other animation
-    // on the page.
-    import * as THREE from 'three';
-
-    var logoCanvas = document.getElementById('brand-logo-canvas');
-    if (logoCanvas && window.WebGLRenderingContext) {
-      var logoRenderer = new THREE.WebGLRenderer({ canvas: logoCanvas, antialias: true, alpha: true });
-      logoRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      logoRenderer.outputColorSpace = THREE.SRGBColorSpace;
-
-      var logoScene = new THREE.Scene();
-      var logoCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 10);
-      logoCamera.position.set(0, 0, 3.2);
-      logoCamera.lookAt(0, 0, 0);
-
-      // logo mark is 964x1927 (about 1:2) - give it a bit of real depth
-      var LOGO_ASPECT = 964 / 1927;
-      var LOGO_H = 1.6, LOGO_W = LOGO_H * LOGO_ASPECT, LOGO_DEPTH = 0.06;
-
-      var edgeMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
-      // Both +z and -z faces show the logo mark so the card never goes
-      // blank as it spins. Each gets its OWN single-sided (FrontSide)
-      // material - earlier this was one shared DoubleSide material, which
-      // let the back face's copy show through the front face's alpha
-      // cutouts (looked like two overlapping logos). Single-sided means
-      // only whichever face currently points at the camera ever renders.
-      var faceMat = new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.5, side: THREE.FrontSide });
-      var backFaceMat = new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.5, side: THREE.FrontSide });
-      var logoGeo = new THREE.BoxGeometry(LOGO_W, LOGO_H, LOGO_DEPTH);
-      // BoxGeometry face order: +x, -x, +y, -y, +z, -z
-      var logoMesh = new THREE.Mesh(logoGeo, [edgeMat, edgeMat, edgeMat, edgeMat, faceMat, backFaceMat]);
-      logoScene.add(logoMesh);
-
-      new THREE.TextureLoader().load('assets/fluxus-logo.png', function (tex) {
-        tex.colorSpace = THREE.SRGBColorSpace;
-        faceMat.map = tex;
-        faceMat.needsUpdate = true;
-        backFaceMat.map = tex;
-        backFaceMat.needsUpdate = true;
-      });
-
-      function resizeLogo() {
-        var w = logoCanvas.clientWidth || 1;
-        var h = logoCanvas.clientHeight || 1;
-        logoRenderer.setSize(w, h, false);
-        logoCamera.aspect = w / h;
-        logoCamera.updateProjectionMatrix();
-      }
-      window.addEventListener('resize', resizeLogo);
-      resizeLogo();
-
-      var LOGO_SPIN_SPEED = 0.9; // radians / second - constant, not eased
-      var lastLogoT = performance.now();
-      function animateLogo(t) {
-        var dt = Math.min((t - lastLogoT) / 1000, 0.1);
-        lastLogoT = t;
-        logoMesh.rotation.y += LOGO_SPIN_SPEED * dt;
-        logoRenderer.render(logoScene, logoCamera);
-        requestAnimationFrame(animateLogo);
-      }
-      requestAnimationFrame(animateLogo);
-    }
-  </script>
 
 </body>
 </html>
