@@ -4,6 +4,7 @@
 // Prefix 'light:' for dark artwork on a transparent background (shown on a light tile), 'bleed:' for full column width.
 // `tags`: any of WEB, BRANDING, FURNITURE, 3D, PRINTS, MOTION, INTERACTION (drives the category filter).
 // Leave `year` empty ('') to show the type on its own. Optional `link` adds a Website row; `mediaLink: true` makes the media open that link.
+// Optional `preview: N` shows only the first N media inline (the rest via "View all").
 
 window.FLUXUS_WORKS = [
   {
@@ -27,14 +28,15 @@ window.FLUXUS_WORKS = [
     tags: ["BRANDING", "MOTION"],
     link: "https://fakechurch.xyz/",
     mediaLink: true,
+    preview: 2,
     media: [
       "video:resume/img/OTHERPROJECTS/fakechurch/fc-logo_opt.mp4",
+      "resume/img/OTHERPROJECTS/fakechurch/fc-last-supper-wide_web.webp",
       "resume/img/OTHERPROJECTS/fakechurch/fc-prayer_web.webp",
       "resume/img/OTHERPROJECTS/fakechurch/fc-fist-rings_web.webp",
       "resume/img/OTHERPROJECTS/fakechurch/fc-signet-hand_web.webp",
       "resume/img/OTHERPROJECTS/fakechurch/fc-bracelet_web.webp",
-      "resume/img/OTHERPROJECTS/fakechurch/fc-necklace_web.webp",
-      "resume/img/OTHERPROJECTS/fakechurch/fc-last-supper_web.webp"
+      "resume/img/OTHERPROJECTS/fakechurch/fc-necklace_web.webp"
     ]
   },
   {

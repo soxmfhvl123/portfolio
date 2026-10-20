@@ -573,8 +573,8 @@
     </div>
   </div>
 
-  <script src="works.js?v=6611dc08"></script>
-  <script src="media-meta.js?v=3e2445b8"></script>
+  <script src="works.js?v=fdb264ed"></script>
+  <script src="media-meta.js?v=ffdb2817"></script>
   <script>
     // (the typed manifesto lives on wheel.html with the hero)
     // ===== Works stream, index, category filter, lightbox, section nav =====
@@ -655,7 +655,8 @@
         art.id = 'work-' + (wi + 1);
         art.dataset.tags = (w.tags || []).join(' ');
         var mediaWrap = el('div', 'work-media');
-        w.media.slice(0, PREVIEW).forEach(function (entry, mi) {
+        var shown = Math.min(w.preview || PREVIEW, PREVIEW);
+        w.media.slice(0, shown).forEach(function (entry, mi) {
           var m = parse(entry);
           var btn;
           if (w.mediaLink && w.link) {
@@ -731,12 +732,12 @@
           linkDd.appendChild(siteLink);
           meta.appendChild(linkDd);
         }
-        if (w.media.length > PREVIEW) {
+        if (w.media.length > shown) {
           meta.appendChild(el('dt', null, ''));
           var dd = el('dd');
           var more = el('button', 'work-more', 'View all ' + w.media.length);
           more.type = 'button';
-          more.addEventListener('click', function () { openLightbox(wi, PREVIEW); });
+          more.addEventListener('click', function () { openLightbox(wi, shown); });
           dd.appendChild(more);
           meta.appendChild(dd);
         }

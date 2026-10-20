@@ -10,7 +10,7 @@ Also refreshes the ?v= versions of works.js / media-meta.js in index.html.
 
 Run again after adding works:   py -3.11 tools/build_media_meta.py
 """
-import hashlib, json, os, re, subprocess, sys
+import hashlib, json, os, re, subprocess, sys, time
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -73,5 +73,10 @@ page = open(ix, encoding='utf8').read()
 for name in ('works.js', 'media-meta.js'):
     v = hashlib.md5(open(os.path.join(ROOT, name), 'rb').read()).hexdigest()[:8]
     page = re.sub(re.escape(name) + r'\?v=[0-9a-f]+', f'{name}?v={v}', page)
-open(ix, 'w', encoding='utf8', newline='\n').write(page)
+for attempt in range(20):  # an editor / sync tool can hold the file for a moment
+    try:
+        open(ix, 'w', encoding='utf8', newline='\n').write(page); break
+    except OSError:
+        if attempt == 19: raise
+        time.sleep(0.5)
 print(f'{len(meta)} entries, {made} thumbnails written, index.html versions updated')
