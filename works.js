@@ -8,6 +8,18 @@
 
 window.FLUXUS_WORKS = [
   {
+    project: "KINDA OFFICIAL",
+    client: "Kinda Official",
+    type: "Studio Website",
+    year: "2026",
+    tags: ["WEB", "BRANDING"],
+    link: "https://kindaofficial.xyz/",
+    mediaLink: true,
+    media: [
+      "video:resume/img/OTHERPROJECTS/KINDA/kinda-site_opt.mp4"
+    ]
+  },
+  {
     project: "ONLY LOVE MAKES THE VASTNESS BEARABLE",
     client: "Self-initiated",
     type: "Interactive Typography Website",
@@ -16,7 +28,7 @@ window.FLUXUS_WORKS = [
     link: "https://soxmfhvl123.github.io/onlylovemakesthevastnessbearable/home/",
     mediaLink: true,
     media: [
-      "video:resume/img/OTHERPROJECTS/ONLYLOVE/olm-site_opt.mp4"
+      "video:resume/img/OTHERPROJECTS/ONLYLOVE/olm-pieces_opt.mp4"
     ]
   },
   {
