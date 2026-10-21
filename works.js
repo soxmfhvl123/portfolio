@@ -28,7 +28,8 @@ window.FLUXUS_WORKS = [
     link: "https://soxmfhvl123.github.io/onlylovemakesthevastnessbearable/home/",
     mediaLink: true,
     media: [
-      "video:resume/img/OTHERPROJECTS/ONLYLOVE/olm-pieces-v3_opt.mp4"
+      "video:resume/img/OTHERPROJECTS/ONLYLOVE/olm-pieces-v3_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/ONLYLOVE/love-3d-showreel_opt.mp4"
     ]
   },
   {
