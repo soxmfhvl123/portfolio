@@ -28,7 +28,7 @@ window.FLUXUS_WORKS = [
     link: "https://soxmfhvl123.github.io/onlylovemakesthevastnessbearable/home/",
     mediaLink: true,
     media: [
-      "video:resume/img/OTHERPROJECTS/ONLYLOVE/olm-pieces_opt.mp4"
+      "video:resume/img/OTHERPROJECTS/ONLYLOVE/olm-pieces-v2_opt.mp4"
     ]
   },
   {
@@ -120,7 +120,7 @@ window.FLUXUS_WORKS = [
     tags: ["WEB"],
     mediaLink: true,
     media: [
-      "video:resume/img/CLAB/CLAB_GLOBAL DESIGN LEADERSHIP/gdla-site-v3_opt.mp4"
+      "video:resume/img/CLAB/CLAB_GLOBAL DESIGN LEADERSHIP/gdla-site-v4_opt.mp4"
     ]
   },
   {
