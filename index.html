@@ -360,7 +360,7 @@
   .lightbox .lightbox-close{ position:absolute; top:20px; right:32px; }
   .lightbox-nav{ display:flex; gap:24px; }
 
-  /* ===== FEATURE VIDEO (full bleed, between description and footer) ===== */
+  /* ===== FEATURE VIDEO (full bleed, at the bottom of the page) ===== */
   .feature-video{
     width:100%;
     line-height:0;
@@ -398,6 +398,18 @@
     color:var(--ink);
     white-space:nowrap;
   }
+
+  /* ===== PAGE END: closing wordmark + footer over the feature video ===== */
+  .page-end{ position:relative; background:var(--paper); }
+  .page-end .end-overlay{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    z-index:6;
+    background:linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0));
+  }
+  .page-end .closing-logo{ background:transparent; padding-top:0; }
+  .page-end .site-footer{ background:transparent; color:rgba(255,255,255,0.75); }
+  .page-end .site-footer a:hover{ color:#fff; }
 
   /* ===== FOOTER ===== */
   .site-footer{
@@ -449,7 +461,7 @@
     .lightbox-stage{ padding:56px 12px 0; }
     .lightbox-bar{ padding:14px 20px 18px; }
     .lightbox .lightbox-close{ right:20px; }
-    .closing-logo{ padding:10vh 20px 0.5vh; }
+    .closing-logo{ padding:0 20px 0.5vh; }
     /* phones: just FLUXUS, sized by script to run exactly margin to margin */
     .closing-logo{ justify-content:flex-start; }
     .closing-word{ font-size:24vw; }
@@ -546,10 +558,6 @@
       </section>
     </main>
 
-    <section class="feature-video">
-      <video muted loop playsinline webkit-playsinline preload="none" poster="assets/feature-video_poster.jpg" data-src="assets/feature-video.mp4"></video>
-    </section>
-
     <section class="archive-section" id="contact">
       <h2 class="section-label">CONTACT</h2>
       <ul class="index-list">
@@ -573,8 +581,8 @@
     </div>
   </div>
 
-  <script src="works.js?v=fdb264ed"></script>
-  <script src="media-meta.js?v=ffdb2817"></script>
+  <script src="works.js?v=95b7d038"></script>
+  <script src="media-meta.js?v=38ff765e"></script>
   <script>
     // (the typed manifesto lives on wheel.html with the hero)
     // ===== Works stream, index, category filter, lightbox, section nav =====
@@ -961,6 +969,24 @@
       updateNav();
     })();
   </script>
+
+  <!-- page end: the feature video with the closing wordmark + footer laid over its bottom edge -->
+  <div class="page-end">
+    <section class="feature-video">
+      <video muted loop playsinline webkit-playsinline preload="none" poster="assets/feature-video_poster.jpg" data-src="assets/feature-video.mp4"></video>
+    </section>
+    <div class="end-overlay">
+      <section class="closing-logo">
+        <span class="closing-word">STUDIO</span>
+        <span class="closing-word">FLUXUS</span>
+      </section>
+      <footer class="site-footer">
+        <span class="footer-full">&copy; 2026 STUDIO FLUXUS</span>
+        <a class="footer-full" href="mailto:soxmfhvl123@gmail.com">soxmfhvl123@gmail.com</a>
+        <span class="footer-brief">STUDIO FLUXUS</span>
+      </footer>
+    </div>
+  </div>
   <script>
     // This clip sits well below the fold - fetching it eagerly on page
     // load competed with the hero wheel's own clips for bandwidth and
@@ -989,11 +1015,6 @@
       }
     })();
   </script>
-
-  <section class="closing-logo">
-    <span class="closing-word">STUDIO</span>
-    <span class="closing-word">FLUXUS</span>
-  </section>
   <script>
     // On phones the closing wordmark is FLUXUS alone, scaled so its ink runs
     // exactly from the left margin to the right margin like the content above.
@@ -1016,11 +1037,6 @@
     })();
   </script>
 
-  <footer class="site-footer">
-    <span class="footer-full">&copy; 2026 STUDIO FLUXUS</span>
-    <a class="footer-full" href="mailto:soxmfhvl123@gmail.com">soxmfhvl123@gmail.com</a>
-    <span class="footer-brief">STUDIO FLUXUS</span>
-  </footer>
 
 </body>
 </html>

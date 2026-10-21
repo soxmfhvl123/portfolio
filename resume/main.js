@@ -17,17 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
         img.src = sized(src, w);
     };
 
-    // ===== Rainbow Trail Canvas only (particles removed) =====
-    const rCanvas = document.getElementById('rainbowTrailCanvas');
-    const rCtx = rCanvas.getContext('2d');
+    // ===== Pointer position (hero grid drift, Future-of-GD letters) =====
     let mx = window.innerWidth / 2, my = window.innerHeight / 2;
 
-    function resizeCanvas() {
-        rCanvas.width = window.innerWidth;
-        rCanvas.height = window.innerHeight;
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
 
     document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
     document.addEventListener('touchmove', (e) => {
@@ -35,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
     document.addEventListener('touchend', () => { mx = window.innerWidth/2; my = window.innerHeight/2; }, { passive: true });
 
-    let frameCount = 0;
 
     // ===== Hero Image Grid (all 243 images via window.HERO_IMAGES) =====
     const heroImageGrid = document.getElementById('heroImageGrid');
@@ -117,36 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
         animateHeroGrid();
     }
 
-
-
-    // ===== Custom Cursor =====
-    const cursor = document.getElementById('cursor');
-    const cursorDot = cursor.querySelector('.cursor-dot');
-    const cursorRing = cursor.querySelector('.cursor-ring');
-    let cursorX = 0, cursorY = 0, ringX = 0, ringY = 0;
-    let lastCursorDotX = 0, lastCursorDotY = 0;
-    
-    document.addEventListener('mousemove', (e) => {
-        cursorX = e.clientX; cursorY = e.clientY;
-        if (Math.abs(cursorX - lastCursorDotX) > 0.5 || Math.abs(cursorY - lastCursorDotY) > 0.5) {
-            cursorDot.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
-            lastCursorDotX = cursorX;
-            lastCursorDotY = cursorY;
-        }
-    });
-
-    function animateCursor() {
-        ringX += (cursorX - ringX) * 0.12; ringY += (cursorY - ringY) * 0.12;
-        if (Math.abs(cursorX - ringX) > 0.1 || Math.abs(cursorY - ringY) > 0.1) {
-            cursorRing.style.transform = `translate(${ringX.toFixed(2)}px, ${ringY.toFixed(2)}px)`;
-        }
-        requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
-    document.querySelectorAll('a, button, .resume-block, .char-wrap, .tag, .project-line').forEach(el => {
-        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-    });
 
 
     // ===== EN / KR Language Toggle =====
@@ -369,93 +330,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateClock();
 
 
-    // ===== Rainbow Line Trail (Below Hero, not in futureofgd) =====
-    const trailPoints = [];
-    const TRAIL_LIFETIME = 2000; // 2 seconds
-    let heroBottom = 0;
-    let noRainbowSections = [];
-
-    function updateSectionBounds() {
-        const rect = heroSection.getBoundingClientRect();
-        heroBottom = rect.bottom + window.scrollY;
-
-        noRainbowSections = [];
-        document.querySelectorAll('[data-no-rainbow]').forEach(sec => {
-            const r = sec.getBoundingClientRect();
-            noRainbowSections.push({
-                top: r.top + window.scrollY,
-                bottom: r.bottom + window.scrollY
-            });
-        });
-    }
-    updateSectionBounds();
-    window.addEventListener('resize', updateSectionBounds);
-
-    function isInNoRainbowZone(absY) {
-        for (let i = 0; i < noRainbowSections.length; i++) {
-            if (absY >= noRainbowSections[i].top && absY <= noRainbowSections[i].bottom) return true;
-        }
-        return false;
-    }
-
-    document.addEventListener('mousemove', (e) => {
-        const scrollTop = window.scrollY || document.documentElement.scrollTop;
-        const absY = e.clientY + scrollTop;
-        if (absY > heroBottom && !isInNoRainbowZone(absY)) {
-            trailPoints.push({ x: e.clientX, y: e.clientY, time: Date.now() });
-        }
-    });
-
-    let isRainbowClear = true;
-    function animateRainbowTrail() {
-        const now = Date.now();
-
-        while (trailPoints.length > 0 && now - trailPoints[0].time > TRAIL_LIFETIME) {
-            trailPoints.shift();
-        }
-
-        if (trailPoints.length > 2) {
-            rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
-            isRainbowClear = false;
-            rCtx.lineWidth = 3;
-            rCtx.lineCap = 'round';
-            rCtx.lineJoin = 'round';
-
-            // Smooth quadratic curve through points
-            for (let i = 1; i < trailPoints.length - 1; i++) {
-                const p0 = trailPoints[i - 1];
-                const p1 = trailPoints[i];
-                const p2 = trailPoints[i + 1];
-                const age = now - p1.time;
-                const life = 1 - age / TRAIL_LIFETIME;
-                const hue = (i * 4) % 360;
-                const alpha = life * 0.8;
-                if (alpha <= 0) continue;
-
-                const midX = (p1.x + p2.x) / 2;
-                const midY = (p1.y + p2.y) / 2;
-
-                rCtx.beginPath();
-                if (i === 1) {
-                    rCtx.moveTo(p0.x, p0.y);
-                } else {
-                    const prevMidX = (p0.x + p1.x) / 2;
-                    const prevMidY = (p0.y + p1.y) / 2;
-                    rCtx.moveTo(prevMidX, prevMidY);
-                }
-                rCtx.quadraticCurveTo(p1.x, p1.y, midX, midY);
-                rCtx.strokeStyle = `hsla(${hue}, 90%, 60%, ${alpha})`;
-                rCtx.stroke();
-            }
-        } else if (!isRainbowClear) {
-            rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
-            isRainbowClear = true;
-        }
-
-        requestAnimationFrame(animateRainbowTrail);
-    }
-    animateRainbowTrail();
-
 
     // ===== Scroll Reveal =====
     const revealObserver = new IntersectionObserver((entries) => {
@@ -503,11 +377,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const sectionNames = { 
         hero: 'PORTFOLIO 2026', 
         about: 'ABOUT', 
-        cdjstudio: 'CDJ STUDIO',
         experience: 'EXPERIENCE', 
         mastermind: 'MASTERMIND',
-        'vibecoding-gallery': 'VIBE CODING',
-        'research-section': 'RESEARCH',
+        'vibecoding-gallery': 'OTHER PROJECTS',
+        'research-section': 'THOUGHTS',
         futureofgd: 'FUTURE OF GD', 
         contact: 'CONTACT' 
     };
@@ -519,23 +392,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { threshold: 0.3 });
     document.querySelectorAll('.section, .hero').forEach(s => sectionObs.observe(s));
 
-
-    // ===== Counter Animation =====
-    const counterObs = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const el = entry.target, target = parseInt(el.dataset.count);
-                let cur = 0; const step = target / 40;
-                const timer = setInterval(() => {
-                    cur += step;
-                    if (cur >= target) { cur = target; clearInterval(timer); }
-                    el.textContent = Math.floor(cur);
-                }, 30);
-                counterObs.unobserve(el);
-            }
-        });
-    }, { threshold: 0.5 });
-    document.querySelectorAll('[data-count]').forEach(c => counterObs.observe(c));
 
 
     // ===== Experience + Project Hover Preview =====
@@ -680,13 +536,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ===== Magnetic Elements =====
-    document.querySelectorAll('[data-magnetic]').forEach(el => {
-        el.addEventListener('mousemove', (e) => {
-            const r = el.getBoundingClientRect();
-            el.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.25}px, ${(e.clientY - r.top - r.height / 2) * 0.25}px)`;
-        });
-        el.addEventListener('mouseleave', () => { el.style.transform = ''; });
-    });
 
 });

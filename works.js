@@ -8,6 +8,18 @@
 
 window.FLUXUS_WORKS = [
   {
+    project: "ONLY LOVE MAKES THE VASTNESS BEARABLE",
+    client: "Self-initiated",
+    type: "Interactive Typography Website",
+    year: "2026",
+    tags: ["WEB", "INTERACTION"],
+    link: "https://soxmfhvl123.github.io/onlylovemakesthevastnessbearable/home/",
+    mediaLink: true,
+    media: [
+      "video:resume/img/OTHERPROJECTS/ONLYLOVE/olm-site_opt.mp4"
+    ]
+  },
+  {
     project: "REF-ARCHIVE",
     client: "Self-initiated",
     type: "Reference Archive Website",
