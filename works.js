@@ -3,13 +3,12 @@
 // are relative to the site root; prefix a path with 'video:' for an mp4.
 // Prefix 'light:' for dark artwork on a transparent background (shown on a light tile), 'bleed:' for full column width.
 // `tags`: any of WEB, BRANDING, FURNITURE, 3D, PRINTS, MOTION, INTERACTION (drives the category filter).
-// Leave `year` empty ('') to show the type on its own. Optional `link` adds a Website row; `mediaLink: true` makes the media open that link.
+// Leave `year` empty ('') to show the type on its own. Leave out `client` to drop the Client row. Optional `link` adds a Website row; `mediaLink: true` makes the media open that link.
 // Optional `preview: N` shows only the first N media inline (the rest via "View all").
 
 window.FLUXUS_WORKS = [
   {
-    project: "KINDA OFFICIAL",
-    client: "Kinda Official",
+    project: "Choi DongJin",
     type: "Studio Website",
     year: "2026",
     tags: ["WEB", "BRANDING"],

@@ -3,12 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STUDIO FLUXUS™ — Wheel</title>
-<meta name="description" content="STUDIO FLUXUS™ is an independent creative platform founded by Dongjin Choi, documenting experiments across graphic design, objects, digital media, and visual culture.">
-<meta property="og:title" content="STUDIO FLUXUS™">
+<title>KINDA OFFICIAL — Wheel</title>
+<meta name="description" content="Kinda Official is an independent creative platform founded by Dongjin Choi, documenting experiments across graphic design, objects, digital media, and visual culture.">
+<meta property="og:title" content="KINDA OFFICIAL">
 <meta property="og:description" content="Art Archive & Design Studio — an independent creative platform founded by Dongjin Choi.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://kindaofficial.xyz/wheel.html">
+<meta property="og:image" content="https://kindaofficial.xyz/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23FF00FF'/></svg>">
 <style>
   :root{
@@ -562,10 +566,10 @@
     .lightbox-bar{ padding:14px 20px 18px; }
     .lightbox .lightbox-close{ right:20px; }
     .closing-logo{ padding:10vh 20px 0.5vh; }
-    /* phones: just FLUXUS, sized by script to run exactly margin to margin */
+    /* phones: KINDA OFFICIAL on one line, sized by script to run exactly margin to margin */
     .closing-logo{ justify-content:flex-start; }
-    .closing-word{ font-size:24vw; }
-    .closing-word:first-child{ display:none; }
+    .closing-word:first-child{ margin-right:0.25em; }
+    .closing-word{ font-size:10vw; }
     .site-footer{ padding:2px 20px 10px; justify-content:center; }
     .footer-full{ display:none; }
     .footer-brief{ display:inline; }
@@ -597,7 +601,7 @@
   <header class="site-header">
     <div class="brand">
       <span class="brand-mark" aria-hidden="true"><span class="brand-card"><img class="f" src="assets/fluxus-logo.png" alt="" decoding="async"><img class="b" src="assets/fluxus-logo.png" alt="" decoding="async"><i class="l"></i><i class="r"></i></span></span>
-      <a class="wordmark" href="index.html">STUDIO FLUXUS</a>
+      <a class="wordmark" href="index.html">KINDA OFFICIAL</a>
     </div>
     <nav class="header-links" aria-label="Elsewhere">
       <a class="resume-link" href="https://ref-archive.site/" target="_blank" rel="noopener">ref-archive &nearr;</a>
@@ -630,7 +634,7 @@
       });
     })();
   </script>
-  <div class="edge-mark" aria-hidden="true">&copy; STUDIO FLUXUS &mdash; 2026</div>
+  <div class="edge-mark" aria-hidden="true">&copy; KINDA OFFICIAL &mdash; 2026</div>
 
   <section class="manifesto" aria-label="Manifesto">
     <!-- Each line is typed out in turn once the section scrolls into view.
@@ -643,7 +647,7 @@
       <li>Between the physical and the digital</li>
       <li>Collected, developed, released, revisited</li>
     </ul>
-    <p class="manifesto-caption">FLUXUS [Art Archive &amp; Design Studio] is an independent creative platform founded by Dongjin Choi, documenting experiments across graphic design, objects, digital media, and visual culture.</p>
+    <p class="manifesto-caption">Kinda Official [Art Archive &amp; Design Studio] is an independent creative platform founded by Dongjin Choi, documenting experiments across graphic design, objects, digital media, and visual culture.</p>
   </section>
 
   <script>
@@ -693,24 +697,26 @@
   </script>
 
   <section class="closing-logo">
-    <span class="closing-word">STUDIO</span>
-    <span class="closing-word">FLUXUS</span>
+    <span class="closing-word">KINDA</span>
+    <span class="closing-word">OFFICIAL</span>
   </section>
   <script>
-    // On phones the closing wordmark is FLUXUS alone, scaled so its ink runs
+    // On phones the closing wordmark (both words on one line) is scaled so it runs
     // exactly from the left margin to the right margin like the content above.
     (function () {
       var section = document.querySelector('.closing-logo');
-      var word = section && section.querySelector('.closing-word:last-child');
-      if (!word) return;
+      var words = section ? section.querySelectorAll('.closing-word') : [];
+      if (!words.length) return;
+      var first = words[0], last = words[words.length - 1];
       var phone = window.matchMedia('(max-width:640px)');
+      function set(v) { for (var i = 0; i < words.length; i++) words[i].style.fontSize = v; }
       function fit() {
-        if (!phone.matches) { word.style.fontSize = ''; word.style.letterSpacing = ''; return; }
+        if (!phone.matches) { set(''); return; }
         var cs = getComputedStyle(section);
         var target = section.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-        word.style.fontSize = '100px';
-        var w = word.getBoundingClientRect().width;
-        if (w > 0) word.style.fontSize = (100 * target / w).toFixed(2) + 'px';
+        set('100px');
+        var w = last.getBoundingClientRect().right - first.getBoundingClientRect().left;
+        if (w > 0) set((100 * target / w).toFixed(2) + 'px');
       }
       fit();
       window.addEventListener('resize', fit);
@@ -719,9 +725,9 @@
   </script>
 
   <footer class="site-footer">
-    <span class="footer-full">&copy; 2026 STUDIO FLUXUS</span>
+    <span class="footer-full">&copy; 2026 KINDA OFFICIAL</span>
     <a class="footer-full" href="mailto:soxmfhvl123@gmail.com">soxmfhvl123@gmail.com</a>
-    <span class="footer-brief">STUDIO FLUXUS</span>
+    <span class="footer-brief">KINDA OFFICIAL</span>
   </footer>
 
   <script type="importmap">
