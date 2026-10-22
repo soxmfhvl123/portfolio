@@ -8,14 +8,14 @@
 
 window.FLUXUS_WORKS = [
   {
-    project: "Choi DongJin",
+    project: "Choi Dong Jin",
     type: "Studio Website",
     year: "2026",
     tags: ["WEB", "BRANDING"],
     link: "https://cdj.kr/",
     mediaLink: true,
     media: [
-      "video:resume/img/OTHERPROJECTS/KINDA/kinda-site_opt.mp4"
+      "video:resume/img/OTHERPROJECTS/CDJ/cdj-site_opt.mp4"
     ]
   },
   {

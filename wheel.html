@@ -54,34 +54,6 @@
     gap:10px;
     justify-self:start;
   }
-  /* Small spinning FLUXUS logo mark: a thin card (logo on both faces, light
-     edges) turning at a constant speed - plain CSS 3D, no WebGL. */
-  .brand-mark{
-    width:30px;
-    height:30px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-  }
-  .brand-card{
-    position:relative;
-    width:12px;
-    height:24px;
-    transform-style:preserve-3d;
-    animation:brand-spin 6.98s linear infinite; /* 0.9 rad/s */
-  }
-  .brand-card > *{ position:absolute; inset:0; backface-visibility:hidden; }
-  .brand-card img{ width:100%; height:100%; filter:invert(1); } /* the logo art is black */
-  .brand-card .f{ transform:translateZ(0.5px); }
-  .brand-card .b{ transform:rotateY(180deg) translateZ(0.5px); }
-  .brand-card i{ left:50%; width:1px; margin-left:-0.5px; background:#eee; }
-  .brand-card .l{ transform:rotateY(-90deg) translateZ(6px); }
-  .brand-card .r{ transform:rotateY(90deg) translateZ(6px); }
-  @keyframes brand-spin{
-    from{ transform:perspective(48px) rotateY(0deg); }
-    to{ transform:perspective(48px) rotateY(360deg); }
-  }
   .wordmark{
     font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-weight:700;
@@ -600,7 +572,6 @@
 
   <header class="site-header">
     <div class="brand">
-      <span class="brand-mark" aria-hidden="true"><span class="brand-card"><img class="f" src="assets/fluxus-logo.png" alt="" decoding="async"><img class="b" src="assets/fluxus-logo.png" alt="" decoding="async"><i class="l"></i><i class="r"></i></span></span>
       <a class="wordmark" href="index.html">KINDA OFFICIAL</a>
     </div>
     <nav class="header-links" aria-label="Elsewhere">

@@ -73,10 +73,10 @@ page = open(ix, encoding='utf8').read()
 for name in ('works.js', 'media-meta.js'):
     v = hashlib.md5(open(os.path.join(ROOT, name), 'rb').read()).hexdigest()[:8]
     page = re.sub(re.escape(name) + r'\?v=[0-9a-f]+', f'{name}?v={v}', page)
-for attempt in range(20):  # an editor / sync tool can hold the file for a moment
+for attempt in range(60):  # an editor / sync tool can hold the file for a while
     try:
         open(ix, 'w', encoding='utf8', newline='\n').write(page); break
     except OSError:
-        if attempt == 19: raise
+        if attempt == 59: raise
         time.sleep(0.5)
 print(f'{len(meta)} entries, {made} thumbnails written, index.html versions updated')
