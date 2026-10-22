@@ -13,7 +13,7 @@ window.FLUXUS_WORKS = [
     type: "Studio Website",
     year: "2026",
     tags: ["WEB", "BRANDING"],
-    link: "https://kindaofficial.xyz/",
+    link: "https://cdj.kr/",
     mediaLink: true,
     media: [
       "video:resume/img/OTHERPROJECTS/KINDA/kinda-site_opt.mp4"

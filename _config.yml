@@ -1,6 +1,6 @@
 # GitHub Pages publishes at most 1 GB. Everything below stays in the repo but
-# is left out of the published site (cdj.kr):
-#  - project folders cdj.kr does not link to (they live in their own repos)
+# is left out of the published site:
+#  - project folders the site does not link to (they live in their own repos)
 #  - original / superseded media in resume/img that no page references
 # To publish something again, delete its line.
 exclude:
