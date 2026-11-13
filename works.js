@@ -8,6 +8,15 @@
 
 window.FLUXUS_WORKS = [
   {
+    project: "CP-02",
+    type: "3D Film",
+    year: "2026",
+    tags: ["3D", "MOTION"],
+    media: [
+      "video:resume/img/OTHERPROJECTS/CP-02/cp-02_opt.mp4"
+    ]
+  },
+  {
     project: "CP-01",
     type: "3D Film",
     year: "2026",
