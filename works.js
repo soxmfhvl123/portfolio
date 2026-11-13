@@ -8,6 +8,15 @@
 
 window.FLUXUS_WORKS = [
   {
+    project: "CP-01",
+    type: "3D Film",
+    year: "2026",
+    tags: ["3D", "MOTION"],
+    media: [
+      "video:resume/img/OTHERPROJECTS/CP-01/cp-01_opt.mp4"
+    ]
+  },
+  {
     project: "Choi Dong Jin",
     type: "Studio Website",
     year: "2026",
