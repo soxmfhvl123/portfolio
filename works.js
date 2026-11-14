@@ -198,6 +198,7 @@ window.FLUXUS_WORKS = [
     tags: ["BRANDING", "WEB", "3D"],
     mediaLink: true,
     media: [
+      "video:resume/img/OTHERPROJECTS/fvc/fvc-site_opt.mp4",
       "video:resume/img/OTHERPROJECTS/fvc/fvc logo rotate_opt.mp4"
     ]
   },
