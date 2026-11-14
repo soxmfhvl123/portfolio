@@ -8,6 +8,19 @@
 
 window.FLUXUS_WORKS = [
   {
+    project: "FVC Records",
+    client: "CHUGO.inc",
+    type: "Brand Identity + Website",
+    year: "",
+    link: "https://fvc.ai.kr/",
+    tags: ["BRANDING", "WEB", "3D"],
+    mediaLink: true,
+    media: [
+      "video:resume/img/OTHERPROJECTS/fvc/fvc-site_opt.mp4",
+      "video:resume/img/OTHERPROJECTS/fvc/fvc logo rotate_opt.mp4"
+    ]
+  },
+  {
     project: "CP-02",
     type: "3D Film",
     year: "2026",
@@ -187,19 +200,6 @@ window.FLUXUS_WORKS = [
     media: [
       "video:resume/img/OTHERPROJECTS/FURNITURE/YELLOW BOX/yellow box1_opt.mp4",
       "video:resume/img/OTHERPROJECTS/FURNITURE/YELLOW BOX/yellow box2_opt.mp4"
-    ]
-  },
-  {
-    project: "FVC Records",
-    client: "CHUGO.inc",
-    type: "Brand Identity + Website",
-    year: "",
-    link: "https://fvc.ai.kr/",
-    tags: ["BRANDING", "WEB", "3D"],
-    mediaLink: true,
-    media: [
-      "video:resume/img/OTHERPROJECTS/fvc/fvc-site_opt.mp4",
-      "video:resume/img/OTHERPROJECTS/fvc/fvc logo rotate_opt.mp4"
     ]
   },
   {
