@@ -15,6 +15,7 @@ window.FLUXUS_WORKS = [
     link: "https://fvc.ai.kr/",
     tags: ["BRANDING", "WEB", "3D"],
     mediaLink: true,
+    preview: 1,
     media: [
       "video:resume/img/OTHERPROJECTS/fvc/fvc-site_opt.mp4",
       "video:resume/img/OTHERPROJECTS/fvc/fvc logo rotate_opt.mp4"
