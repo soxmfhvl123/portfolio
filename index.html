@@ -237,6 +237,17 @@
   }
   .work[hidden], .index-table li[hidden]{ display:none; }
 
+  /* IMAGE / LIST switch (LIST = list.html, the poster wall) */
+  .view-toggle{ display:flex; gap:10px; font-family:"Courier Prime","Courier New",ui-monospace,monospace; font-size:0.72rem; letter-spacing:0.04em; }
+  .nav-links .view-toggle{ margin-left:auto; }
+  .view-toggle a, .view-toggle span{ color:var(--dim); text-decoration:none; white-space:nowrap; transition:color 0.2s ease; }
+  .view-toggle a:hover{ color:var(--ink); }
+  .view-toggle [aria-current]{ color:var(--ink); }
+  .view-toggle [aria-current]::before{ content:"["; }
+  .view-toggle [aria-current]::after{ content:"]"; }
+  .works-label-row{ display:flex; justify-content:space-between; align-items:baseline; gap:16px; }
+  .view-toggle--inline{ display:none; }
+
   /* index: every work in one table */
   .index-table{ list-style:none; margin:0; padding:0; border-top:1px solid var(--hairline); }
   .index-table li{ border-bottom:1px solid var(--hairline); }
@@ -435,6 +446,8 @@
     .work-meta{ grid-template-columns:72px minmax(0, 1fr); }
     .index-list a, .index-list .row{ grid-template-columns:minmax(0, 1fr) auto; }
     .index-list .desc{ display:none; }
+    .nav-links .view-toggle{ display:none; }
+    .view-toggle--inline{ display:flex; gap:12px; font-size:0.8rem; }
     .lightbox-stage{ padding:56px 12px 0; }
     .lightbox-bar{ padding:14px 20px 18px; }
     .lightbox .lightbox-close{ right:20px; }
@@ -507,13 +520,17 @@
         <a href="#index">INDEX</a>
         <a href="#about">ABOUT</a>
         <a href="#contact">CONTACT</a>
+        <span class="view-toggle" role="group" aria-label="Works view"><span aria-current="page">IMAGE</span><a href="list.html">LIST</a></span>
       </div>
       <div class="nav-filters" id="navFilters" role="group" aria-label="Filter works by category"></div>
     </nav>
 
     <main>
       <section class="archive-section" id="works">
-        <h2 class="section-label">SELECTED WORKS</h2>
+        <div class="works-label-row">
+          <h2 class="section-label">SELECTED WORKS</h2>
+          <span class="view-toggle view-toggle--inline" role="group" aria-label="Works view"><span aria-current="page">IMAGE</span><a href="list.html">LIST</a></span>
+        </div>
         <div id="worksList"></div>
       </section>
 
@@ -557,8 +574,8 @@
     </div>
   </div>
 
-  <script src="works.js?v=2aa7ae01"></script>
-  <script src="media-meta.js?v=4c671e1b"></script>
+  <script src="works.js?v=15e874c4"></script>
+  <script src="media-meta.js?v=0472cff3"></script>
   <script>
     // (the typed manifesto lives on wheel.html with the hero)
     // ===== Works stream, index, category filter, lightbox, section nav =====
@@ -931,7 +948,7 @@
       });
 
       // --- section nav: highlight the section currently in view ---
-      var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-links a'));
+      var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-links > a'));
       var sections = navLinks.map(function (a) { return document.querySelector(a.getAttribute('href')); });
       function updateNav() {
         var probe = navEl.offsetHeight + 12; // just below the sticky nav

@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b0b0b">
+<title>KINDA OFFICIAL — Works List</title>
+<meta name="description" content="Every selected work of Kinda Official on one endless folded sheet.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23FF00FF'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<!--
+  LIST view of the works: one endless sheet of paper, folded like a leporello.
+  Every panel lists all the works in four typewriter columns over the site's own
+  closing wordmark (KINDA / OFFICIAL) printed across the sheet in magenta.
+  Hovering a name blocks it out, prints the work on the sheet in magenta inks and sets
+  its number + name large; a click opens the work in the IMAGE view.
+  Names and pictures come from works.js / media-meta.js, so new works appear by themselves.
+  The sheet is painted in 2D and laid on a bent surface in WebGL (accordion folds, paste
+  waves, light, foil on the wordmark). No WebGL: the flat painting is shown.
+-->
+<style>
+  :root{
+    --ink:#ededed; --bg:#0b0b0b; --dim:#7a7a7a; --hairline:#242424;
+    --mono:"Courier Prime","Courier New",ui-monospace,monospace;
+    --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--bg);color:var(--ink)}
+  body{font-family:var(--sans);-webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none}
+  a{color:inherit;text-decoration:none}
+  canvas.wall{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+  canvas.wall.dragging{cursor:grabbing}
+  canvas.wall.on-item{cursor:pointer}
+
+  #hd{
+    position:fixed;top:0;left:0;right:0;z-index:20;
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;gap:16px;
+    padding:18px 24px 14px;
+    background:rgba(11,11,11,.86);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--hairline);
+    font:.7rem/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;
+  }
+  #hd::after{content:"";position:absolute;left:0;right:0;top:100%;height:20px;pointer-events:none;
+    background:linear-gradient(rgba(0,0,0,.22),rgba(0,0,0,0))}
+  #hd .wordmark{justify-self:start;font:700 clamp(1.05rem,1.6vw,1.35rem)/1 var(--sans);letter-spacing:-.01em;text-transform:none;white-space:nowrap}
+  #hd .meta{color:var(--dim);white-space:nowrap}
+  #hd .view{justify-self:end;display:flex;gap:10px;white-space:nowrap}
+  #hd .view a{color:var(--dim);transition:color .2s}
+  #hd .view a:hover{color:var(--ink)}
+  #hd .view [aria-current]::before{content:"["}
+  #hd .view [aria-current]::after{content:"]"}
+  @media (max-width:760px){ #hd{grid-template-columns:1fr auto;padding:14px 16px 11px} #hd .meta{display:none} }
+
+  /* a picture the browser won't let us read (page opened as a local file): shown as a magenta print above the sheet */
+  .rawprint{position:fixed;z-index:2;pointer-events:none;background:#ff3fd2;mix-blend-mode:multiply;opacity:0}
+  .rawprint img{display:block;width:100%;height:100%;filter:grayscale(1) contrast(1.35);mix-blend-mode:screen}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+
+<canvas class="wall" id="gl" aria-label="One long folded sheet listing every Kinda Official work. Scroll or drag to move, hover a name to see the work, click to open it."></canvas>
+
+<header id="hd">
+  <a class="wordmark" href="index.html">KINDA OFFICIAL</a>
+  <span class="meta"><span id="metaCount"></span> &mdash; <span id="clockD"></span> &mdash; <span id="clockT"></span></span>
+  <span class="view" role="group" aria-label="Works view"><a href="index.html#works">IMAGE</a><span aria-current="page">LIST</span></span>
+</header>
+
+<ul class="sr" id="srList"></ul>
+
+<script src="works.js?v=15e874c4"></script>
+<script src="media-meta.js?v=0472cff3"></script>
+<script>
+(() => {
+"use strict";
+
+/* ===================================================================
+   data
+   =================================================================== */
+const WORKS = window.FLUXUS_WORKS || [];
+const MEDIA = window.FLUXUS_MEDIA || {};
+const DARK = window.FLUXUS_DARK || {};
+const WORDS = ["KINDA", "OFFICIAL"];                       // the site's closing wordmark, one word per panel
+const M = { light: "#FFB3F1", pale: "#FFE0FA", mid: "#F27BDD", hot: "#FF3FD2", deep: "#C7239F" };
+const THEMES = [
+  { paper: "#FCFBF8", ink: "#141414", type: M.mid,  blend: "multiply",    img: "multiply", hBg: M.mid,     hInk: "#FFFFFF" },
+  { paper: M.light,   ink: "#141414", type: "#FFFFFF", blend: "source-over", img: "multiply", hBg: "#141414", hInk: M.light },
+  { paper: "#FCFBF8", ink: "#141414", type: M.hot,  blend: "multiply",    img: "multiply", hBg: "#141414", hInk: "#FFFFFF" },
+  { paper: M.mid,     ink: "#FFFFFF", type: M.pale, blend: "source-over", img: "screen",   hBg: "#FFFFFF", hInk: M.deep },
+];
+const MONO = '"Courier Prime","Courier New",ui-monospace,monospace';
+const SANS = '"Helvetica Neue",Helvetica,Arial,sans-serif';
+
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const mod = (a, n) => ((a % n) + n) % n;
+const lerp = (a, b, t) => a + (b - a) * t;
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const pad3 = n => String(n).padStart(3, "0");
+const mk = (w, h) => { const c = document.createElement("canvas"); c.width = Math.max(1, Math.ceil(w)); c.height = Math.max(1, Math.ceil(h)); return c; };
+const track = (g, em, size) => { if ("letterSpacing" in g) g.letterSpacing = `${em * size}px`; };
+
+function firstMedia(w) {
+  let e = String((w.media || [])[0] || ""), p; const f = {};
+  while ((p = /^(video|light|bleed):/.exec(e))) { f[p[1]] = true; e = e.slice(p[0].length); }
+  return { path: e, video: !!f.video };
+}
+function pictureOf(w) {
+  const m = firstMedia(w);
+  if (m.video) return encodeURI(m.path.replace(/\.mp4$/i, "_poster.jpg"));
+  const info = MEDIA[m.path], tiers = info && info[2];
+  return encodeURI(tiers && tiers.length ? m.path.replace(/\.[^./]+$/, "") + ".w" + tiers[tiers.length - 1] + ".webp" : m.path);
+}
+function wrapPx(g, text, maxW) {
+  const out = []; let line = "";
+  for (const word of String(text).split(/\s+/)) {
+    if (!word) continue;
+    const t = line ? line + " " + word : word;
+    if (g.measureText(t).width <= maxW) { line = t; continue; }
+    if (line) out.push(line);
+    line = "";
+    let rest = word;
+    while (g.measureText(rest).width > maxW && rest.length > 2) {
+      let n = rest.length - 1;
+      while (n > 1 && g.measureText(rest.slice(0, n) + "-").width > maxW) n--;
+      out.push(rest.slice(0, n) + "-"); rest = rest.slice(n);
+    }
+    line = rest;
+  }
+  if (line) out.push(line);
+  return out.length ? out : [""];
+}
+
+document.getElementById("metaCount").textContent = `Selected works: ${WORKS.length} items`;
+document.getElementById("srList").innerHTML = WORKS.map((w, i) =>
+  `<li><a href="index.html#work-${i + 1}">No.${pad3(i + 1)} — ${String(w.project).replace(/</g, "&lt;")}</a></li>`).join("");
+
+/* ===================================================================
+   canvases
+   =================================================================== */
+const glCanvas = document.getElementById("gl");
+const paint = document.createElement("canvas"), ctx = paint.getContext("2d");
+const inkCv = document.createElement("canvas"), ictx = inkCv.getContext("2d");
+let gl = null;
+try { gl = glCanvas.getContext("webgl", { antialias: true, alpha: false, premultipliedAlpha: false }); } catch (err) { gl = null; }
+function useFlat() {
+  gl = null;
+  paint.className = "wall"; paint.style.pointerEvents = "none";
+  document.body.insertBefore(paint, glCanvas);
+  glCanvas.style.opacity = "0";
+}
+if (!gl) useFlat();
+const wall = glCanvas;
+
+const rawEl = document.createElement("div"), rawImg = document.createElement("img");
+rawEl.className = "rawprint"; rawImg.alt = ""; rawEl.appendChild(rawImg);
+document.body.insertBefore(rawEl, document.getElementById("hd"));
+
+const grain = (() => {
+  const c = mk(256, 256), g = c.getContext("2d"), d = g.createImageData(256, 256);
+  for (let i = 0; i < d.data.length; i += 4) { const v = 165 + Math.random() * 90; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+  g.putImageData(d, 0, 0); return c;
+})();
+const erosion = (() => {
+  const c = mk(192, 192), g = c.getContext("2d"), d = g.createImageData(192, 192);
+  for (let i = 0; i < d.data.length; i += 4) { const r = Math.random(); d.data[i + 3] = r > .82 ? 255 * (r - .82) / .18 : 0; }
+  g.putImageData(d, 0, 0); return c;
+})();
+let grainPat = null;
+
+/* ===================================================================
+   layout: one panel = every work in columns, over one word of the wordmark
+   =================================================================== */
+let W = 0, H = 0, DPR = 1, L = null;
+
+function layout() {
+  W = innerWidth; H = innerHeight;
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  if (gl && W * H * DPR * DPR > 4.6e6) DPR = Math.max(1, Math.sqrt(4.6e6 / (W * H)));
+  for (const c of [paint, glCanvas]) { c.width = Math.round(W * DPR); c.height = Math.round(H * DPR); }
+  inkCv.width = Math.round(W); inkCv.height = Math.round(H);
+  grainPat = ctx.createPattern(grain, "repeat");
+
+  const narrow = W < 700;
+  const cols = W < 560 ? 2 : W < 900 ? 3 : 4;
+  const m = Math.round(clamp(W * 0.018, 12, 28)), gapX = Math.round(m * 1.1);
+  const colW = (W - 2 * m - (cols - 1) * gapX) / cols;
+  const fs = clamp(colW * 0.074, 13, 25), lh = Math.round(fs * 1.02);
+  const sfs = Math.max(8.5, fs * 0.46), slh = Math.round(sfs * 1.45);
+  const g = mk(4, 4).getContext("2d");
+  g.font = `700 ${sfs}px ${MONO}`; const numW = g.measureText("000 ").width + 2;
+
+  // every work: number, name (wrapped), then a small type + year line
+  const items = WORKS.map((w, i) => {
+    g.font = `${fs}px ${MONO}`;
+    const lines = wrapPx(g, w.project, colW - numW - 4).map(t => ({ t, w: g.measureText(t).width }));
+    g.font = `${sfs}px ${MONO}`;
+    let meta = [w.type, w.year].filter(Boolean).join(", ");
+    while (meta.length > 4 && g.measureText(meta).width > colW - numW - 4) meta = meta.slice(0, -2).trimEnd() + "…";
+    return { wi: i, lines, meta, h: lines.length * lh + slh + Math.round(fs * 0.5) };
+  });
+  // balanced columns, in order
+  const total = items.reduce((s, it) => s + it.h, 0), per = total / cols;
+  const colItems = Array.from({ length: cols }, () => []), colH = new Array(cols).fill(0);
+  let c = 0;
+  for (const it of items) {
+    if (c < cols - 1 && colH[c] + it.h * 0.5 > per) c++;
+    colItems[c].push(it); colH[c] += it.h;
+  }
+  const headY = Math.round(m * 0.9), colsTop = headY + slh + Math.round(m * 1.1);
+  const colsH = Math.max(...colH);
+
+  // the wordmark: each word set as wide as the sheet
+  const words = WORDS.map(word => {
+    g.font = `700 100px ${SANS}`; track(g, -0.03, 100);
+    const mt = g.measureText(word);
+    const inkW = (mt.actualBoundingBoxLeft + mt.actualBoundingBoxRight) || mt.width;
+    const size = 100 * (W - 2 * m) / inkW;
+    return { word, size, inkL: (mt.actualBoundingBoxLeft || 0) / 100 * size, asc: (mt.actualBoundingBoxAscent || 72) / 100 * size };
+  });
+  const PH = Math.round(Math.max(colsTop + colsH + m, colsTop + Math.max(...words.map(w => w.asc)) + m * 2));
+
+  const entries = [];
+  colItems.forEach((list, ci) => {
+    const x = m + ci * (colW + gapX); let y = colsTop;
+    for (const it of list) {
+      const e = { wi: it.wi, col: ci, x, tx: x + numW, y0: y, y1: y + it.h - Math.round(fs * 0.5) + 2, meta: it.meta,
+                  lines: it.lines.map((ln, k) => ({ t: ln.t, w: ln.w, y: y + k * lh })) };
+      e.metaY = y + it.lines.length * lh;
+      e.maxW = numW + Math.max(...it.lines.map(l => l.w));
+      entries.push(e); y += it.h;
+    }
+  });
+
+  L = { narrow, cols, m, gapX, colW, fs, lh, sfs, slh, numW, headY, colsTop, PH, entries, words,
+        byCol: Array.from({ length: cols }, (_, ci) => entries.filter(e => e.col === ci)) };
+  const sd = Math.min(DPR, Math.sqrt(7e6 / (W * PH)));
+  L.names = buildNames(sd);
+  L.wordMasks = words.map(w => buildWord(w, sd));
+  L.tint = new Map();
+}
+
+/* names, numbers and type lines of one panel as an alpha mask (tinted per colourway) */
+function buildNames(sd) {
+  const { fs, lh, sfs, entries } = L;
+  const cv = mk(W * sd, L.PH * sd), g = cv.getContext("2d");
+  g.scale(sd, sd); g.fillStyle = "#000"; g.textBaseline = "alphabetic";
+  for (const e of entries) {
+    g.globalAlpha = 1; g.font = `700 ${sfs}px ${MONO}`;
+    g.fillText(pad3(e.wi + 1), e.x, e.lines[0].y + lh * 0.8 - (fs - sfs) * 0.62);
+    g.font = `${fs}px ${MONO}`;
+    for (const ln of e.lines) g.fillText(ln.t, e.tx, ln.y + lh * 0.8);
+    g.globalAlpha = 0.62; g.font = `${sfs}px ${MONO}`;
+    g.fillText(e.meta, e.tx, e.metaY + L.slh * 0.72);
+  }
+  // typewriter ribbon: a little speckled and worn
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = "destination-out"; g.globalAlpha = 0.3;
+  g.fillStyle = g.createPattern(erosion, "repeat"); g.fillRect(0, 0, cv.width, cv.height);
+  return cv;
+}
+
+/* one word of the wordmark, printed twice a little off register, with uneven ink */
+function buildWord(w, sd) {
+  const h = Math.ceil(w.asc + w.size * 0.06), cv = mk(W * sd, h * sd), g = cv.getContext("2d");
+  g.scale(sd, sd); g.fillStyle = "#000"; g.textBaseline = "alphabetic";
+  g.font = `700 ${w.size}px ${SANS}`; track(g, -0.03, w.size);
+  const x = L.m + w.inkL, y = w.asc + w.size * 0.012;
+  g.globalAlpha = 0.3; g.filter = "blur(2.5px)"; g.fillText(w.word, x + w.size * 0.012, y + w.size * 0.016);
+  g.filter = "none"; g.globalAlpha = 0.8; g.fillText(w.word, x, y);
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = "destination-out"; g.globalAlpha = 0.22;
+  g.scale(2, 2); g.fillStyle = g.createPattern(erosion, "repeat"); g.fillRect(0, 0, cv.width, cv.height);
+  return { cv, h };
+}
+
+function tinted(cv, color) {
+  const key = color, slot = L.tint.get(cv) || L.tint.set(cv, {}).get(cv);
+  if (slot[key]) return slot[key];
+  const t = mk(cv.width, cv.height), g = t.getContext("2d");
+  g.drawImage(cv, 0, 0); g.globalCompositeOperation = "source-in"; g.fillStyle = color; g.fillRect(0, 0, t.width, t.height);
+  return (slot[key] = t);
+}
+
+/* ===================================================================
+   the hovered work, printed in two magenta inks
+   =================================================================== */
+const decals = new Map();
+let decal = null, inkDark = 0, inkLight = 0;
+
+function processArt(img) {
+  const w = img.naturalWidth, h = img.naturalHeight;
+  const make = () => { const c = mk(w, h); return [c, c.getContext("2d")]; };
+  const out = { w, h, ratio: w / h };
+  try {
+    const [, sg] = make(); sg.drawImage(img, 0, 0);
+    const d = sg.getImageData(0, 0, w, h).data;
+    let lumSum = 0, lumN = 0;
+    for (let i = 0; i < d.length; i += 16) { lumSum += (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]) * d[i + 3] / 255 + 255 * (1 - d[i + 3] / 255); lumN++; }
+    const invert = lumSum / lumN / 255 < 0.42;                 // dark artwork prints in negative
+    const [dk, dg] = make(), [lt, lg] = make(), [dkS, dgS] = make(), [ltS, lgS] = make();
+    const A = dg.createImageData(w, h), B = lg.createImageData(w, h), AS = dgS.createImageData(w, h), BS = lgS.createImageData(w, h);
+    for (let i = 0; i < d.length; i += 4) {
+      const a = d[i + 3] / 255;
+      let lum = (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]) / 255;
+      if (invert) lum = 1 - lum;
+      lum = 1 - (1 - lum) * a;                                  // over paper
+      const inkIn = clamp((1 - lum) / 0.65, 0, 1), cover = smooth(0.1, 0.9, inkIn);
+      const dark = smooth(0.5, 0.78, cover), tone = smooth(0.04, 0.92, cover);
+      // light paper (multiply): hot magenta for every tone, deep magenta in the shadows
+      A.data[i] = 0x9E; A.data[i + 1] = 0x0F; A.data[i + 2] = 0x7E; A.data[i + 3] = 255 * tone * dark;
+      B.data[i] = 0xFF; B.data[i + 1] = 0x3F; B.data[i + 2] = 0xD2; B.data[i + 3] = 255 * tone;
+      // magenta paper (screen): pale pink and white
+      AS.data[i] = 0xFF; AS.data[i + 1] = 0xE0; AS.data[i + 2] = 0xFA; AS.data[i + 3] = 255 * tone * dark;
+      BS.data[i] = 0xFF; BS.data[i + 1] = 0xFF; BS.data[i + 2] = 0xFF; BS.data[i + 3] = 200 * tone * (1 - dark);
+    }
+    dg.putImageData(A, 0, 0); lg.putImageData(B, 0, 0); dgS.putImageData(AS, 0, 0); lgS.putImageData(BS, 0, 0);
+    Object.assign(out, { dark: dk, light: lt, darkS: dkS, lightS: ltS });
+  } catch (err) {
+    Object.assign(out, { raw: true, img });                     // pixels unreadable (no CORS / local file)
+  }
+  return out;
+}
+function requestDecal(wi) {
+  if (decals.has(wi)) return decals.get(wi);
+  const rec = { wi, state: "loading", art: null };
+  decals.set(wi, rec);
+  const img = new Image(); img.decoding = "async";
+  img.onload = () => { rec.art = processArt(img); rec.state = "ready"; };
+  img.onerror = () => { rec.state = "error"; };
+  img.src = pictureOf(WORKS[wi]);
+  if (decals.size > 60) decals.delete(decals.keys().next().value);
+  return rec;
+}
+function decalRect(art) {
+  const maxW = W * (L.narrow ? 0.86 : 0.44), maxH = H * (L.narrow ? 0.42 : 0.62);
+  const k = Math.min(maxW / art.w, maxH / art.h), w = art.w * k, h = art.h * k, b = L.m * 1.6;
+  return { x: W - b - w, y: H - b - h, w, h };
+}
+
+/* ===================================================================
+   state
+   =================================================================== */
+let scrollY = 0, drift = 0, vel = 0, T = 0, introT = 0;
+let dragging = false, dragMoved = 0, dragVel = 0, lastPY = 0, lastPT = 0, pointerType = "mouse";
+const mouse = { x: -1, y: -1, in: false };
+let hover = null, hoverKey = "", wipe = 0, hoverWi = -1, labelA = 0, labelWi = -1;
+
+const FEED = 60;
+function leadOf() {                                             // intro: the sheet comes down from under the header
+  if (introT >= 99) return 1e5;
+  const t = clamp((introT - 0.45) / 2.0, 0, 1);
+  return (H + FEED) * (0.5 - 0.5 * Math.cos(Math.PI * t));
+}
+function posOf() { return scrollY + drift + (introT >= 99 ? 0 : H + FEED - leadOf()); }
+
+function hitTest(mx, my) {
+  if (introT < 99 || my < 0 || my > H) return null;
+  const y = my + posOf(), pi = Math.floor(y / L.PH), ly = y - pi * L.PH;
+  const ci = Math.floor((mx - L.m + L.gapX / 2) / (L.colW + L.gapX));
+  if (ci < 0 || ci >= L.cols) return null;
+  for (const e of L.byCol[ci]) {
+    if (ly < e.y0) break;
+    if (ly < e.y1) return mx >= e.x - 3 && mx <= e.x + e.maxW + 8 ? { pi, e } : null;
+  }
+  return null;
+}
+
+/* ===================================================================
+   painting
+   =================================================================== */
+function labelLines() {
+  const g = ctx, size = clamp(W * 0.05, 26, 84);
+  g.save(); g.font = `700 ${size}px ${SANS}`; track(g, -0.03, size);
+  const lines = ["No." + pad3(labelWi + 1), ...wrapPx(g, WORKS[labelWi].project, W * (L.narrow ? 0.9 : 0.5))];
+  g.restore();
+  return { lines, size, lh: size * 0.9 };
+}
+
+function drawPanel(pi, top, lead) {
+  const { PH, m, fs, lh, sfs } = L;
+  if (top > H || top + PH < 0) return;
+  const th = THEMES[mod(pi, THEMES.length)], word = L.wordMasks[mod(pi, 2)];
+  ctx.save();
+  ctx.beginPath(); ctx.rect(0, Math.max(top, -2), W, Math.min(top + PH, lead) - Math.max(top, -2)); ctx.clip();
+  ctx.fillStyle = th.paper; ctx.fillRect(0, top, W, PH);
+
+  // the wordmark, along the bottom of the panel, then the names over it
+  const wy = top + PH - m * 1.2 - word.h;
+  ctx.globalCompositeOperation = th.blend;
+  ctx.drawImage(tinted(word.cv, th.type), 0, wy, W, word.h);
+  ctx.globalCompositeOperation = "source-over";
+  if (gl) { ictx.save(); ictx.beginPath(); ictx.rect(0, top, W, Math.min(PH, lead - top)); ictx.clip(); ictx.drawImage(word.cv, 0, wy, W, word.h); ictx.restore(); }
+  ctx.drawImage(tinted(L.names, th.ink), 0, top, W, PH);
+
+  // sheet line
+  ctx.fillStyle = th.ink; ctx.font = `${sfs}px ${MONO}`; ctx.textBaseline = "alphabetic";
+  const hy = top + L.headY + sfs;
+  ctx.textAlign = "left"; ctx.fillText("KINDA OFFICIAL — SELECTED WORKS", m, hy);
+  ctx.textAlign = "right"; ctx.fillText(`${WORKS.length} ITEMS — SHEET ${pad3(mod(pi, 999) + 1)}`, W - m, hy);
+  ctx.textAlign = "left";
+  ctx.strokeStyle = th.ink; ctx.lineWidth = 1; ctx.setLineDash([3, 3]); ctx.globalAlpha = 0.8;
+  ctx.beginPath(); ctx.moveTo(m, Math.round(hy + 7) + .5); ctx.lineTo(W - m, Math.round(hy + 7) + .5); ctx.stroke();
+  ctx.setLineDash([]); ctx.globalAlpha = 1;
+
+  // hover: the name blocked out, wiped in from the left
+  if (hover && hover.pi === pi) {
+    const e = hover.e;
+    ctx.fillStyle = th.hBg;
+    ctx.beginPath();
+    for (const ln of e.lines) ctx.rect(e.x - 3, top + ln.y, (L.numW + ln.w + 7) * wipe, lh);
+    ctx.fill(); ctx.save(); ctx.clip();
+    ctx.fillStyle = th.hInk;
+    ctx.font = `700 ${sfs}px ${MONO}`; ctx.fillText(pad3(e.wi + 1), e.x, top + e.lines[0].y + lh * 0.8 - (fs - sfs) * 0.62);
+    ctx.font = `${fs}px ${MONO}`;
+    for (const ln of e.lines) ctx.fillText(ln.t, e.tx, top + ln.y + lh * 0.8);
+    ctx.restore();
+  }
+
+  // the work, printed bottom right, and its number + name set large
+  if (decal && decal.state === "ready" && !decal.art.raw && inkDark + inkLight > 0.001) {
+    const a = decal.art, r = decalRect(a), screen = th.img === "screen";
+    ctx.globalCompositeOperation = screen ? "screen" : "multiply";
+    ctx.globalAlpha = inkLight; ctx.drawImage(screen ? a.lightS : a.light, r.x, r.y, r.w, r.h);
+    ctx.globalAlpha = inkDark;  ctx.drawImage(screen ? a.darkS : a.dark, r.x, r.y, r.w, r.h);
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = "source-over";
+  }
+  if (labelWi >= 0 && labelA > 0.01) {
+    const lb = labelLines();
+    const y0 = L.narrow ? 74 + lb.size * 0.8 : H - m * 1.8 - (lb.lines.length - 1) * lb.lh;
+    ctx.font = `700 ${lb.size}px ${SANS}`; track(ctx, -0.03, lb.size);
+    ctx.globalCompositeOperation = th.blend; ctx.fillStyle = th.blend === "multiply" ? M.deep : th.type;
+    ctx.globalAlpha = 0.45 * labelA; lb.lines.forEach((t, i) => ctx.fillText(t, m + lb.size * 0.05, y0 + i * lb.lh + lb.size * 0.06));
+    ctx.globalAlpha = 0.9 * labelA;  lb.lines.forEach((t, i) => ctx.fillText(t, m, y0 + i * lb.lh));
+    track(ctx, 0, 1); ctx.globalAlpha = 1; ctx.globalCompositeOperation = "source-over";
+  }
+
+  // paper grain, moving with the sheet
+  ctx.globalCompositeOperation = "multiply"; ctx.globalAlpha = 0.1;
+  ctx.save(); ctx.translate(0, top); ctx.fillStyle = grainPat; ctx.fillRect(0, 0, W, PH); ctx.restore();
+  // the fold at the top of the panel: a pressed line
+  ctx.globalAlpha = 1;
+  const fg = ctx.createLinearGradient(0, top - 1, 0, top + 16);
+  fg.addColorStop(0, "rgba(0,0,0,.20)"); fg.addColorStop(0.12, "rgba(0,0,0,.07)"); fg.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = fg; ctx.fillRect(0, top - 1, W, 17);
+  ctx.globalCompositeOperation = "source-over";
+  ctx.fillStyle = "rgba(255,255,255,.5)"; ctx.fillRect(0, top + PH - 1, W, 1);
+  ctx.restore();
+}
+
+function paintFrame() {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
+  ctx.fillStyle = "#0b0b0b"; ctx.fillRect(0, 0, W, H);
+  if (gl) { ictx.setTransform(1, 0, 0, 1, 0, 0); ictx.clearRect(0, 0, inkCv.width, inkCv.height); }
+  const lead = leadOf(), pos = posOf();
+  if (lead <= 0) return;
+  const p0 = Math.floor(pos / L.PH), p1 = Math.floor((pos + H) / L.PH);
+  for (let pi = p0; pi <= p1; pi++) drawPanel(pi, pi * L.PH - pos, lead);
+  if (lead < H) {                                               // the sheet's leading edge and its shadow
+    const sg = ctx.createLinearGradient(0, lead, 0, lead + 26);
+    sg.addColorStop(0, "rgba(0,0,0,.6)"); sg.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = sg; ctx.fillRect(0, lead, W, 26);
+  }
+}
+
+/* ===================================================================
+   input
+   =================================================================== */
+window.addEventListener("wheel", e => {
+  e.preventDefault();
+  const k = e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? H : 1;
+  vel = clamp(vel + e.deltaY * k * 5, -4500, 4500);
+}, { passive: false });
+
+wall.addEventListener("pointerdown", e => {
+  dragging = true; dragMoved = 0; dragVel = 0; pointerType = e.pointerType;
+  lastPY = e.clientY; lastPT = performance.now();
+  wall.classList.add("dragging"); wall.setPointerCapture(e.pointerId);
+});
+wall.addEventListener("pointermove", e => {
+  mouse.x = e.clientX; mouse.y = e.clientY;
+  if (e.pointerType === "mouse") mouse.in = true;
+  if (!dragging) return;
+  const now = performance.now(), dy = lastPY - e.clientY, dtt = Math.max(1, now - lastPT) / 1000;
+  scrollY += dy; dragMoved += Math.abs(dy);
+  dragVel = lerp(dragVel, dy / dtt, 0.5);
+  lastPY = e.clientY; lastPT = now;
+  if (pointerType !== "mouse" && dragMoved > 6) mouse.in = false;
+});
+const endDrag = e => {
+  if (!dragging) return;
+  dragging = false; wall.classList.remove("dragging");
+  vel = clamp(dragVel, -4500, 4500);
+  if (dragMoved >= 6 || e.type === "pointercancel") return;
+  vel = 0;
+  const hit = hitTest(e.clientX, e.clientY);
+  // mouse: one click opens; touch: the first tap prints the work, a second tap on it opens
+  if (hit && (pointerType === "mouse" || hoverWi === hit.e.wi)) { location.href = "index.html#work-" + (hit.e.wi + 1); return; }
+  if (pointerType !== "mouse") { mouse.x = e.clientX; mouse.y = e.clientY; mouse.in = true; }
+};
+wall.addEventListener("pointerup", endDrag);
+wall.addEventListener("pointercancel", endDrag);
+wall.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") mouse.in = false; });
+
+window.addEventListener("keydown", e => {
+  const step = { ArrowDown: 700, ArrowUp: -700, PageDown: 2200, PageUp: -2200, " ": 1500 }[e.key];
+  if (step) { e.preventDefault(); vel = clamp(vel + (e.shiftKey ? -step : step), -4500, 4500); }
+});
+
+const cD = document.getElementById("clockD"), cT = document.getElementById("clockT");
+function tick() {
+  const d = new Date(), p = n => String(n).padStart(2, "0");
+  cD.textContent = `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())}`;
+  cT.textContent = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+tick(); setInterval(tick, 1000);
+
+/* ===================================================================
+   3D paper (WebGL): the sheet is folded like an accordion (mountain and
+   valley folds at the panel edges) and carries soft waves and creases
+   =================================================================== */
+const mouseS = { x: 0, y: 0 };
+let GLS = null;
+
+const VS = `
+precision highp float;
+attribute vec2 aPos;
+uniform vec2 uSize;
+uniform float uPos, uPH, uLead, uFocal;
+varying vec2 vUv;
+varying vec3 vN;
+float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p){
+  vec2 i = floor(p), f = fract(p), u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+}
+float height(vec2 p){
+  float py = p.y + uPos;
+  float f = py / uPH, t = fract(f), par = mod(floor(f), 2.0);
+  float tri = par < 0.5 ? t : 1.0 - t;                           // accordion: up one panel, down the next
+  float fold = (tri - 0.5) * 0.05;
+  vec2 q = vec2(p.x, py) / uSize.x * 3.0;
+  float bumps = noise(q) * 0.6 + noise(q * 2.1 + 3.7) * 0.3 + noise(q * 4.3 + 9.1) * 0.1;
+  float crease = 1.0 - abs(noise(q * vec2(0.7, 1.9) + 21.0) * 2.0 - 1.0);
+  float h = (fold + 0.0085 * ((bumps - 0.5) + pow(crease, 3.0) * 0.22)) * uSize.x;
+  float d = uLead - p.y;
+  if (d < 0.0) return h * exp(d / 12.0);                          // bare desk below the leading edge
+  return h + 0.05 * uSize.x * exp(-d / (0.07 * uSize.x));         // the leading edge curls up
+}
+void main(){
+  vec2 p = aPos * uSize;
+  float h = height(p), e = 2.5;
+  float hx = height(p + vec2(e, 0.0)) - height(p - vec2(e, 0.0));
+  float hy = height(p + vec2(0.0, e)) - height(p - vec2(0.0, e));
+  vN = normalize(vec3(-hx / (2.0 * e), hy / (2.0 * e), 1.0));
+  vUv = aPos;
+  vec2 c = p - uSize * 0.5;
+  vec2 sp = c * (uFocal / (uFocal - h)) + uSize * 0.5;
+  gl_Position = vec4(sp.x / uSize.x * 2.0 - 1.0, 1.0 - sp.y / uSize.y * 2.0, -h / uFocal, 1.0);
+}`;
+
+const FS = `
+precision mediump float;
+uniform sampler2D uTex, uInk;
+uniform vec2 uMouse;
+uniform float uTime;
+varying vec2 vUv;
+varying vec3 vN;
+vec3 hue(float h){ h = fract(h); return clamp(vec3(abs(h * 6.0 - 3.0) - 1.0, 2.0 - abs(h * 6.0 - 2.0), 2.0 - abs(h * 6.0 - 4.0)), 0.0, 1.0); }
+vec3 hardLight(vec3 b, vec3 l){ return mix(2.0 * b * l, 1.0 - 2.0 * (1.0 - b) * (1.0 - l), step(0.5, l)); }
+void main(){
+  vec2 uv = clamp(vUv, 0.0, 1.0);
+  vec3 base = texture2D(uTex, uv).rgb;
+  float ink = texture2D(uInk, uv).a;
+  vec3 N = normalize(vN), V = vec3(0.0, 0.0, 1.0);
+  vec3 L1 = normalize(vec3(0.55 + uMouse.x * 0.25, 0.5 + uMouse.y * 0.2, 0.8));
+  vec3 L2 = normalize(vec3(-0.6, 0.3, 0.75));
+  float d = max(dot(N, L1), 0.0) * 0.7 + max(dot(N, L2), 0.0) * 0.32;
+  float flatD = L1.z * 0.7 + L2.z * 0.32;
+  vec3 col = base * clamp(1.0 + (d - flatD) * 1.9, 0.62, 1.3);
+  float nh = max(dot(N, normalize(L1 + V)), 0.0);
+  col += pow(nh, 36.0) * 0.06 * dot(base, vec3(0.333)) + pow(nh, 110.0) * 0.28 * ink;
+  // foil on the wordmark: a rainbow that follows the bends and the pointer
+  vec3 R = reflect(-V, N);
+  float hh = R.x * 2.2 + R.y * 1.6 + uTime * 0.04 + uMouse.x * 0.8 + uMouse.y * 0.5
+           + sin((uv.x * 7.0 + uv.y * 3.0) * 6.2832) * 0.18 + sin((uv.x * 2.0 - uv.y * 6.0) * 6.2832) * 0.12;
+  vec3 rb = hue(hh);
+  rb = mix(vec3(dot(rb, vec3(0.299, 0.587, 0.114))), rb, 0.6);
+  col = mix(col, hardLight(col, mix(vec3(0.5), rb, 0.42)), ink * 0.38);
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+function initGL() {
+  const sh = (type, src) => {
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    return s;
+  };
+  const prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS));
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+  gl.useProgram(prog);
+  const NX = 220, NY = 150, o = 0.04, pos = [], idx = [];
+  for (let j = 0; j <= NY; j++) for (let i = 0; i <= NX; i++) pos.push(-o + (1 + 2 * o) * i / NX, -o + (1 + 2 * o) * j / NY);
+  for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+    const a = j * (NX + 1) + i, b = a + 1, c = a + NX + 1, d = c + 1;
+    idx.push(a, c, b, b, c, d);
+  }
+  const vb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vb); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pos), gl.STATIC_DRAW);
+  const ib = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(idx), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(prog, "aPos");
+  gl.enableVertexAttribArray(aPos); gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+  const tex = unit => {
+    const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    return t;
+  };
+  const U = {};
+  ["uSize", "uPos", "uPH", "uLead", "uFocal", "uTex", "uInk", "uMouse", "uTime"].forEach(n => U[n] = gl.getUniformLocation(prog, n));
+  GLS = { count: idx.length, texPaint: tex(0), texInk: tex(1), U };
+  gl.uniform1i(U.uTex, 0); gl.uniform1i(U.uInk, 1);
+  gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL);
+  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+}
+
+function renderGL() {
+  const U = GLS.U;
+  gl.viewport(0, 0, glCanvas.width, glCanvas.height);
+  gl.clearColor(0.04, 0.04, 0.04, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, GLS.texPaint);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, paint);
+  gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, GLS.texInk);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, inkCv);
+  gl.uniform2f(U.uSize, W, H);
+  gl.uniform1f(U.uPos, mod(posOf(), L.PH * 2));
+  gl.uniform1f(U.uPH, L.PH);
+  gl.uniform1f(U.uLead, leadOf());
+  gl.uniform1f(U.uFocal, 1.35 * Math.max(W, H));
+  gl.uniform2f(U.uMouse, mouseS.x, mouseS.y);
+  gl.uniform1f(U.uTime, T);
+  gl.drawElements(gl.TRIANGLES, GLS.count, gl.UNSIGNED_SHORT, 0);
+}
+
+if (gl) {
+  try { initGL(); }
+  catch (err) { console.warn("WebGL paper off:", err); useFlat(); }
+}
+
+/* ===================================================================
+   loop
+   =================================================================== */
+let last = performance.now();
+function frame(now) {
+  requestAnimationFrame(frame);
+  const raw = (now - last) / 1000, dt = Math.min(0.05, raw); last = now; T += dt;
+  if (introT < 99) { introT += Math.min(raw, 0.25); if (introT > 2.6) introT = 99; }
+
+  hover = mouse.in && !dragging ? hitTest(mouse.x, mouse.y) : null;
+  if (!dragging) { vel *= Math.pow(0.05, dt); scrollY += vel * dt; }
+  if (introT >= 99 && !hover && !dragging) drift += dt * 14;       // the sheet keeps sliding a little
+  if (hover) hover = hitTest(mouse.x, mouse.y);
+  wall.classList.toggle("on-item", !!hover && !dragging);
+
+  const key = hover ? `${hover.pi}:${hover.e.wi}` : "";
+  if (key !== hoverKey) {
+    hoverKey = key; wipe = 0;
+    const wi = hover ? hover.e.wi : -1;
+    if (wi >= 0 && wi !== hoverWi) {
+      const rec = requestDecal(wi);
+      if (rec !== decal) { decal = rec; inkDark = 0; inkLight = 0; }
+      labelWi = wi; labelA = 0;
+    }
+    hoverWi = wi;
+  }
+  wipe = Math.min(1, wipe + dt * 5);
+  labelA = hoverWi >= 0 ? Math.min(1, labelA + dt * 5) : Math.max(0, labelA - dt * 4);
+  // the two inks come in one after the other, and lift together
+  if (hoverWi >= 0 && decal && decal.state === "ready") {
+    inkLight = Math.min(1, inkLight + dt / 0.28);
+    if (inkLight > 0.55) inkDark = Math.min(1, inkDark + dt / 0.3);
+  } else {
+    inkDark = Math.max(0, inkDark - dt / 0.22); inkLight = Math.max(0, inkLight - dt / 0.22);
+  }
+  if (decal && decal.state === "ready" && decal.art.raw) {
+    const r = decalRect(decal.art);
+    if (rawImg.src !== decal.art.img.src) {
+      rawImg.src = decal.art.img.src;
+      rawImg.style.filter = DARK[firstMedia(WORKS[decal.wi]).path] ? "grayscale(1) invert(1) contrast(1.35)" : "";
+    }
+    rawEl.style.cssText = `left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;opacity:${Math.max(inkDark, inkLight)}`;
+  } else if (rawEl.style.opacity !== "0") rawEl.style.opacity = "0";
+
+  paintFrame();
+  if (gl) {
+    mouseS.x = lerp(mouseS.x, mouse.in ? mouse.x / W * 2 - 1 : 0, Math.min(1, dt * 3));
+    mouseS.y = lerp(mouseS.y, mouse.in ? 1 - mouse.y / H * 2 : 0, Math.min(1, dt * 3));
+    try { renderGL(); }
+    catch (err) { console.warn("WebGL paper off:", err); useFlat(); }
+  }
+}
+
+/* ===================================================================
+   boot
+   =================================================================== */
+let rT = 0;
+window.addEventListener("resize", () => { clearTimeout(rT); rT = setTimeout(layout, 120); });
+
+const fontsReady = Promise.race([
+  Promise.all([document.fonts.load(`16px "Courier Prime"`), document.fonts.load(`700 16px "Courier Prime"`)]),
+  new Promise(r => setTimeout(r, 1500)),
+]).catch(() => {});
+
+fontsReady.then(() => {
+  layout();
+  requestAnimationFrame(t => { last = t; frame(t); });
+  document.fonts.ready.then(() => layout());
+});
+})();
+</script>
+</body>
+</html>

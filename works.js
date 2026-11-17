@@ -8,18 +8,6 @@
 
 window.FLUXUS_WORKS = [
   {
-    project: "ASTRA JIN · Christmas",
-    client: "Self-initiated",
-    type: "Interactive Web",
-    year: "2026",
-    tags: ["INTERACTION", "WEB"],
-    link: "https://soxmfhvl123.github.io/astrajin/christmas",
-    mediaLink: true,
-    media: [
-      "video:resume/img/OTHERPROJECTS/astrajin/astrajin-christmas_opt.mp4"
-    ]
-  },
-  {
     project: "FVC Records",
     client: "CHUGO.inc",
     type: "Brand Identity + Website",
@@ -31,6 +19,18 @@ window.FLUXUS_WORKS = [
     media: [
       "video:resume/img/OTHERPROJECTS/fvc/fvc-site_opt.mp4",
       "video:resume/img/OTHERPROJECTS/fvc/fvc logo rotate_opt.mp4"
+    ]
+  },
+  {
+    project: "ASTRA JIN · Christmas",
+    client: "Self-initiated",
+    type: "Interactive Web",
+    year: "2026",
+    tags: ["INTERACTION", "WEB"],
+    link: "https://soxmfhvl123.github.io/astrajin/christmas",
+    mediaLink: true,
+    media: [
+      "video:resume/img/OTHERPROJECTS/astrajin/astrajin-christmas_opt.mp4"
     ]
   },
   {
