@@ -8,6 +8,18 @@
 
 window.FLUXUS_WORKS = [
   {
+    project: "Global Design Leadership Association",
+    client: "CLAB",
+    type: "Web Design",
+    year: "2026",
+    link: "https://globaldesignleadership.org/",
+    tags: ["WEB"],
+    mediaLink: true,
+    media: [
+      "video:resume/img/CLAB/CLAB_GLOBAL DESIGN LEADERSHIP/gdla-site-v6_opt.mp4"
+    ]
+  },
+  {
     project: "CP-04",
     type: "3D Film",
     year: "2026",
@@ -171,18 +183,6 @@ window.FLUXUS_WORKS = [
     mediaLink: true,
     media: [
       "video:resume/img/OTHERPROJECTS/DATASTREAM/datastream_opt.mp4"
-    ]
-  },
-  {
-    project: "Global Design Leadership Association",
-    client: "CLAB",
-    type: "Web Design",
-    year: "2026",
-    link: "https://globaldesignleadership.org/",
-    tags: ["WEB"],
-    mediaLink: true,
-    media: [
-      "video:resume/img/CLAB/CLAB_GLOBAL DESIGN LEADERSHIP/gdla-site-v5_opt.mp4"
     ]
   },
   {
