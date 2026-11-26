@@ -8,6 +8,15 @@
 
 window.FLUXUS_WORKS = [
   {
+    project: "CP-04",
+    type: "3D Film",
+    year: "2026",
+    tags: ["3D", "MOTION"],
+    media: [
+      "video:resume/img/OTHERPROJECTS/CP-04/cp-04_opt.mp4"
+    ]
+  },
+  {
     project: "FVC Records",
     client: "CHUGO.inc",
     type: "Brand Identity + Website",
